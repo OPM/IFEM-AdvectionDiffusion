@@ -35,9 +35,7 @@ FIND_PACKAGE(IFEM REQUIRED)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IFEM_CXX_FLAGS}")
 
-INCLUDE_DIRECTORIES(${IFEM_INCLUDES} ../Stokes/Common/Helpers 
-                    ${PROJECT_SOURCE_DIR}/../LinearElasticity
-                    ../Stokes/Common/NavierStokes)
+INCLUDE_DIRECTORIES(${IFEM_INCLUDES} ../Common)
 
 SET(EXECUTABLE_OUTPUT_PATH bin)
 
@@ -48,12 +46,12 @@ IF(NOT WIN32)
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 ENDIF(NOT WIN32)
 
-ADD_SUBDIRECTORY(../Stokes/Common/NavierStokes CommonNavierStokes.dir)
+ADD_SUBDIRECTORY(../Common CommonIFEM.dir)
 
 ADD_EXECUTABLE(AdvectionDiffusion AdvectionDiffusion.C 
                                   AdvectionDiffusionBDF.C
                                   main_AdvectionDiffusion.C)
-TARGET_LINK_LIBRARIES(AdvectionDiffusion ${IFEM_LIBRARIES} CommonNavierStokes)
+TARGET_LINK_LIBRARIES(AdvectionDiffusion ${IFEM_LIBRARIES} CommonIFEM)
 
 ADD_CUSTOM_TARGET(doc doxygen 
                   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
