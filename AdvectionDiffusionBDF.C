@@ -23,21 +23,17 @@
 #include "Vec3Oper.h"
 
 
-AdvectionDiffusionBDF::AdvectionDiffusionBDF (unsigned short int n, int order_,
+AdvectionDiffusionBDF::AdvectionDiffusionBDF (unsigned short int n, int order,
                                               int itg_type, int form) :
   AdvectionDiffusion(n, itg_type == Integrand::STANDARD?NONE:SUPG),
-  order(order_), formulation(form)
+  formulation(form), bdf(order)
 {
   primsol.resize(order);
   velocity.resize(order);
   registerVector("velocity1", &velocity[0]);
-  if (order == 1)
-    bdf[0] = 1.0, bdf[1] = -1.0, ext[0] = 1.0;
-  if (order == 2) {
-    bdf[0] = 3.0/2.0, bdf[1] = -2.0, bdf[2] = 1.0/2.0,
-    ext[0] = 2.0, ext[1] = -1.0;
+  if (order == 2)
     registerVector("velocity2", &velocity[1]);
-  }
+
   registerVector("nut", &nut);
   registerVector("grid velocity", &ux);
 }
@@ -93,9 +89,12 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
     for (int i=0;i<nsd;++i)
       U[i] = Ua[i];
   } else {
-    for (int j=0;j<order;++j)
-      for (size_t i=1;i<=nsd;++i)
-        U[i-1] += ext[j]*elMat.vec[primsol.size()+j].dot(fe.N,i-1,nsd);
+    for (size_t i=1;i<=nsd;++i) {
+      double tmp[2] = {0};
+      for (int j=0; j<bdf.getOrder();++j)
+        tmp[j] = elMat.vec[primsol.size()+j].dot(fe.N,i-1,nsd);
+      U[i-1] = bdf.extrapolate(tmp);
+    }
     if (formulation & SIM::RANS)
       nut += fe.N.dot(elMat.vec[2*primsol.size()])/Pr;
   }
@@ -108,8 +107,8 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
     tau = StabilizationUtils::getTauPt(time.dt, nut, U, fe.G);
 
   double theta=0;
-  for (int t=0;t<order;++t)
-    theta += -bdf[1+t]/time.dt*fe.N.dot(elMat.vec[t]);
+  for (int t=0;t<bdf.getOrder();++t)
+    theta += -bdf.getCoefs()[1+t]/time.dt*fe.N.dot(elMat.vec[t]);
 
   // Integrate source, if defined
   if (source)
@@ -133,7 +132,7 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
       advect *= fe.N(i);
 
       elMat.A[0](i,j) += (nut*laplace+advect+
-                          (bdf[0]/time.dt+react)*fe.N(i)*fe.N(j))*fe.detJxW;
+                          (bdf.getCoefs()[0]/time.dt+react)*fe.N(i)*fe.N(j))*fe.detJxW;
 
       if (stab == SUPG) {
         laplace = 0.0;
@@ -142,7 +141,7 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
           laplace -= fe.d2NdX2(j,k,k);
         }
         elMat.eMs(i,j) += (nut*laplace+advect+
-                           (bdf[0]/time.dt+react)*fe.N(j))*convI;
+                           (bdf.getCoefs()[0]/time.dt+react)*fe.N(j))*convI;
       }
     }
     if (stab == SUPG)

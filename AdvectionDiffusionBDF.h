@@ -16,6 +16,7 @@
 #define _ADVECTIONDIFFUSIONBDF_H
 
 #include "AdvectionDiffusion.h"
+#include "BDF.h"
 #include "ElmMats.h"
 #include "Vec3.h"
 
@@ -33,7 +34,7 @@ public:
   //! \param[in] n Number of spatial dimensions
   //! \param[in] order Temporal order (1,2)
   //! \param[in] stab Integrand formulation
-  AdvectionDiffusionBDF(unsigned short int n = 3, int order_ = 1,
+  AdvectionDiffusionBDF(unsigned short int n = 3, int order = 1,
                         int itg_type_=Integrand::STANDARD,
                         int form = 0);
 
@@ -68,11 +69,14 @@ public:
 
     return Integrand::SECOND_DERIVATIVES | Integrand::G_MATRIX;
   }
+
+  virtual void advanceStep()
+  {
+    bdf.advanceStep();
+  }
 protected:
-  double bdf[3];   //!< BDF coefficients
-  double ext[2];   //!< Extrapolation coefficients
-  int order;       //!< Temporal order (1,2)
-  int formulation; //!< Formulation (STANDARD, RANS, ALE)
+  int formulation;  //!< Formulation (STANDARD, RANS, ALE)
+  BDF bdf;          //!< BDF helper class
 
   Vectors velocity; //!< The advecting velocity field
   Vector  nut;      //!< The turbulent viscosity field

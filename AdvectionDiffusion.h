@@ -102,6 +102,8 @@ public:
     return tauE(el);
   }
 
+  virtual void advanceStep() {}
+
   //! \brief Returns a local integral container for the given element.
   //! \param[in] nen Number of nodes on element
   //! \param[in] neumann Whether or not we are assembling Neumann BC's
