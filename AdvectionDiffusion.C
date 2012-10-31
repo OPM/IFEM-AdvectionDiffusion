@@ -252,7 +252,7 @@ const char* AdvectionDiffusion::getField1Name (size_t i,
                                                const char* prefix) const
 {
   if (i >= 1)
-    return 0;
+    i = 0;
 
   static const char* s[1] = { "theta"};
   if (!prefix)
