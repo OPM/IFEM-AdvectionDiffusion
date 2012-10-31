@@ -108,7 +108,7 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
 
   double theta=0;
   for (int t=0;t<bdf.getOrder();++t)
-    theta += -bdf.getCoefs()[1+t]/time.dt*fe.N.dot(elMat.vec[t]);
+    theta += -bdf[1+t]/time.dt*fe.N.dot(elMat.vec[t]);
 
   // Integrate source, if defined
   if (source)
@@ -132,7 +132,7 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
       advect *= fe.N(i);
 
       elMat.A[0](i,j) += (nut*laplace+advect+
-                          (bdf.getCoefs()[0]/time.dt+react)*fe.N(i)*fe.N(j))*fe.detJxW;
+                          (bdf[0]/time.dt+react)*fe.N(i)*fe.N(j))*fe.detJxW;
 
       if (stab == SUPG) {
         laplace = 0.0;
@@ -141,7 +141,7 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
           laplace -= fe.d2NdX2(j,k,k);
         }
         elMat.eMs(i,j) += (nut*laplace+advect+
-                           (bdf.getCoefs()[0]/time.dt+react)*fe.N(j))*convI;
+                           (bdf[0]/time.dt+react)*fe.N(j))*convI;
       }
     }
     if (stab == SUPG)
