@@ -74,7 +74,7 @@ int runSimulatorStationary(bool adap, char* infile)
   AdaptiveSIM* aSim = 0;
   if (adap) {
     theSim = aSim = new AdaptiveSIM(model);
-    IFEM_cmdOptions.discretization = ASM::LRSpline;
+    IFEM::getOptions().discretization = ASM::LRSpline;
   }
   // Read in model definitions
   if (!theSim->read(infile))
@@ -290,7 +290,7 @@ int main (int argc, char** argv)
   TIMEINTEGRATION tInt = NONE;
   int integrandType = Integrand::STANDARD;
 
-  const LinAlgInit& linalg = LinAlgInit::Init(argc,argv);
+  int myPid = IFEM::Init(argc, argv);
 
   for (i = 1; i < argc; i++)
     if (dummy.parseOldOptions(argc,argv,i))
@@ -320,32 +320,31 @@ int main (int argc, char** argv)
     return 0;
   }
 
-  InitIFEM(argc, argv, linalg.myPid);
   if (adap)
-    IFEM_cmdOptions.discretization = ASM::LRSpline;
+    IFEM::getOptions().discretization = ASM::LRSpline;
 
-  if (linalg.myPid == 0)
+  if (myPid == 0)
   {
     std::cout <<"\n >>> IFEM Advection-Diffusion equation solver <<<"
 	      <<"\n ====================================\n"
 	      <<"\n Executing command:\n";
     for (i = 0; i < argc; i++) std::cout <<" "<< argv[i];
     std::cout <<"\n\nInput file: "<< infile
-	      <<"\nEquation solver: "<< IFEM_cmdOptions.solver
-	      <<"\nNumber of Gauss points: "<< IFEM_cmdOptions.nGauss[0];
-    if (IFEM_cmdOptions.format >= 0)
+	      <<"\nEquation solver: "<< IFEM::getOptions().solver
+	      <<"\nNumber of Gauss points: "<< IFEM::getOptions().nGauss[0];
+    if (IFEM::getOptions().format >= 0)
     {
-      std::cout <<"\nVTF file format: "<< (IFEM_cmdOptions.format ? "BINARY":"ASCII")
-		<<"\nNumber of visualization points: "<< IFEM_cmdOptions.nViz[0];
-      if (ndim > 1) std::cout <<" "<< IFEM_cmdOptions.nViz[1];
-      if (ndim > 2) std::cout <<" "<< IFEM_cmdOptions.nViz[2];
+      std::cout <<"\nVTF file format: "<< (IFEM::getOptions().format ? "BINARY":"ASCII")
+		<<"\nNumber of visualization points: "<< IFEM::getOptions().nViz[0];
+      if (ndim > 1) std::cout <<" "<< IFEM::getOptions().nViz[1];
+      if (ndim > 2) std::cout <<" "<< IFEM::getOptions().nViz[2];
     }
 
-    if (IFEM_cmdOptions.discretization == ASM::Lagrange)
+    if (IFEM::getOptions().discretization == ASM::Lagrange)
       std::cout <<"\nLagrangian basis functions are used";
-    else if (IFEM_cmdOptions.discretization == ASM::Spectral)
+    else if (IFEM::getOptions().discretization == ASM::Spectral)
       std::cout <<"\nSpectral basis functions are used";
-    else if (IFEM_cmdOptions.discretization == ASM::LRSpline)
+    else if (IFEM::getOptions().discretization == ASM::LRSpline)
       std::cout <<"\nLR-spline basis functions are used";
     std::cout << std::endl;
   }
