@@ -13,6 +13,7 @@
 //==============================================================================
 
 #include "AdvectionDiffusionBDF.h"
+#include "CFDenums.h"
 #include "FiniteElement.h"
 #include "Utilities.h"
 #include "ElmMats.h"
@@ -48,7 +49,7 @@ bool AdvectionDiffusionBDF::initElement(const std::vector<int>& MNPC,
                                         LocalIntegral& A)
 {
   size_t nvec   = primsol.size() + velocity.size();
-  if (formulation & SIM::RANS)
+  if (formulation & CFD::RANS)
     nvec++;
 //  if (formulation & SIM::ALE)
 //    nvec++;
@@ -61,7 +62,7 @@ bool AdvectionDiffusionBDF::initElement(const std::vector<int>& MNPC,
       ierr = utl::gather(MNPC,nsd,velocity[i],A.vec[i+primsol.size()]);
   }
 
-  if (formulation & SIM::RANS)
+  if (formulation & CFD::RANS)
     ierr = utl::gather(MNPC,1,nut,A.vec[nvec-1]);
 
   if (ierr == 0)
@@ -95,7 +96,7 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
         tmp[j] = elMat.vec[primsol.size()+j].dot(fe.N,i-1,nsd);
       U[i-1] = bdf.extrapolate(tmp);
     }
-    if (formulation & SIM::RANS)
+    if (formulation & CFD::RANS)
       nut += fe.N.dot(elMat.vec[2*primsol.size()])/Pr;
   }
   double react = 0;
