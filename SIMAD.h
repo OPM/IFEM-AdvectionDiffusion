@@ -154,6 +154,14 @@ public:
     }
   }
 
+  virtual bool preprocess(const std::vector<int>& ignored = std::vector<int>(),
+			  bool fixDup = false)
+  {
+    bool result = Dim::preprocess(ignored, fixDup);
+    AD->setElements(Dim::getNoElms());
+    return result;
+  }
+
   //! \brief Opens a new VTF-file and writes the model geometry to it.
   //! \param[in] fileName File name used to construct the VTF-file name from
   virtual bool saveModel(char* fileName, int& nBlock)

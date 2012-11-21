@@ -68,7 +68,7 @@ enum TIMEINTEGRATION { NONE, BE, BDF2 };
 int runSimulatorStationary(bool adap, char* infile)
 {
   // Create the simulation model
-  SIMAD<Dim>* model = new SIMAD<Dim>(new AdvectionDiffusion(Dim::dimension));
+  SIMAD<Dim>* model = new SIMAD<Dim>(new AdvectionDiffusion(Dim::dimension), true);
 
   SIMinput* theSim = model;
   AdaptiveSIM* aSim = 0;
@@ -76,6 +76,8 @@ int runSimulatorStationary(bool adap, char* infile)
     theSim = aSim = new AdaptiveSIM(model);
     IFEM::getOptions().discretization = ASM::LRSpline;
   }
+
+  utl::profiler->start("Model input");
   // Read in model definitions
   if (!theSim->read(infile))
     return 1;
@@ -120,6 +122,7 @@ int runSimulatorStationary(bool adap, char* infile)
 
   if (adap) {
     aSim->initAdaptor(0,2);
+    aSim->setupProjections();
     bool iterate=true;
     int iStep=1;
     while (iterate) {
@@ -159,8 +162,6 @@ int runSimulatorStationary(bool adap, char* infile)
       std::cout << norm->getName(1,5) << ": " << gNorm[0](1)/gNorm[0](2) << std::endl;
     }
     delete norm;
-
-    utl::profiler->start("Postprocessing");
 
     const char* prefix[pOpt.size()+1];
     prefix[pOpt.size()] = 0;
@@ -223,7 +224,6 @@ int runSimulatorStationary(bool adap, char* infile)
       exporter->dumpTimeLevel();
   }
 
-  utl::profiler->stop("Postprocessing");
   delete exporter;
   delete theSim;
   return 0;
