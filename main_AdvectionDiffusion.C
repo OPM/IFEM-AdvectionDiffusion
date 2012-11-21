@@ -68,7 +68,7 @@ enum TIMEINTEGRATION { NONE, BE, BDF2 };
 int runSimulatorStationary(bool adap, char* infile)
 {
   // Create the simulation model
-  SIMbase* model = new SIMAD<Dim>(new AdvectionDiffusion(Dim::dimension));
+  SIMAD<Dim>* model = new SIMAD<Dim>(new AdvectionDiffusion(Dim::dimension));
 
   SIMinput* theSim = model;
   AdaptiveSIM* aSim = 0;
@@ -116,8 +116,7 @@ int runSimulatorStationary(bool adap, char* infile)
 
   model->initSystem(model->opt.solver,1,1);
   model->setAssociatedRHS(0,0);
-  TimeStep dummy2;
-  model->init(dummy2);
+  model->init();
 
   if (adap) {
     aSim->initAdaptor(0,2);
