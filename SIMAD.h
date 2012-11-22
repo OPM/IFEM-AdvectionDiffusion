@@ -141,7 +141,6 @@ public:
 
   void init()
   {
-    Dim::init(tp);
     AD->setElements(Dim::getNoElms());
 
     // Initialize temperature solution vectors
