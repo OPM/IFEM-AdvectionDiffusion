@@ -238,9 +238,10 @@ int runSimulatorTransient(bool adap, char* infile, TIMEINTEGRATION tIt,
   SIMAD<Dim> model(new AdvectionDiffusionBDF(Dim::dimension, tIt==BE?1:2,
                                              integrandType), true);
 
+  SIMSolver< SIMAD<Dim> > solver(model);
   // Read in model definitions
   utl::profiler->start("Model input");
-  if (!model.read(infile))
+  if (!model.read(infile) || !solver.read(infile))
     return 1;
 
   utl::profiler->stop("Model input");
@@ -264,9 +265,8 @@ int runSimulatorTransient(bool adap, char* infile, TIMEINTEGRATION tIt,
     exporter->registerWriter(new XMLWriter(model.opt.hdf5));
   }
 
-  model.init();
+  model.init(solver.getTimePrm());
 
-  SIMSolver< SIMAD<Dim> > solver(model);
   if (!solver.solveProblem(infile, exporter))
     return 5;
 

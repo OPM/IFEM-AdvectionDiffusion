@@ -122,9 +122,7 @@ public:
             Dim::myVectors[code] = Dim::mySol->getScalarSecSol();
           }
         }
-      } else if (strcasecmp(child->Value(), "timestepping") == 0)
-        tp.parse(child);
-      else
+      } else
         Dim::parse(child);
 
       child = child->NextSiblingElement();
@@ -133,13 +131,16 @@ public:
     return true;
   }
 
-  //! \brief Returns a const reference to the time stepping parameters.
-  const TimeStep& getTimePrm() const { return tp; }
-
   //! \brief Returns the name of this simulator (for use in the HDF5 export).
   virtual std::string getName() const { return "AdvectionDiffusion"; }
 
   void init()
+  {
+    TimeStep dummy;
+    init(dummy);
+  }
+
+  void init(const TimeStep& tp)
   {
     AD->setElements(Dim::getNoElms());
 
@@ -233,7 +234,6 @@ public:
     return temperature[n];
   }
 
-  TimeStep tp;       //!< Time discretization parameters
 protected:
   //! \brief Initializes for integration of Neumann terms for a given property.
   //! \param[in] propInd Physical property index
