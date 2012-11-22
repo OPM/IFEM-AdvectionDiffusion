@@ -49,12 +49,13 @@ bool AdvectionDiffusionBDF::initElement(const std::vector<int>& MNPC,
                                         LocalIntegral& A)
 {
   size_t nvec   = primsol.size() + velocity.size();
+  size_t nfield = nvec;
   if (formulation & CFD::RANS)
-    nvec++;
-//  if (formulation & SIM::ALE)
-//    nvec++;
+    nfield++;
+  if (formulation & CFD::ALE)
+    nfield++;
 
-  A.vec.resize(nvec);
+  A.vec.resize(nfield);
   int ierr = 0;
   for (size_t i = 0; i < primsol.size() && ierr == 0; i++) {
     ierr = utl::gather(MNPC,1,primsol[i],A.vec[i]);
@@ -63,7 +64,10 @@ bool AdvectionDiffusionBDF::initElement(const std::vector<int>& MNPC,
   }
 
   if (formulation & CFD::RANS)
-    ierr = utl::gather(MNPC,1,nut,A.vec[nvec-1]);
+    ierr = utl::gather(MNPC,1,nut,A.vec[nvec++]);
+
+  if (formulation & CFD::ALE)
+    ierr = utl::gather(MNPC,nsd,nut,A.vec[nvec++]);
 
   if (ierr == 0)
     return true;
@@ -96,8 +100,13 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
         tmp[j] = elMat.vec[primsol.size()+j].dot(fe.N,i-1,nsd);
       U[i-1] = bdf.extrapolate(tmp);
     }
+    size_t nvec = primsol.size() + velocity.size();
     if (formulation & CFD::RANS)
-      nut += fe.N.dot(elMat.vec[2*primsol.size()])/Pr;
+      nut += fe.N.dot(elMat.vec[nvec++])/Pr;
+    if (formulation & CFD::ALE) {
+      for (size_t i=1;i<=nsd;++i)
+        U(i) -= elMat.vec[nvec++].dot(fe.N,i-1,nsd);
+    }
   }
   double react = 0;
   if (reaction)
