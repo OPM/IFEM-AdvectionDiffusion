@@ -16,6 +16,7 @@
 #include "SIM3D.h"
 #include "SIMAD.h"
 #include "SIMExplicitRK.h"
+#include "SIMExplicitRKE.h"
 #include "SIMSolver.h"
 #include "AdvectionDiffusionBDF.h"
 #include "AdvectionDiffusionExplicit.h"
@@ -282,6 +283,12 @@ int runSimulatorTransient(char* infile, TimeIntegration::Method tIt,
                                                integrandType), true);
     return runSimulatorTransientImpl<SIMAD<Dim>, SIMAD<Dim> >(infile, tIt,
                                                               model, model);
+  } else if (tIt >= TimeIntegration::HEUNEULER) {
+    SIMAD<Dim> model(new AdvectionDiffusionExplicit(Dim::dimension,
+                                                    integrandType), true);
+    TimeIntegration::SIMExplicitRKE<SIMAD<Dim> > sim(model, tIt);
+    return runSimulatorTransientImpl<TimeIntegration::SIMExplicitRKE<SIMAD<Dim> >, 
+                                     SIMAD<Dim> >(infile, tIt, sim, model);
   } else {
     SIMAD<Dim> model(new AdvectionDiffusionExplicit(Dim::dimension,
                                                     integrandType), true);
@@ -325,6 +332,12 @@ int main (int argc, char** argv)
       tInt = TimeIntegration::EULER;
     else if (!strcmp(argv[i],"-heun"))
       tInt = TimeIntegration::HEUN;
+    else if (!strcmp(argv[i],"-heuneuler"))
+      tInt = TimeIntegration::HEUNEULER;
+    else if (!strcmp(argv[i],"-bs"))
+      tInt = TimeIntegration::BOGACKISHAMPINE;
+    else if (!strcmp(argv[i],"-fehlberg"))
+      tInt = TimeIntegration::FEHLBERG;
     else if (!strcmp(argv[i],"-rk3"))
       tInt = TimeIntegration::RK3;
     else if (!strcmp(argv[i],"-rk4"))
