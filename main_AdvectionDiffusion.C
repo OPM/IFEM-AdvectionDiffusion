@@ -15,8 +15,10 @@
 #include "SIM2D.h"
 #include "SIM3D.h"
 #include "SIMAD.h"
+#include "SIMExplicitRK.h"
 #include "SIMSolver.h"
 #include "AdvectionDiffusionBDF.h"
+#include "AdvectionDiffusionExplicit.h"
 
 #include "IFEM.h"
 #include "LinAlgInit.h"
@@ -61,8 +63,6 @@
   \arg -BE : Time dependent (BE) simulation
   \arg -BDF2 : Time dependent (BDF2) simulation
 */
-
-enum TIMEINTEGRATION { NONE, BE, BDF2 };
 
   template<class Dim>
 int runSimulatorStationary(bool adap, char* infile)
@@ -230,15 +230,11 @@ int runSimulatorStationary(bool adap, char* infile)
 }
 
 
-  template<class Dim>
-int runSimulatorTransient(bool adap, char* infile, TIMEINTEGRATION tIt,
-                          int integrandType)
+  template<class Solver, class AD>
+int runSimulatorTransientImpl(char* infile, TimeIntegration::Method tIt,
+                              Solver& sim, AD& model)
 {
-  // Create the simulation model
-  SIMAD<Dim> model(new AdvectionDiffusionBDF(Dim::dimension, tIt==BE?1:2,
-                                             integrandType), true);
-
-  SIMSolver< SIMAD<Dim> > solver(model);
+  SIMSolver<Solver> solver(sim);
   // Read in model definitions
   utl::profiler->start("Model input");
   if (!model.read(infile) || !solver.read(infile))
@@ -257,7 +253,8 @@ int runSimulatorTransient(bool adap, char* infile, TIMEINTEGRATION tIt,
   DataExporter* exporter=NULL;
   if (model.opt.dumpHDF5(infile))
   {
-    exporter = new DataExporter(true);
+    exporter = new DataExporter(true, model.getDumpInterval(),
+                                TimeIntegration::Steps(tIt));
     exporter->registerField("theta","temperature",DataExporter::SIM,
                             DataExporter::PRIMARY);
     exporter->setFieldValue("theta", &model, &model.getSolution());
@@ -275,6 +272,28 @@ int runSimulatorTransient(bool adap, char* infile, TIMEINTEGRATION tIt,
 }
 
 
+  template<class Dim>
+int runSimulatorTransient(char* infile, TimeIntegration::Method tIt,
+                          int integrandType)
+{
+  if (tIt == TimeIntegration::BE || tIt == TimeIntegration::BDF2) {
+    SIMAD<Dim> model(new AdvectionDiffusionBDF(Dim::dimension,
+                                               tIt==TimeIntegration::BE?1:2,
+                                               integrandType), true);
+    return runSimulatorTransientImpl<SIMAD<Dim>, SIMAD<Dim> >(infile, tIt,
+                                                              model, model);
+  } else {
+    SIMAD<Dim> model(new AdvectionDiffusionExplicit(Dim::dimension,
+                                                    integrandType), true);
+    TimeIntegration::SIMExplicitRK<SIMAD<Dim> > sim(model, tIt);
+    return runSimulatorTransientImpl<TimeIntegration::SIMExplicitRK<SIMAD<Dim> >, 
+                                     SIMAD<Dim> >(infile, tIt, sim, model);
+  }
+
+  return 1; // should not be here
+}
+
+
 int main (int argc, char** argv)
 {
   Profiler prof(argv[0]);
@@ -286,7 +305,7 @@ int main (int argc, char** argv)
   char* infile = 0;
   bool adap = false;
   int ndim = 3;
-  TIMEINTEGRATION tInt = NONE;
+  TimeIntegration::Method tInt = TimeIntegration::NONE;
   int integrandType = Integrand::STANDARD;
 
   int myPid = IFEM::Init(argc, argv);
@@ -299,9 +318,17 @@ int main (int argc, char** argv)
     else if (!strcmp(argv[i],"-2D"))
       ndim = 2;
     else if (!strcmp(argv[i],"-be"))
-      tInt = BE;
+      tInt = TimeIntegration::BE;
     else if (!strcmp(argv[i],"-bdf2"))
-      tInt = BDF2;
+      tInt = TimeIntegration::BDF2;
+    else if (!strcmp(argv[i],"-euler"))
+      tInt = TimeIntegration::EULER;
+    else if (!strcmp(argv[i],"-heun"))
+      tInt = TimeIntegration::HEUN;
+    else if (!strcmp(argv[i],"-rk3"))
+      tInt = TimeIntegration::RK3;
+    else if (!strcmp(argv[i],"-rk4"))
+      tInt = TimeIntegration::RK4;
     else if (!strcmp(argv[i],"-supg"))
       integrandType = Integrand::SECOND_DERIVATIVES|Integrand::G_MATRIX;
     else if (!infile)
@@ -349,16 +376,16 @@ int main (int argc, char** argv)
   }
   utl::profiler->stop("Initialization");
 
-  if (tInt == NONE) {
+  if (tInt == TimeIntegration::NONE) {
     if (ndim == 2)
       return runSimulatorStationary<SIM2D>(adap, infile);
     if (ndim == 3)
-      return runSimulatorStationary<SIM2D>(adap, infile);
+      return runSimulatorStationary<SIM3D>(adap, infile);
   } else {
     if (ndim == 2)
-      return runSimulatorTransient<SIM2D>(adap, infile, tInt, integrandType);
+      return runSimulatorTransient<SIM2D>(infile, tInt, integrandType);
     if (ndim == 3)
-      return runSimulatorTransient<SIM2D>(adap, infile, tInt, integrandType);
+      return runSimulatorTransient<SIM3D>(infile, tInt, integrandType);
   }
 
   return 1; // Should not be here

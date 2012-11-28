@@ -50,6 +50,7 @@ ADD_SUBDIRECTORY(../Common CommonIFEM.dir)
 
 ADD_EXECUTABLE(AdvectionDiffusion AdvectionDiffusion.C 
                                   AdvectionDiffusionBDF.C
+                                  AdvectionDiffusionExplicit.C
                                   main_AdvectionDiffusion.C)
 TARGET_LINK_LIBRARIES(AdvectionDiffusion ${IFEM_LIBRARIES} CommonIFEM)
 

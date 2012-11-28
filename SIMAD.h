@@ -16,6 +16,7 @@
 
 #include "AdvectionDiffusion.h"
 
+#include "AlgEqSystem.h"
 #include "AnaSol.h"
 #include "Functions.h"
 #include "Profiler.h"
@@ -179,7 +180,7 @@ public:
     for (int n = nNusols-1; n > 0; n--)
       temperature[n] = temperature[n-1];
 
-    return !standalone || tp.increment();
+    return true;
   }
 
   //! \brief Computes the solution for the current time step.
@@ -189,6 +190,9 @@ public:
 
     if (Dim::myPid == 0 && Dim::msgLevel >= 0 && standalone)
       std::cout <<"\n  step = "<< tp.step <<"  time = "<< tp.time.t << std::endl;
+
+    Vector dummy;
+    this->updateDirichlet(tp.time.t, &dummy);
 
     if (!this->assembleSystem(tp.time, temperature))
       return false;
@@ -227,6 +231,11 @@ public:
                                   tp.time.t, true, "temperature", 89);
 
     return (!standalone || this->writeGlvStep(iDump, tp.time.t)) && result;
+  }
+
+  Vector& getSolution(int n=0)
+  {
+    return temperature[n];
   }
 
   const Vector& getSolution(int n=0) const
