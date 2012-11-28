@@ -75,8 +75,8 @@ public:
     bdf.advanceStep();
   }
 protected:
-  int formulation;  //!< Formulation (STANDARD, RANS, ALE)
-  BDF bdf;          //!< BDF helper class
+  int formulation;           //!< Formulation (STANDARD, RANS, ALE)
+  TimeIntegration::BDF bdf;  //!< BDF helper class
 
   Vectors velocity; //!< The advecting velocity field
   Vector  nut;      //!< The turbulent viscosity field
