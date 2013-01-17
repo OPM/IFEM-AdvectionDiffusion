@@ -38,6 +38,15 @@ AdvectionDiffusion::~AdvectionDiffusion()
 }
 
 
+int AdvectionDiffusion::getIntegrandType () const
+{
+  if (stab == NONE)
+    return STANDARD;
+
+  return SECOND_DERIVATIVES | ELEMENT_CORNERS;
+}
+
+
 LocalIntegral* AdvectionDiffusion::getLocalIntegral (size_t nen, size_t,
                                                      bool neumann) const
 {
@@ -68,31 +77,28 @@ LocalIntegral* AdvectionDiffusion::getLocalIntegral (size_t nen, size_t,
 // define quadratic bubble functions
 static Vector bubblederivative(const FiniteElement& E, const Vec3& X)
 {
-  Vector value;
-  value.resize(5);
+  Vector value(5);
   double v[2], dv[2], sv[2];
 
-  for (size_t i = 0; i < 2; i++) {  
+  for (size_t i = 0; i < 2; i++)
     if ((X[i] > E.XC[0][i]) && (X[i] < E.XC[3][i])) {
 
-      v[i] = (X[i]-E.XC[0][i])*(E.XC[3][i]-X[i-1])/
+      v[i] = (X[i]-E.XC[0][i])*(E.XC[3][i]-X[i])/
              ((E.XC[3][i]-E.XC[0][i])*(E.XC[3][i]-E.XC[0][i]));
 
-      dv[i] = (E.XC[0][i]+E.XC[3][i]-2*X[i-1])/
+      dv[i] = (E.XC[0][i]+E.XC[3][i]-2*X[i])/
               ((E.XC[3][i]-E.XC[0][i])*(E.XC[3][i]-E.XC[0][i]));
 
       sv[i] = -2/((E.XC[3][i]-E.XC[0][i])*(E.XC[3][i]-E.XC[0][i]));
-    } else {
-      v[i]=0;
-      dv[i]=0;
-      sv[i]=0;
     }
-  }
+    else
+      v[i] = dv[i] = sv[i] = 0.0;
+
   value[0] = v[0]*v[1];
   value[1] = dv[0]*v[1];
   value[2] = v[0]*dv[1];
   value[3] = sv[0]*v[0];
-  value[4] = v[0]*sv[1];  
+  value[4] = v[0]*sv[1];
 
   return value;
 }
@@ -114,6 +120,7 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
   double f = 0.f;
   if (source)
     f = (*source)(X);
+
   if (!elMat.A.empty()) {
     // evaluate reaction field
     double react = 0.f;
@@ -192,6 +199,7 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
       }
     }
   }
+
   // Integrate source, if defined
   if (source)
     elMat.b.front().add(fe.N,f*fe.detJxW);
@@ -282,8 +290,8 @@ const char* AdvectionDiffusion::getField2Name (size_t i,
 }
 
 
-bool AdvectionDiffusion::finalizeElement(LocalIntegral& A, 
-                                        const TimeDomain&, size_t)
+bool AdvectionDiffusion::finalizeElement (LocalIntegral& A,
+                                          const TimeDomain&, size_t)
 {
   if (stab != NONE) {
     ElementInfo& E = static_cast<ElementInfo&>(A);
@@ -410,7 +418,7 @@ size_t AdvectionDiffusionNorm::getNoFields (int fld) const
 
 LocalIntegral* AdvectionDiffusionNorm::getLocalIntegral (size_t nen, size_t iEl,
                                                          bool neumann) const
-{ 
+{
   LocalIntegral* result = NormBase::getLocalIntegral(nen,iEl,neumann);
   if (result) {
     ADElmNorm* norm = new ADElmNorm(static_cast<ElmNorm&>(*result));
@@ -427,7 +435,7 @@ LocalIntegral* AdvectionDiffusionNorm::getLocalIntegral (size_t nen, size_t iEl,
   ADElmNorm* r2 = new ADElmNorm(nNorms);
   r2->iEl = iEl;
   return r2;
-}   
+}
 
 
 /*!
@@ -512,9 +520,9 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
   pnorm[norm++] += h*h*residualNorm(val, U, grad, hess,
                                     problem.kappa, f, react)*fe.detJxW;
   pnorm[norm++] += H1Norm(grad)*fe.detJxW;
-  
+
   double eVal;
-  Vec3 eGrad;   
+  Vec3 eGrad;
   if (phi && gradPhi) {
     eVal = (*phi)(X);
     eGrad = (*gradPhi)(X);
@@ -535,7 +543,7 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
     pnorm[norm++] += H1Norm(grad-rGrad)*fe.detJxW;
 
     if (phi && gradPhi) {
-      pnorm[norm++] += H1Norm(eGrad-rGrad)*fe.detJxW;   
+      pnorm[norm++] += H1Norm(eGrad-rGrad)*fe.detJxW;
       norm++; // effectivity index
     }
   }
@@ -566,8 +574,8 @@ bool AdvectionDiffusionNorm::finalizeElement (LocalIntegral& elmInt,
 }
 
 
-const char* AdvectionDiffusionNorm::getName(size_t i, size_t j,
-                                            const char* prefix)
+const char* AdvectionDiffusionNorm::getName (size_t i, size_t j,
+                                             const char* prefix) const
 {
   static const char* s[5] = {
     "R(u^h)",
@@ -584,9 +592,7 @@ const char* AdvectionDiffusionNorm::getName(size_t i, size_t j,
     "eff index, H1"
   };
 
-  const char** n = s;
-  if (i >= 2)
-    n = p;
+  const char** n = i > 1 ? p : s;
 
   if (!prefix)
     return n[j-1];
@@ -596,4 +602,4 @@ const char* AdvectionDiffusionNorm::getName(size_t i, size_t j,
   name += n[j-1];
 
   return name.c_str();
-} 
+}

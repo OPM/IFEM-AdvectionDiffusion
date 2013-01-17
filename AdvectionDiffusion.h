@@ -21,7 +21,6 @@
 
 /*!
   \brief Class representing the integrand of the Advection-Diffusion problem.
-  \details The blah. 
 */
 
 class AdvectionDiffusion : public IntegrandBase
@@ -31,19 +30,18 @@ public:
 
   //! \brief The default constructor initializes all pointers to zero.
   //! \param[in] n Number of spatial dimensions
-  AdvectionDiffusion(unsigned short int n = 3,
-                     Stabilization stab=NONE);
+  //! \param[in] stab Stabilization option
+  AdvectionDiffusion(unsigned short int n = 3, Stabilization stab = NONE);
 
   class ElementInfo : public ElmMats
   {
     public:
-      //! \brief Default constructor
+      //! \brief Default constructor.
       ElementInfo() {}
-      
-      //! \brief Empty destructor
+      //! \brief Empty destructor.
       virtual ~ElementInfo() {}
 
-      //! \brief Return the stabilization parameter
+      //! \brief Returns the stabilization parameter.
       double getTau(double kappa, double Cinv) const;
 
       Matrix eMs; //!< Stabilized matrix
@@ -51,7 +49,7 @@ public:
       Vector Cv;  //!< velocity + area
       double eBl; //!< a(b_1^e, b_2^e)-bilinear term using quadratic bubble as trial and test functions
       double eBu; //!< b_1^e*\int_K b_2^e d\Omega -where new stabilization can be defined as \tau=eBu/eBl (assuming element residual is constant)
-    
+
       double hk;  //!< element size
       size_t iEl; //!< element index
   };
@@ -59,50 +57,40 @@ public:
   //! \brief Empty destructor.
   virtual ~AdvectionDiffusion();
 
-  //! \brief Defines the source function
+  //! \brief Defines the source function.
   void setSource(RealFunc* src) { source = src; }
 
-  //! \brief Set the Cinv stabilization parameter
+  //! \brief Defines the Cinv stabilization parameter.
   void setCinv(double Cinv_) { Cinv = Cinv_; }
 
-  //! \brief Set kappa
+  //! \brief Defines kappa.
   void setKappa(double kappa_) { kappa = kappa_; }
 
-  //! \brief Set the stabilization type
+  //! \brief Defines the stabilization type.
   void setStabilization(Stabilization s) { stab = s; }
 
-  //! \brief Defines the advection field 
+  //! \brief Defines the advection field.
   void setAdvectionField(VecFunc* U) { Uad = U; }
 
-  //! \brief Defines the flux function
+  //! \brief Defines the flux function.
   void setFlux(RealFunc* f) { flux = f; }
 
   //! \brief Defines the reaction field
   void setReactionField(RealFunc* f) { reaction = f; }
 
-  //! \brief Set the global number of elements
-  void setElements(size_t els)
-  {
-    tauE.resize(els);
-  }
+  //! \brief Defines the global number of elements.
+  void setElements(size_t els) { tauE.resize(els); }
 
-  void setPrandtlNumber(double Pr_)
-  {
-    Pr = Pr_;
-  }
+  //! \brief Defines the Prandtl number.
+  void setPrandtlNumber(double Pr_) { Pr = Pr_; }
 
   //! \brief Returns a previously calculated tau value for the given element.
-  //! \brief param[in] el The element number
-  //!\details Used with norm calculations
-  double getElementTau(size_t el)
-  {
-    if (el > tauE.size())
-      return 0;
+  //! \brief param[in] e The element number
+  //! \details Used with norm calculations
+  double getElementTau(size_t e) const { return e > tauE.size() ? 0 : tauE(e); }
 
-    return tauE(el);
-  }
-
-  virtual void advanceStep() {}
+  //! \brief Defines which FE quantities are needed by the integrand.
+  virtual int getIntegrandType() const;
 
   //! \brief Returns a local integral container for the given element.
   //! \param[in] nen Number of nodes on element
@@ -162,20 +150,6 @@ public:
   //! \param[in] prefix Name prefix for all components
   virtual const char* getField2Name(size_t i, const char* prefix = 0) const;
 
-  virtual int getIntegrandType() const
-  { 
-    if (stab == NONE)
-      return Integrand::STANDARD;
-
-    return Integrand::SECOND_DERIVATIVES |
-           Integrand::ELEMENT_CORNERS;
-  }
-
-  //! \brief Returns characteristic element size
-  //! \param XC The element corner coordinates
-  //! \details The size is taken as the longest diagonal 
-  double getElementSize(const std::vector<Vec3>& XC) const;
-
   //! \brief Returns a pointer to an Integrand for solution norm evaluation.
   //! \note The Integrand object is allocated dynamically and has to be deleted
   //! manually when leaving the scope of the pointer variable receiving the
@@ -183,15 +157,22 @@ public:
   //! \param[in] asol Pointer to analytical solution (optional)
   virtual NormBase* getNormIntegrand(AnaSol* asol = 0) const;
 
+  //! \brief Returns characteristic element size.
+  //! \param XC The element corner coordinates
+  //! \details The size is taken as the longest diagonal.
+  double getElementSize(const std::vector<Vec3>& XC) const;
+
+public:
   VecFunc* Uad; //!< Pointer to advection field
   RealFunc* reaction; //<!< Pointer to the reaction field
   RealFunc* source; //!< Pointer to source
   unsigned short int nsd; //!< Number of space dimensions (1, 2 or, 3)
   double kappa; //!< diffusion coefficient
   double Pr;     //!< Prandtl number
+
 protected:
-  RealFunc* flux; //<!< Pointer to the flux field
-  Vector tauE;     //<!< Stored tau values - need for norm integration
+  RealFunc* flux; //!< Pointer to the flux field
+  Vector tauE;     //!< Stored tau values - need for norm integration
 
   Stabilization stab; //!< The type of stabilization used
 
@@ -208,13 +189,14 @@ class AdvectionDiffusionNorm : public NormBase
 public:
   //! \brief The only constructor initializes its data members.
   //! \param[in] p The Advection-Diffusion problem to evaluate norms for
-  AdvectionDiffusionNorm(AdvectionDiffusion& p, RealFunc* u=0,
-                                                VecFunc*  du=0);
+  //! \param[in] u Analytical solution field
+  //! \param[in] du Analytical gradient field
+  AdvectionDiffusionNorm(AdvectionDiffusion& p, RealFunc* u=0, VecFunc* du=0);
   //! \brief Empty destructor.
   virtual ~AdvectionDiffusionNorm() {}
 
-  //! \brief Returns whether this norm has explicit boundary contributions.
-  virtual bool hasBoundaryTerms() const { return false; }
+  //! \brief Defines which FE quantities are needed by the integrand.
+  virtual int getIntegrandType() const { return myProblem.getIntegrandType(); }
 
   //! \brief Returns a local integral container for the given element.
   //! \param[in] nen Number of nodes on element
@@ -231,11 +213,6 @@ public:
                            const Vec3& Xc, size_t nPt,
                            LocalIntegral& elmInt);
 
-  //! \brief Returns the number of norm quantities.
-  //! \param[in] fld If 1, the number of exact norms of the exact solution,
-  //                 else the number of norms for FE fields
-  virtual size_t getNoFields(int fld=0) const;
-
   //! \brief Evaluates the integrand at an interior point.
   //! \param elmInt The local integral object to receive the contributions
   //! \param[in] fe Finite element data of current integration point
@@ -243,26 +220,25 @@ public:
   virtual bool evalInt(LocalIntegral& elmInt, const FiniteElement& fe,
 		       const Vec3& X) const;
 
-
   //! \brief Finalizes the element norms after the numerical integration.
   //! \details This method is used to compute effectivity indices.
   //! \param elmInt The local integral object to receive the contributions
   virtual bool finalizeElement(LocalIntegral& elmInt, const TimeDomain&,size_t);
 
-  virtual int getIntegrandType() const
-  {
-    return myProblem.getIntegrandType();
-  }
+  //! \brief Returns the number of norm groups or size of a specified group.
+  //! \param[in] group The norm group to return the size of
+  //! (if zero, return the number of groups)
+  virtual size_t getNoFields(int group = 0) const;
 
-  const char* getName(size_t i, size_t j, const char* prefix);
+  //! \brief Returns the name of a norm quantity.
+  //! \param[in] i The norm group (one-based index)
+  //! \param[in] j The norm number (one-based index)
+  //! \param[in] prefix Common prefix for all norm names
+  const char* getName(size_t i, size_t j, const char* prefix) const;
 
-  bool hasElementContributions(size_t i, size_t j)
-  {
-    return true;
-  }
 protected:
-  RealFunc* phi;
-  VecFunc*  gradPhi;
+  RealFunc* phi;      //!< Analytical solution field
+  VecFunc*  gradPhi;  //!< Analytical gradient field
 };
 
 #endif
