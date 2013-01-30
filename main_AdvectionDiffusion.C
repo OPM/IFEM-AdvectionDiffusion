@@ -7,11 +7,12 @@
 //!
 //! \author Arne Morten Kvarving / SINTEF
 //!
-//! \brief Main program for the isogeometric solver for the Advection-Diffusion equation.
+//! \brief Main program for the isogeometric solver for the Advection-Diffusion
+//! equation.
 //!
 //==============================================================================
 
-#include "AdaptiveSIM.h"
+#include "IFEM.h"
 #include "SIM2D.h"
 #include "SIM3D.h"
 #include "SIMAD.h"
@@ -20,12 +21,9 @@
 #include "SIMSolver.h"
 #include "AdvectionDiffusionBDF.h"
 #include "AdvectionDiffusionExplicit.h"
-
-#include "IFEM.h"
-#include "LinAlgInit.h"
+#include "AdaptiveSIM.h"
 #include "HDF5Writer.h"
 #include "XMLWriter.h"
-#include "TimeStep.h"
 #include "Utilities.h"
 #include "Profiler.h"
 #include <stdlib.h>
@@ -34,7 +32,7 @@
 
 
 /*!
-  \brief Main program for the NURBS-based isogeometric Advection-Diffusion equation solver.
+  \brief Main program for the isogeometric Advection-Diffusion equation solver.
 
   The input to the program is specified through the following
   command-line arguments. The arguments may be given in arbitrary order.
@@ -55,12 +53,8 @@
   \arg -nv \a nv : Number of visualization points per knot-span in v-direction
   \arg -nw \a nw : Number of visualization points per knot-span in w-direction
   \arg -hdf5 : Write primary and projected secondary solution to HDF5 file
-  \arg -ignore \a p1, \a p2, ... : Ignore these patches in the analysis
-  \arg -check : Data check only, read model and output to VTF (no solution)
-  \arg -checkRHS : Check that the patches are modelled in a right-hand system
-  \arg -vizRHS : Save the right-hand-side load vector on the VTF-file
-  \arg -fixDup : Resolve co-located nodes by merging them into a single node
   \arg -2D : Use two-parametric simulation driver
+  \arg -adap : Use adaptive simulation driver with LR-splines discretization
   \arg -BE : Time dependent (BE) simulation
   \arg -BDF2 : Time dependent (BDF2) simulation
 */
@@ -95,7 +89,7 @@ int runSimulatorStationary(bool adap, char* infile)
   // Set default projection method (tensor splines only)
   if (model->opt.discretization < ASM::Spline)
     pOpt.clear(); // No projection if Lagrange/Spectral
-  else if (model->opt.discretization == ASM::Spline || model->opt.discretization == ASM::LRSpline)
+  else if (model->opt.discretization == ASM::Spline && pOpt.empty())
     pOpt[SIMoptions::GLOBAL] = "Greville point projection";
 
   model->setQuadratureRule(model->opt.nGauss[0],true);
@@ -124,16 +118,14 @@ int runSimulatorStationary(bool adap, char* infile)
   if (adap) {
     aSim->initAdaptor(0,2);
     aSim->setupProjections();
-    bool iterate=true;
-    int iStep=1;
-    while (iterate) {
+    do {
       if (!aSim->solveStep(infile,iStep))
         return 5;
       if (!aSim->writeGlv(infile,iStep,nBlock,2))
         return 6;
-      iterate = aSim->adaptMesh(++iStep);
-    }
-  } else {
+    } while (aSim->adaptMesh(++iStep));
+  }
+  else {
     if (!model->assembleSystem())
       return 2;
 
@@ -142,12 +134,11 @@ int runSimulatorStationary(bool adap, char* infile)
       return 3;
 
     // Project onto the splines basis
-    for (pit = pOpt.begin(); pit != pOpt.end(); pit++) {
+    for (pit = pOpt.begin(); pit != pOpt.end(); pit++)
       if (!model->project(ssol,sol,pit->first))
         return 4;
       else
         projs.push_back(ssol);
-    }
 
     model->setMode(SIM::RECOVERY);
     model->setQuadratureRule(model->opt.nGauss[1]);
@@ -164,17 +155,15 @@ int runSimulatorStationary(bool adap, char* infile)
     }
     delete norm;
 
-    const char* prefix[pOpt.size()+1];
-    prefix[pOpt.size()] = 0;
-
+    const char* prefix[pOpt.size()];
     size_t j=0;
     for (pit = pOpt.begin(); pit != pOpt.end(); pit++)
       prefix[j++] = pit->second.c_str();
 
-    // Print the norms 
+    // Print the norms
     for ( j=1, pit = pOpt.begin(); pit != pOpt.end() && j<=gNorm[0].size(); pit++, j++)
     {
-      std::cout <<"\n\n>>> Error estimates based on "<< pit->second<<"" <<" <<<";
+      std::cout <<"\n\n>>> Error estimates based on "<< pit->second <<" <<<";
 
       std::cout <<"\n |e|_H^1, e=u^r-u^h : " <<gNorm[j](2);
       if (model->haveAnaSol() && j <= gNorm.size())
@@ -183,7 +172,6 @@ int runSimulatorStationary(bool adap, char* infile)
         std::cout <<"\nEffectivity index             : "<< gNorm[j](2)/gNorm[0](3)<<std::endl;
       }
     }
-    
 
     if (model->opt.format >= 0)
     {
@@ -287,13 +275,13 @@ int runSimulatorTransient(char* infile, TimeIntegration::Method tIt,
     SIMAD<Dim> model(new AdvectionDiffusionExplicit(Dim::dimension,
                                                     integrandType), true);
     TimeIntegration::SIMExplicitRKE<SIMAD<Dim> > sim(model, tIt);
-    return runSimulatorTransientImpl<TimeIntegration::SIMExplicitRKE<SIMAD<Dim> >, 
+    return runSimulatorTransientImpl<TimeIntegration::SIMExplicitRKE<SIMAD<Dim> >,
                                      SIMAD<Dim> >(infile, tIt, sim, model);
   } else {
     SIMAD<Dim> model(new AdvectionDiffusionExplicit(Dim::dimension,
                                                     integrandType), true);
     TimeIntegration::SIMExplicitRK<SIMAD<Dim> > sim(model, tIt);
-    return runSimulatorTransientImpl<TimeIntegration::SIMExplicitRK<SIMAD<Dim> >, 
+    return runSimulatorTransientImpl<TimeIntegration::SIMExplicitRK<SIMAD<Dim> >,
                                      SIMAD<Dim> >(infile, tIt, sim, model);
   }
 
@@ -307,11 +295,9 @@ int main (int argc, char** argv)
   utl::profiler->start("Initialization");
 
   SIMoptions dummy;
-  std::vector<int> ignoredPatches;
-  int  i;
   char* infile = 0;
   bool adap = false;
-  int ndim = 3;
+  int i, ndim = 3;
   TimeIntegration::Method tInt = TimeIntegration::NONE;
   int integrandType = Integrand::STANDARD;
 
@@ -343,7 +329,7 @@ int main (int argc, char** argv)
     else if (!strcmp(argv[i],"-rk4"))
       tInt = TimeIntegration::RK4;
     else if (!strcmp(argv[i],"-supg"))
-      integrandType = Integrand::SECOND_DERIVATIVES|Integrand::G_MATRIX;
+      integrandType = Integrand::SECOND_DERIVATIVES | Integrand::G_MATRIX;
     else if (!infile)
       infile = argv[i];
     else
@@ -353,7 +339,7 @@ int main (int argc, char** argv)
   {
     std::cout <<"usage: "<< argv[0]
 	      <<" <inputfile> [-dense|-spr|-superlu[<nt>]|-samg|-petsc]\n      "
-	      <<" [-lag|-spec|-LR] [-2D] [-nGauss <n>]"
+	      <<" [-lag|-spec|-LR] [-2D] [-adap] [-nGauss <n>]"
 	      <<"\n       [-vtf <format> [-nviz <nviz>]"
 	      <<" [-nu <nu>] [-nv <nv>] [-nw <nw>]] [-hdf5]\n";
     return 0;
@@ -364,26 +350,27 @@ int main (int argc, char** argv)
 
   if (myPid == 0)
   {
+    const SIMoptions& opts = IFEM::getOptions();
     std::cout <<"\n >>> IFEM Advection-Diffusion equation solver <<<"
 	      <<"\n ====================================\n"
 	      <<"\n Executing command:\n";
     for (i = 0; i < argc; i++) std::cout <<" "<< argv[i];
     std::cout <<"\n\nInput file: "<< infile
-	      <<"\nEquation solver: "<< IFEM::getOptions().solver
-	      <<"\nNumber of Gauss points: "<< IFEM::getOptions().nGauss[0];
-    if (IFEM::getOptions().format >= 0)
+	      <<"\nEquation solver: "<< opts.solver
+	      <<"\nNumber of Gauss points: "<< opts.nGauss[0];
+    if (opts.format >= 0)
     {
-      std::cout <<"\nVTF file format: "<< (IFEM::getOptions().format ? "BINARY":"ASCII")
-		<<"\nNumber of visualization points: "<< IFEM::getOptions().nViz[0];
-      if (ndim > 1) std::cout <<" "<< IFEM::getOptions().nViz[1];
-      if (ndim > 2) std::cout <<" "<< IFEM::getOptions().nViz[2];
+      std::cout <<"\nVTF file format: "<< (opts.format ? "BINARY":"ASCII")
+		<<"\nNumber of visualization points: "<< opts.nViz[0];
+      if (ndim > 1) std::cout <<" "<< opts.nViz[1];
+      if (ndim > 2) std::cout <<" "<< opts.nViz[2];
     }
 
-    if (IFEM::getOptions().discretization == ASM::Lagrange)
+    if (opts.discretization == ASM::Lagrange)
       std::cout <<"\nLagrangian basis functions are used";
-    else if (IFEM::getOptions().discretization == ASM::Spectral)
+    else if (opts.discretization == ASM::Spectral)
       std::cout <<"\nSpectral basis functions are used";
-    else if (IFEM::getOptions().discretization == ASM::LRSpline)
+    else if (opts.discretization == ASM::LRSpline)
       std::cout <<"\nLR-spline basis functions are used";
     std::cout << std::endl;
   }
