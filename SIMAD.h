@@ -18,6 +18,7 @@
 
 #include "AlgEqSystem.h"
 #include "AnaSol.h"
+#include "DataExporter.h"
 #include "Functions.h"
 #include "Profiler.h"
 #include "Property.h"
