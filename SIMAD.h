@@ -243,6 +243,12 @@ public:
     return temperature[n];
   }
 
+  void registerFields(DataExporter& exporter)
+  {
+    exporter.registerField("theta","temperature",DataExporter::SIM);
+    exporter.setFieldValue("theta", this, &getSolution());
+  }
+
 protected:
   //! \brief Initializes for integration of Neumann terms for a given property.
   //! \param[in] propInd Physical property index
