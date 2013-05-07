@@ -15,8 +15,6 @@
 #define _SIM_AD_H
 
 #include "AdvectionDiffusion.h"
-
-#include "AlgEqSystem.h"
 #include "AnaSol.h"
 #include "DataExporter.h"
 #include "Functions.h"
@@ -24,8 +22,8 @@
 #include "Property.h"
 #include "TimeStep.h"
 #include "Utilities.h"
-
 #include "tinyxml.h"
+
 
 /*!
   \brief Driver class for an Advection-diffusion simulator.
@@ -33,16 +31,15 @@
   Advection-Diffusion problem using NURBS-based finite elements.
 */
 
-
   template<class Dim>
 class SIMAD : public Dim
 {
 public:
   //! \brief Default constructor.
   //! \param[in] ad Integrand for advection-diffusion problem
-  //! \param[in] standalone Integrand is used standalone (controls time stepping)
-  SIMAD(AdvectionDiffusion* ad, bool standalone_=false) : 
-    Dim(1), AD(ad), standalone(standalone_)
+  //! \param[in] stand_alone Integrand is used standalone (controls time stepping)
+  SIMAD(AdvectionDiffusion* ad, bool stand_alone = false) :
+    Dim(1), AD(ad), standalone(stand_alone)
   {
     Dim::myProblem = AD;
   }
@@ -51,25 +48,22 @@ public:
   virtual ~SIMAD()
   {
     if (!standalone)
-      Dim::setVTF(0);
+      this->setVTF(0);
   }
 
-  //! \brief Parses a data section from an input stream.
-  //! \param[in] keyWord Keyword of current data section to read
-  //! \param is The file stream to read from
-  virtual bool parse(char* keyWord, std::istream& is)
-  {
-    return false;
-  }
+  //! \brief Parses a data section from an input stream (depreciated).
+  virtual bool parse(char*, std::istream&) { return false; }
 
   //! \brief Parses a data section from an XML element.
   virtual bool parse(const TiXmlElement* elem)
   {
     if (strcasecmp(elem->Value(),"advectiondiffusion"))
-      return Dim::parse(elem);
+      return this->Dim::parse(elem);
 
+    const char* value = 0;
     const TiXmlElement* child = elem->FirstChildElement();
-    while (child) {
+    for (; child; child = child->NextSiblingElement())
+
       if (strcasecmp(child->Value(),"stabilization") == 0) {
         std::string type;
         utl::getAttribute(child,"type",type,true);
@@ -77,58 +71,55 @@ public:
           std::cout << "SUPG stabilization is enabled." << std::endl;
           AD->setStabilization(AdvectionDiffusion::SUPG);
         }
-        if (type == "gls") {
+        else if (type == "gls") {
           std::cout << "GLS stabilization is enabled." << std::endl;
           AD->setStabilization(AdvectionDiffusion::GLS);
         }
-        if (type == "ms") {
+        else if (type == "ms") {
           std::cout << "MS stabilization is enabled." << std::endl;
           AD->setStabilization(AdvectionDiffusion::MS);
         }
         double Cinv;
         if (utl::getAttribute(child,"Cinv",Cinv))
           AD->setCinv(Cinv);
-      } else if (strcasecmp(child->Value(),"kappa") == 0) {
-        double kappa = atof(child->FirstChild()->Value());
-        std::cout << "Kappa: " << kappa << std::endl;
-        AD->setKappa(kappa);
-      } else if (strcasecmp(child->Value(),"prandtl") == 0) {
-        double Pr = atof(child->FirstChild()->Value());
-        std::cout << "Prandtl number: " << Pr << std::endl;
-        AD->setPrandtlNumber(Pr);
-      } else if (strcasecmp(child->Value(),"advectionfield") == 0) {
-        VecFunc* func = new VecFuncExpr(utl::getValue(child,"advectionfield"),"");
-        AD->setAdvectionField(func);
-        std::cout << "Advection field: " << utl::getValue(child,"advectionfield") << std::endl;
-      } else if (strcasecmp(child->Value(),"reactionfield") == 0) {
-        RealFunc* func = new EvalFunction(utl::getValue(child,"reactionfield"));
-        AD->setReactionField(func);
-        std::cout << "Reaction field: " << utl::getValue(child,"reactionfield") << std::endl;
-      } else if (strcasecmp(child->Value(),"source") == 0) {
-        RealFunc* src = new EvalFunction(utl::getValue(child,"source"));
-        AD->setSource(src);
-        std::cout << "Source field: " << utl::getValue(child,"source") << std::endl;
-      } else if (strcasecmp(child->Value(),"anasol") == 0) {
-        int code = 0;
-        std::string type;
-        utl::getAttribute(child,"type",type,true);
+      }
+      else if ((value = utl::getValue(child,"kappa"))) {
+        std::cout <<"Kappa: "<< value << std::endl;
+        AD->setKappa(atof(value));
+      }
+      else if ((value = utl::getValue(child,"prandtl"))) {
+        std::cout <<"Prandtl number: "<< value << std::endl;
+        AD->setPrandtlNumber(atof(value));
+      }
+      else if ((value = utl::getValue(child,"advectionfield"))) {
+        AD->setAdvectionField(new VecFuncExpr(value,""));
+        std::cout <<"Advection field: "<< value << std::endl;
+      }
+      else if ((value = utl::getValue(child,"reactionfield"))) {
+        AD->setReactionField(new EvalFunction(value));
+        std::cout <<"Reaction field: "<< value << std::endl;
+      }
+      else if ((value = utl::getValue(child,"source"))) {
+        AD->setSource(new EvalFunction(value));
+        std::cout <<"Source field: "<< value << std::endl;
+      }
+      else if (strcasecmp(child->Value(),"anasol") == 0) {
         std::cout <<"\tAnalytical solution: Expression"<< std::endl;
         if (!Dim::mySol)
           Dim::mySol = new AnaSol(child);
 
         // Define the analytical boundary traction field
+        int code = 0;
         if (utl::getAttribute(child,"code",code)) {
-          if (code > 0 && Dim::mySol && Dim::mySol->getScalarSecSol())
+          if (code > 0 && Dim::mySol->getScalarSecSol())
           {
-            Dim::setPropertyType(code,Property::NEUMANN);
+            this->setPropertyType(code,Property::NEUMANN);
             Dim::myVectors[code] = Dim::mySol->getScalarSecSol();
           }
         }
-      } else
-        Dim::parse(child);
-
-      child = child->NextSiblingElement();
-    }
+      }
+      else
+        this->Dim::parse(child);
 
     return true;
   }
@@ -136,41 +127,30 @@ public:
   //! \brief Returns the name of this simulator (for use in the HDF5 export).
   virtual std::string getName() const { return "AdvectionDiffusion"; }
 
-  void init()
-  {
-    TimeStep dummy;
-    init(dummy);
-  }
+  void init() { TimeStep dummy; this->init(dummy); }
 
   void init(const TimeStep& tp)
   {
-    AD->setElements(Dim::getNoElms());
+    AD->setElements(this->getNoElms());
 
     // Initialize temperature solution vectors
-    size_t n, nSols = Dim::getNoSolutions();
+    size_t n, nSols = this->getNoSolutions();
     temperature.resize(nSols);
     std::string str = "temperature1";
     for (n = 0; n < nSols; n++, str[11]++) {
-      temperature[n].resize(Dim::getNoDOFs(),true);
-      Dim::registerField(str,temperature[n]);
+      temperature[n].resize(this->getNoDOFs(),true);
+      this->registerField(str,temperature[n]);
     }
   }
 
-  virtual bool preprocess(const std::vector<int>& ignored = std::vector<int>(),
-			  bool fixDup = false)
-  {
-    bool result = Dim::preprocess(ignored, fixDup);
-    AD->setElements(Dim::getNoElms());
-    return result;
-  }
+  //! \brief Defines the global number of elements.
+  virtual bool preprocessB() { AD->setElements(this->getNoElms());return true; }
 
   //! \brief Opens a new VTF-file and writes the model geometry to it.
   //! \param[in] fileName File name used to construct the VTF-file name from
   virtual bool saveModel(char* fileName, int& nBlock)
   {
-    if (Dim::opt.format < 0)
-      return true;
-    return Dim::writeGlvG(nBlock, fileName);
+    return Dim::opt.format < 0 ? true : this->writeGlvG(nBlock,fileName);
   }
 
   //! \brief Advances the time step one step forward.
@@ -247,7 +227,7 @@ public:
   void registerFields(DataExporter& exporter)
   {
     exporter.registerField("theta","temperature",DataExporter::SIM);
-    exporter.setFieldValue("theta", this, &getSolution());
+    exporter.setFieldValue("theta", this, &temperature.front());
   }
 
 protected:
@@ -261,6 +241,7 @@ protected:
 
     return tit != Dim::myScalars.end();
   }
+
 private:
   AdvectionDiffusion* AD;
   Vectors temperature;
