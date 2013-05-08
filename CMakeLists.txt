@@ -54,10 +54,6 @@ ADD_EXECUTABLE(AdvectionDiffusion AdvectionDiffusion.C
                                   main_AdvectionDiffusion.C)
 TARGET_LINK_LIBRARIES(AdvectionDiffusion ${IFEM_LIBRARIES} CommonIFEM)
 
-ADD_CUSTOM_TARGET(doc doxygen 
-                  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-                  COMMENT "Generating API documentation" VERBATIM)
-
 ADD_CUSTOM_TARGET(check-commits scripts/check-patchseries.sh
                   "${IFEM_BUILD_TYPE}" "Apps/AdvectionDiffusion" 
                                 WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/../../
@@ -72,8 +68,4 @@ ELSE(IFEM_USE_PARALLEL_PETSC)
   ENDFOREACH()
 ENDIF(IFEM_USE_PARALLEL_PETSC)
 
-IF(NOT IFEM_INSTALL_PREFIX)
-  SET(IFEM_INSTALL_PREFIX $ENV{HOME})
-ENDIF(NOT IFEM_INSTALL_PREFIX)
-
-INSTALL(TARGETS AdvectionDiffusion DESTINATION ${IFEM_INSTALL_PREFIX}/bin)
+INSTALL(TARGETS AdvectionDiffusion DESTINATION bin)
