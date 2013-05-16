@@ -39,7 +39,7 @@ public:
   //! \param[in] ad Integrand for advection-diffusion problem
   //! \param[in] stand_alone Integrand is used standalone (controls time stepping)
   SIMAD(AdvectionDiffusion* ad, bool stand_alone = false) :
-    Dim(1), AD(ad), standalone(stand_alone)
+    Dim(1), AD(ad), standalone(stand_alone), weakDirBC(Dim::dimension, 4.0, 1.0)
   {
     Dim::myProblem = AD;
   }
@@ -86,6 +86,7 @@ public:
       else if ((value = utl::getValue(child,"kappa"))) {
         std::cout <<"Kappa: "<< value << std::endl;
         AD->setKappa(atof(value));
+        weakDirBC.setKappa(atof(value));
       }
       else if ((value = utl::getValue(child,"prandtl"))) {
         std::cout <<"Prandtl number: "<< value << std::endl;
@@ -93,6 +94,7 @@ public:
       }
       else if ((value = utl::getValue(child,"advectionfield"))) {
         AD->setAdvectionField(new VecFuncExpr(value,""));
+        weakDirBC.setAdvectionField(new VecFuncExpr(value,""));
         std::cout <<"Advection field: "<< value << std::endl;
       }
       else if ((value = utl::getValue(child,"reactionfield"))) {
@@ -140,6 +142,22 @@ public:
     for (n = 0; n < nSols; n++, str[11]++) {
       temperature[n].resize(this->getNoDOFs(),true);
       this->registerField(str,temperature[n]);
+    }
+  }
+
+  //! \brief Preprocessing performed before the FEM model generation.
+  virtual void preprocessA()
+  {
+    Dim::myInts.insert(std::make_pair(0,Dim::myProblem));
+
+    // Couple the weak Dirichlet integrand to the generic Neumann property codes
+    PropertyVec::iterator p;
+    for (p = Dim::myProps.begin(); p != Dim::myProps.end(); p++) {
+      if (p->pcode == Property::NEUMANN_GENERIC)
+      {
+        if (Dim::myInts.find(p->pindx) == Dim::myInts.end())
+          Dim::myInts.insert(std::make_pair(p->pindx,&weakDirBC));
+      }
     }
   }
 
@@ -236,8 +254,10 @@ protected:
   virtual bool initNeumann(size_t propInd)
   {
     typename Dim::SclFuncMap::const_iterator tit = Dim::myScalars.find(propInd);
-    if (tit != Dim::myScalars.end())
+    if (tit != Dim::myScalars.end()) {
+      weakDirBC.setFlux(tit->second);
       AD->setFlux(tit->second);
+    }
 
     return tit != Dim::myScalars.end();
   }
@@ -246,6 +266,7 @@ private:
   AdvectionDiffusion* AD;
   Vectors temperature;
   bool standalone;
+  AdvectionDiffusion::WeakDirichlet weakDirBC;
 };
 
 #endif

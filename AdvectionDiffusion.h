@@ -28,6 +28,61 @@ class AdvectionDiffusion : public IntegrandBase
 public:
   enum Stabilization { NONE, SUPG, GLS, MS };
 
+  //! \brief \brief Class representing the weak Dirichlet integrand.
+  class WeakDirichlet : public IntegrandBase
+  {
+  public:
+    //! \brief Default constructor.
+    //! \param[in] n Number of spatial dimensions
+    //! \param[in] CBI_ Model constant
+    //! \param[in] gamma_ Adjoint factor
+    WeakDirichlet(unsigned short int n, double CBI_ = 4, double gamma_ = 1.0);
+    //! \brief Empty destructor.
+    virtual ~WeakDirichlet();
+
+    //! \brief Returns that this integrand has no interior contributions.
+    virtual bool hasInteriorTerms() const { return false; }
+    //! \brief Returns a local integral contribution object for given element.
+    //! \param[in] nen Number of nodes on element
+    virtual LocalIntegral* getLocalIntegral(size_t nen, size_t, bool) const;
+    //! \brief Evaluates the integrand at a boundary point.
+    //! \param elmInt The local integral object to receive the contributions
+    //! \param[in] fe Finite element data of current integration point
+    //! \param[in] X Cartesian coordinates of current integration point
+    //! \param[in] normal Boundary normal vector at current integration point
+    virtual bool evalBou(LocalIntegral& elmInt, const FiniteElement& fe,
+			 const Vec3& X, const Vec3& normal) const;
+
+    //! \brief Initializes current element for boundary integration.
+    //! \param[in] MNPC Matrix of nodal point correspondance for current element
+    //! \param elmInt Local integral for element
+    virtual bool initElementBou(const std::vector<int>& MNPC,
+                                LocalIntegral& elmInt);
+
+    //! \brief Defines the advection field.
+    void setAdvectionField(VecFunc* U) { Uad = U; }
+
+    //! \brief Defines the flux function.
+    void setFlux(RealFunc* f) { flux = f; }
+
+    //! \brief Defines kappa.
+    void setKappa(double kappa_) { kappa = kappa_; }
+
+    //! \brief We need the element sizes
+    int getIntegrandType() const
+    {
+      return ELEMENT_CORNERS;
+    }
+
+    protected:
+      const double CBI; //!< Model constant
+      const double gamma; //!< Adjoint factor
+      VecFunc* Uad; //!< Pointer to advection field
+      RealFunc* flux; //!< Pointer to the flux field
+      unsigned short int nsd; //!< Number of space dimensions (1, 2 or, 3)
+      double kappa; //!< Diffusion coefficient
+  };
+
   //! \brief The default constructor initializes all pointers to zero.
   //! \param[in] n Number of spatial dimensions
   //! \param[in] stab Stabilization option
@@ -160,7 +215,7 @@ public:
   //! \brief Returns characteristic element size.
   //! \param XC The element corner coordinates
   //! \details The size is taken as the longest diagonal.
-  double getElementSize(const std::vector<Vec3>& XC) const;
+  static double getElementSize(const std::vector<Vec3>& XC, int nsd);
 
 public:
   VecFunc* Uad; //!< Pointer to advection field

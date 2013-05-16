@@ -110,7 +110,7 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
 {
   ElementInfo& elMat = static_cast<ElementInfo&>(elmInt);
   if (stab != NONE)
-    elMat.hk = getElementSize(fe.XC);
+    elMat.hk = getElementSize(fe.XC, nsd);
   elMat.iEl = fe.iel;
 
   Vector Bub;
@@ -343,7 +343,7 @@ NormBase* AdvectionDiffusion::getNormIntegrand (AnaSol* asol) const
 }
 
 
-double AdvectionDiffusion::getElementSize(const std::vector<Vec3>& XC) const
+double AdvectionDiffusion::getElementSize(const std::vector<Vec3>& XC, int nsd)
 {
   double h;
   if (nsd == 2) {
@@ -502,7 +502,7 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
 
   double h=0;
   if (!fe.XC.empty())
-    h = problem.getElementSize(fe.XC);
+    h = problem.getElementSize(fe.XC, problem.nsd);
 
   int norm=0;
 
@@ -602,4 +602,113 @@ const char* AdvectionDiffusionNorm::getName (size_t i, size_t j,
   name += n[j-1];
 
   return name.c_str();
+}
+
+AdvectionDiffusion::WeakDirichlet::WeakDirichlet (unsigned short int n,
+                                                  double CBI_,
+                                                  double gamma_) :
+  CBI(CBI_), gamma(gamma_), Uad(NULL), nsd(n)
+{
+  // Need current solution only
+  primsol.resize(1);
+}
+
+
+AdvectionDiffusion::WeakDirichlet::~WeakDirichlet ()
+{
+  delete Uad;
+}
+
+
+LocalIntegral* AdvectionDiffusion::WeakDirichlet::getLocalIntegral (size_t nen,
+								    size_t,
+								    bool) const
+{
+  ElmMats* result = new ElmMats;
+
+  result->withLHS = true;
+  result->resize(1,1);
+  result->A[0].resize(nen,nen);
+  result->b[0].resize(nen);
+
+  return result;
+}
+
+
+bool AdvectionDiffusion::WeakDirichlet::initElementBou(const std::vector<int>& MNPC,
+                                                       LocalIntegral& A)
+{
+  size_t nvec   = primsol.size();
+
+  int ierr = 0;
+  for (size_t i = 0; i < nvec && !primsol[i].empty() && ierr == 0; i++)
+    ierr = utl::gather(MNPC,1,primsol[i],A.vec[i]);
+
+  if (ierr == 0) return true;
+
+  std::cerr <<" *** AdvectionDiffusion::WeakDirichlet::initElementBou: Detected "
+            << ierr <<" node numbers out of range."<< std::endl;
+  return false;
+}
+
+
+bool AdvectionDiffusion::WeakDirichlet::evalBou (LocalIntegral& elmInt,
+					         const FiniteElement& fe,
+					         const Vec3& X,
+					         const Vec3& normal) const
+{
+  ElmMats& elMat = static_cast<ElmMats&>(elmInt);
+
+  // evaluate advection field
+  Vec3 U;
+  if (Uad)
+    U = (*Uad)(X);
+
+  double g=0.0;
+  if (flux)
+    g = (*flux)(X);
+
+  double An = U*normal;
+
+  // element size
+  double h = AdvectionDiffusion::getElementSize(fe.XC, nsd);
+  double C = CBI*fabs(kappa)/h;
+
+  // loop over test functions (i) and basis functions (j)
+  for (size_t i = 1; i <= fe.N.size(); ++i) {
+    double addI = 0.0;
+    for (int k=1; k <= nsd; ++k)
+      addI += fe.dNdX(i,k)*normal[k-1];
+    addI *= gamma*kappa;
+    for (size_t j = 1; j <= fe.N.size(); ++j) {
+      // adjoint
+      double addJ = 0.0;
+      for (int k=1; k <= nsd; ++k)
+        addJ += fe.dNdX(j,k)*normal[k-1];
+      elMat.A[0](i,j) += (-kappa*addJ+An*fe.N(j))*fe.N(i)*fe.detJxW;
+
+      // inflow
+      if (An < 0)
+        elMat.A[0](i,j) += fe.N(j)*(-addI-An*fe.N(i))*fe.detJxW;
+
+      // outflow
+      if (An > 0)
+        elMat.A[0](i,j) += -addI*fe.N(j)*fe.detJxW;
+
+      elMat.A[0](i,j) += C*fe.N(i)*fe.N(j)*fe.detJxW;
+    }
+    if (flux) {
+      // inflow
+      if (An < 0)
+        elMat.b[0](i) += -g*(addI+An*fe.N(i))*fe.detJxW;
+
+      // outflow
+      if (An > 0)
+        elMat.b[0](i) += -g*addI*fe.detJxW;
+
+      elMat.b[0](i) += C*g*fe.N(i)*fe.detJxW;
+    }
+  }
+
+  return true;
 }
