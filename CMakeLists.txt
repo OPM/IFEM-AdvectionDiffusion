@@ -54,7 +54,8 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/../Common/scripts/check-patchseries.sh.in
 IF(IFEM_USE_PARALLEL_PETSC)
   # Add parallel tests here
 ELSE(IFEM_USE_PARALLEL_PETSC)
-  FILE(GLOB AD_TESTFILES "${PROJECT_SOURCE_DIR}/Test/*.reg")
+  FILE(GLOB AD_TESTFILES RELATIVE ${PROJECT_SOURCE_DIR}/Test
+                         ${PROJECT_SOURCE_DIR}/Test/*.reg)
   FOREACH(TESTFILE ${AD_TESTFILES})
     IFEM_ADD_TEST(${TESTFILE} AdvectionDiffusion)
   ENDFOREACH()
