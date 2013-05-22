@@ -2,6 +2,4 @@ Lshape.xinp -2D
 
 L2-norm            : 20.2722
 Max displacement   : 57.8614
-R(u^h): 2346.77
 Gradient u_h: 30922.8
- |e|_H^1, e=u^r-u^h : 695.319

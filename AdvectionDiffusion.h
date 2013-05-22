@@ -102,8 +102,6 @@ public:
       Matrix eMs; //!< Stabilized matrix
       Vector eSs; //!< Stabilized vector
       Vector Cv;  //!< velocity + area
-      double eBl; //!< a(b_1^e, b_2^e)-bilinear term using quadratic bubble as trial and test functions
-      double eBu; //!< b_1^e*\int_K b_2^e d\Omega -where new stabilization can be defined as \tau=eBu/eBl (assuming element residual is constant)
 
       double hk;  //!< element size
       size_t iEl; //!< element index
