@@ -64,43 +64,12 @@ LocalIntegral* AdvectionDiffusion::getLocalIntegral (size_t nen, size_t,
   }
   
   if (stab != NONE) {
-    result->eBl = 0;
-    result->eBu = 0;
     result->eMs.resize(nen,nen,true);
     result->Cv.resize(nsd+1,true);
     result->eSs.resize(nen,true);
   }
 
   return result;
-}
-
-// define quadratic bubble functions
-static Vector bubblederivative(const FiniteElement& E, const Vec3& X)
-{
-  Vector value(5);
-  double v[2], dv[2], sv[2];
-
-  for (size_t i = 0; i < 2; i++)
-    if ((X[i] > E.XC[0][i]) && (X[i] < E.XC[3][i])) {
-
-      v[i] = (X[i]-E.XC[0][i])*(E.XC[3][i]-X[i])/
-             ((E.XC[3][i]-E.XC[0][i])*(E.XC[3][i]-E.XC[0][i]));
-
-      dv[i] = (E.XC[0][i]+E.XC[3][i]-2*X[i])/
-              ((E.XC[3][i]-E.XC[0][i])*(E.XC[3][i]-E.XC[0][i]));
-
-      sv[i] = -2/((E.XC[3][i]-E.XC[0][i])*(E.XC[3][i]-E.XC[0][i]));
-    }
-    else
-      v[i] = dv[i] = sv[i] = 0.0;
-
-  value[0] = v[0]*v[1];
-  value[1] = dv[0]*v[1];
-  value[2] = v[0]*dv[1];
-  value[3] = sv[0]*v[0];
-  value[4] = v[0]*sv[1];
-
-  return value;
 }
 
 
@@ -112,10 +81,6 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
   if (stab != NONE)
     elMat.hk = getElementSize(fe.XC, nsd);
   elMat.iEl = fe.iel;
-
-  Vector Bub;
-  if (stab != NONE && nsd == 2)
-    Bub = bubblederivative(fe, X);
 
   double f = 0.f;
   if (source)
@@ -143,12 +108,6 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
         advect *= fe.N(i);
 
         elMat.A[0](i,j) += (kappa*laplace+advect+react*fe.N(i)*fe.N(j))*fe.detJxW;
-
-        if (stab != NONE && nsd == 2) {
-          elMat.eBl += (kappa*(Bub(2)*Bub(2)+Bub(3)*Bub(3))+
-                       (U[0]*Bub(2)+U[1]*Bub(3))*Bub(1))*fe.detJxW;
-          elMat.eBu += -(Bub(1)*Bub(1))*fe.detJxW;
-        }
 
         if (stab == SUPG) {
           double convV=0, Lu=0;
