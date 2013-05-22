@@ -248,6 +248,10 @@ public:
     exporter.setFieldValue("theta", this, &temperature.front());
   }
 
+  double externalEnergy(const Vectors& psol) const
+  {
+    return 0.0;
+  }
 protected:
   //! \brief Initializes for integration of Neumann terms for a given property.
   //! \param[in] propInd Physical property index
