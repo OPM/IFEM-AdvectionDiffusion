@@ -191,10 +191,10 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
           Lav += react*fe.N(i);
           Lu +=  react*fe.N(j);
           elMat.Cv(nsd+1) += fe.detJxW;
-          elMat.eMs(i,j) -= Lav*Lu*fe.detJxW;
+          elMat.eMs(i,j) += -Lav*Lu*fe.detJxW;
           
           if (source && j == 1)
-            elMat.eSs(i) -= Lav*f*fe.detJxW;
+            elMat.eSs(i) += -Lav*f*fe.detJxW;
         }
       }
     }
@@ -439,14 +439,14 @@ LocalIntegral* AdvectionDiffusionNorm::getLocalIntegral (size_t nen, size_t iEl,
 
 
 /*!
- \brief Returns the energy norm contribution in an integration point
+ \brief Returns the L2 norm contribution in an integration point
 */
 
-static inline double energyNorm(double val, const Vec3& U,
+static inline double L2Norm(double val, const Vec3& U,
                                 const Vec3& grad, double kappa,
                                 double react)
 {
-  return kappa*grad*grad+(U*grad+react)*val;
+  return val*val;
 }
 
 
@@ -517,8 +517,17 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
     }
   }
 
-  pnorm[norm++] += h*h*residualNorm(val, U, grad, hess,
-                                    problem.kappa, f, react)*fe.detJxW;
+  // Intrinsic parameter to get  L^2 norm error (upper bound)
+  double kk = std::min((h/(sqrt(2)*sqrt(13))),(h*h/(3*sqrt(10)*problem.kappa)));
+   
+  // Choice to have VMS based error
+  pnorm[norm++] += kk*kk*residualNorm(val, U, grad, hess,
+     problem.kappa, f, react)*fe.detJxW;
+ 
+ // or Gradient based error depends on what to select here
+  //pnorm[norm++] += H1Norm(grad)*fe.detJxW;
+
+
   pnorm[norm++] += H1Norm(grad)*fe.detJxW;
 
   double eVal;
@@ -527,9 +536,18 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
     eVal = (*phi)(X);
     eGrad = (*gradPhi)(X);
 
-    pnorm[norm++] += H1Norm(grad-eGrad)*fe.detJxW;
-    pnorm[norm++] += energyNorm(val-eVal, U, grad-eGrad,
-                                problem.kappa, react)*fe.detJxW;
+    // Recovery based error 
+    //pnorm[norm++] +=H1Norm(grad-eGrad)*fe.detJxW;
+
+     // VMS based error estimation
+     pnorm[norm++] += L2Norm(val-eVal, U, grad-eGrad,
+      problem.kappa, react)*fe.detJxW;
+
+     double kk = std::min((h/(sqrt(2)*sqrt(13))),(h*h/(3*sqrt(10)*problem.kappa)));
+     pnorm[norm++] += kk*kk*residualNorm(val, U, grad, hess,
+                                problem.kappa, f, react)*fe.detJxW;
+
+
     norm++; // effectivity index
   }
 
@@ -539,12 +557,12 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
       rGrad[k] += pnorm.psol[i].dot(fe.N,k,problem.nsd);
 
     pnorm[norm++] += H1Norm(rGrad)*fe.detJxW;
-
-    pnorm[norm++] += H1Norm(grad-rGrad)*fe.detJxW;
+    // Recovery based estimate
+    pnorm[norm++] +=H1Norm(rGrad-grad)*fe.detJxW;
 
     if (phi && gradPhi) {
-      pnorm[norm++] += H1Norm(eGrad-rGrad)*fe.detJxW;
-      norm++; // effectivity index
+       pnorm[norm++] += H1Norm(eGrad-rGrad)*fe.detJxW;     
+       norm++; // effectivity index
     }
   }
 
@@ -565,7 +583,7 @@ bool AdvectionDiffusionNorm::finalizeElement (LocalIntegral& elmInt,
     return true;
 
   size_t skip = getNoFields(1);
-  norm[4] = norm[0]/norm[1];
+  norm[4] = norm[3]/norm[2];
   int j=2;
   for (size_t i = skip; i < norm.size(); i += getNoFields(j++))
     norm[i+3] = norm[i+1]/norm[2];
@@ -578,21 +596,21 @@ const char* AdvectionDiffusionNorm::getName (size_t i, size_t j,
                                              const char* prefix) const
 {
   static const char* s[5] = {
-    "R(u^h)",
+    "VMS explicit estimate (residual)",
     "Gradient u_h",
-    "|e|_H1, e=u-u^h",
-    "a(e,e)^0.5, e=u-u^h",
+    "Exact error in L^2 norm,  e=u-u^h",
+    "VMS explicit residual estimate",
     "eff index, residual"
   };
 
   static const char* p[4] = {
     "|u^r|_H1",
     "|e|_H1 e=u^r-u^h",
-    "|e|_H1, e'=u-u^r",
+    "|e|_H1, e=u-u^r",
     "eff index, H1"
   };
 
-  const char** n = i > 1 ? p : s;
+  const char** n = i > 2 ? p : s;
 
   if (!prefix)
     return n[j-1];

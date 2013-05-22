@@ -121,6 +121,21 @@ int runSimulatorStationary(bool adap, char* infile)
     do {
       if (!aSim->solveStep(infile,iStep))
         return 5;
+
+   //New added for print norm
+    model->solutionNorms(Vectors(1,sol),projs,eNorm,gNorm);
+   // print norm of solution
+      NormBase* norm = model->getNormIntegrand();
+    std::cout << norm->getName(1,1) << ": " << gNorm[0](1) << std::endl;
+    std::cout << norm->getName(1,2) << ": " << gNorm[0](2) << std::endl;
+    if (gNorm[0].size() > 1) {
+      std::cout << norm->getName(1,3) << ": " << gNorm[0](3) << std::endl;
+      std::cout << norm->getName(1,4) << ": " << gNorm[0](4) << " :"<< std::endl;
+      std::cout << norm->getName(1,5) << ": " << gNorm[0](4)/gNorm[0](3) << std::endl;
+    }
+    delete norm;
+   //end here
+
       if (!aSim->writeGlv(infile,iStep,nBlock,2))
         return 6;
     } while (aSim->adaptMesh(++iStep));
@@ -148,28 +163,31 @@ int runSimulatorStationary(bool adap, char* infile)
     NormBase* norm = model->getNormIntegrand();
     std::cout << norm->getName(1,1) << ": " << gNorm[0](1) << std::endl;
     std::cout << norm->getName(1,2) << ": " << gNorm[0](2) << std::endl;
-    if (gNorm[0].size() > 2) {
+    if (gNorm[0].size() > 1) {
       std::cout << norm->getName(1,3) << ": " << gNorm[0](3) << std::endl;
       std::cout << norm->getName(1,4) << ": " << gNorm[0](4) << std::endl;
-      std::cout << norm->getName(1,5) << ": " << gNorm[0](1)/gNorm[0](2) << std::endl;
+      std::cout << norm->getName(1,5) << ": " << gNorm[0](4)/gNorm[0](3) << std::endl;
     }
     delete norm;
 
-    const char* prefix[pOpt.size()];
-    size_t j=0;
+    const char* prefix[pOpt.size()+1];
+    prefix[pOpt.size()] = 0;
+
+    size_t j=1;
     for (pit = pOpt.begin(); pit != pOpt.end(); pit++)
       prefix[j++] = pit->second.c_str();
 
-    // Print the norms
+    // Print the norms 
     for ( j=1, pit = pOpt.begin(); pit != pOpt.end() && j<=gNorm[0].size(); pit++, j++)
     {
-      std::cout <<"\n\n>>> Error estimates based on "<< pit->second <<" <<<";
+      std::cout <<"\n\n>>> Error estimates based on "<< pit->second<<"" <<" <<<";
 
-      std::cout <<"\n |e|_H^1, e=u^r-u^h : " <<gNorm[j](2);
+      std::cout <<"\n |e|_H^1, e=u^r-u^h : " <<gNorm[j](2)<<std::endl;
       if (model->haveAnaSol() && j <= gNorm.size())
       {
-        std::cout <<"\n |e|_H^1, e=u-u^r : " <<gNorm[j](3);
-        std::cout <<"\nEffectivity index             : "<< gNorm[j](2)/gNorm[0](3)<<std::endl;
+        std::cout <<"\n |e|_H^1, e=u-u^r : " <<gNorm[j](3)<<std::endl;
+        std::cout <<"\n |e|_H^1, e=u-u^h : " <<gNorm[0](3)<<std::endl;
+        std::cout <<"\nEffectivity index (recovery) : "<< gNorm[j](2)/gNorm[0](3)<<std::endl;
       }
     }
 
