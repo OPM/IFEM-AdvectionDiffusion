@@ -122,19 +122,19 @@ int runSimulatorStationary(bool adap, char* infile)
       if (!aSim->solveStep(infile,iStep))
         return 5;
 
-   //New added for print norm
-    model->solutionNorms(Vectors(1,sol),projs,eNorm,gNorm);
-   // print norm of solution
+      //New added for print norm
+      model->solutionNorms(Vectors(1,sol),projs,eNorm,gNorm);
+      // print norm of solution
       NormBase* norm = model->getNormIntegrand();
-    std::cout << norm->getName(1,1) << ": " << gNorm[0](1) << std::endl;
-    std::cout << norm->getName(1,2) << ": " << gNorm[0](2) << std::endl;
-    if (gNorm[0].size() > 1) {
-      std::cout << norm->getName(1,3) << ": " << gNorm[0](3) << std::endl;
-      std::cout << norm->getName(1,4) << ": " << gNorm[0](4) << " :"<< std::endl;
-      std::cout << norm->getName(1,5) << ": " << gNorm[0](4)/gNorm[0](3) << std::endl;
-    }
-    delete norm;
-   //end here
+      std::cout << norm->getName(1,1) << ": " << gNorm[0](1) << std::endl;
+      std::cout << norm->getName(1,2) << ": " << gNorm[0](2) << std::endl;
+      if (gNorm[0].size() > 3) {
+        std::cout << norm->getName(1,3) << ": " << gNorm[0](3) << std::endl;
+        std::cout << norm->getName(1,4) << ": " << gNorm[0](4) << " :"<< std::endl;
+        std::cout << norm->getName(1,5) << ": " << gNorm[0](4)/gNorm[0](3) << std::endl;
+      }
+      delete norm;
+      //end here
 
       if (!aSim->writeGlv(infile,iStep,nBlock,2))
         return 6;
@@ -163,7 +163,7 @@ int runSimulatorStationary(bool adap, char* infile)
     NormBase* norm = model->getNormIntegrand();
     std::cout << norm->getName(1,1) << ": " << gNorm[0](1) << std::endl;
     std::cout << norm->getName(1,2) << ": " << gNorm[0](2) << std::endl;
-    if (gNorm[0].size() > 1) {
+    if (gNorm[0].size() > 3) {
       std::cout << norm->getName(1,3) << ": " << gNorm[0](3) << std::endl;
       std::cout << norm->getName(1,4) << ": " << gNorm[0](4) << std::endl;
       std::cout << norm->getName(1,5) << ": " << gNorm[0](4)/gNorm[0](3) << std::endl;
