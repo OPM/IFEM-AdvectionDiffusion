@@ -24,7 +24,7 @@
 
 AdvectionDiffusion::AdvectionDiffusion (unsigned short int n,
                                         AdvectionDiffusion::Stabilization s) : 
-  nsd(n), kappa(1.0), Pr(1.0), stab(s), Cinv(5)
+  nsd(n), kappa(1.0), Pr(1.0), order(1), stab(s), Cinv(5)
 {
   primsol.resize(1);
 
@@ -256,7 +256,7 @@ bool AdvectionDiffusion::finalizeElement (LocalIntegral& A,
     ElementInfo& E = static_cast<ElementInfo&>(A);
 
     // Compute stabilization parameter
-    double tau = E.getTau(kappa, Cinv);
+    double tau = E.getTau(kappa, Cinv, order);
     
     E.eMs *=  tau;
     E.eSs *=  tau;
@@ -272,10 +272,11 @@ bool AdvectionDiffusion::finalizeElement (LocalIntegral& A,
 }
 
 
-double AdvectionDiffusion::ElementInfo::getTau(double kappa, double Cinv) const
+double AdvectionDiffusion::ElementInfo::getTau(double kappa,
+                                               double Cinv, int p) const
 {
   // eqns (211)-(214)
-  double mk = std::min(1.0/3,2.0/Cinv);
+  double mk = std::min(1.0/(3.0*p*p), 2.0/Cinv);
 
   // find mean element advection velocity
   double vel=0.f;

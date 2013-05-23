@@ -16,6 +16,7 @@
 
 #include "AdvectionDiffusion.h"
 #include "AnaSol.h"
+#include "ASMbase.h"
 #include "DataExporter.h"
 #include "Functions.h"
 #include "Profiler.h"
@@ -134,6 +135,10 @@ public:
   void init(const TimeStep& tp)
   {
     AD->setElements(this->getNoElms());
+    int p1, p2, p3;
+    this->getFEModel()[0]->getOrder(p1, p2, p3);
+    // assumes equal ordered basis
+    AD->setOrder(p1);
 
     // Initialize temperature solution vectors
     size_t n, nSols = this->getNoSolutions();

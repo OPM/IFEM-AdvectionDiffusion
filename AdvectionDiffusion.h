@@ -97,7 +97,7 @@ public:
       virtual ~ElementInfo() {}
 
       //! \brief Returns the stabilization parameter.
-      double getTau(double kappa, double Cinv) const;
+      double getTau(double kappa, double Cinv, int p) const;
 
       Matrix eMs; //!< Stabilized matrix
       Vector eSs; //!< Stabilized vector
@@ -133,6 +133,9 @@ public:
 
   //! \brief Defines the global number of elements.
   void setElements(size_t els) { tauE.resize(els); }
+
+  //! \brief Set the basis order
+  void setOrder(int p) { order = p; }
 
   //! \brief Defines the Prandtl number.
   void setPrandtlNumber(double Pr_) { Pr = Pr_; }
@@ -225,7 +228,8 @@ public:
 
 protected:
   RealFunc* flux; //!< Pointer to the flux field
-  Vector tauE;     //!< Stored tau values - need for norm integration
+  Vector tauE;    //!< Stored tau values - need for norm integration
+  int order;      //!< Basis order 
 
   Stabilization stab; //!< The type of stabilization used
 
