@@ -32,24 +32,26 @@
   Advection-Diffusion problem using NURBS-based finite elements.
 */
 
-  template<class Dim>
-class SIMAD : public Dim
+template<class Dim> class SIMAD : public Dim
 {
 public:
   //! \brief Default constructor.
   //! \param[in] ad Integrand for advection-diffusion problem
-  //! \param[in] stand_alone Integrand is used standalone (controls time stepping)
-  SIMAD(AdvectionDiffusion* ad, bool stand_alone = false) :
-    Dim(1), AD(ad), standalone(stand_alone), weakDirBC(Dim::dimension, 4.0, 1.0)
+  //! \param[in] alone Integrand is used stand-alone (controls time stepping)
+  SIMAD(AdvectionDiffusion* ad, bool alone = false) :
+    Dim(1), AD(ad), weakDirBC(Dim::dimension, 4.0, 1.0)
   {
+    standalone = alone;
     Dim::myProblem = AD;
   }
 
-  //! \brief The destructor frees the dynamically allocated data.
+  //! \brief The destructor clears the VTF-file pointer, unless stand-alone.
+  //! \details This is needed when the VTF-file is assumed to be owned by
+  //! another SIM-object, is deleted by the SIMbase destructor of that object.
   virtual ~SIMAD()
   {
     if (!standalone)
-      this->setVTF(0);
+      this->setVTF(NULL);
   }
 
   //! \brief Parses a data section from an input stream (depreciated).
@@ -134,11 +136,11 @@ public:
 
   void init(const TimeStep& tp)
   {
-    AD->setElements(this->getNoElms());
     int p1, p2, p3;
-    this->getFEModel()[0]->getOrder(p1, p2, p3);
-    // assumes equal ordered basis
-    AD->setOrder(p1);
+    this->getPatch(0)->getOrder(p1,p2,p3);
+
+    AD->setOrder(p1); // assumes equal ordered basis
+    AD->setElements(this->getNoElms());
 
     // Initialize temperature solution vectors
     size_t n, nSols = this->getNoSolutions();
@@ -157,13 +159,10 @@ public:
 
     // Couple the weak Dirichlet integrand to the generic Neumann property codes
     PropertyVec::iterator p;
-    for (p = Dim::myProps.begin(); p != Dim::myProps.end(); p++) {
+    for (p = Dim::myProps.begin(); p != Dim::myProps.end(); p++)
       if (p->pcode == Property::NEUMANN_GENERIC)
-      {
         if (Dim::myInts.find(p->pindx) == Dim::myInts.end())
           Dim::myInts.insert(std::make_pair(p->pindx,&weakDirBC));
-      }
-    }
   }
 
   //! \brief Defines the global number of elements.
@@ -171,6 +170,7 @@ public:
 
   //! \brief Opens a new VTF-file and writes the model geometry to it.
   //! \param[in] fileName File name used to construct the VTF-file name from
+  //! \param nBlock Running VTF block counter
   virtual bool saveModel(char* fileName, int& nBlock)
   {
     return Dim::opt.format < 0 ? true : this->writeGlvG(nBlock,fileName);
@@ -208,10 +208,10 @@ public:
     {
       size_t iMax[1];
       double dMax[1];
-      double normL2 = this->solutionNorms(temperature.front(),dMax,iMax);
+      double normL2 = this->solutionNorms(temperature.front(),dMax,iMax,1);
       if (Dim::myPid == 0)
         std::cout <<"Temperature summary: L2-norm        : "<< normL2
-                 <<"\n                   Max temperature : "<< dMax[0]
+                  <<"\n                   Max temperature : "<< dMax[0]
                   << std::endl;
     }
 
@@ -237,15 +237,9 @@ public:
     return (!standalone || this->writeGlvStep(iDump, tp.time.t)) && result;
   }
 
-  Vector& getSolution(int n=0)
-  {
-    return temperature[n];
-  }
+  Vector& getSolution(int n=0) { return temperature[n]; }
 
-  const Vector& getSolution(int n=0) const
-  {
-    return temperature[n];
-  }
+  const Vector& getSolution(int n=0) const { return temperature[n]; }
 
   void registerFields(DataExporter& exporter)
   {
@@ -253,10 +247,8 @@ public:
     exporter.setFieldValue("theta", this, &temperature.front());
   }
 
-  double externalEnergy(const Vectors& psol) const
-  {
-    return 0.0;
-  }
+  double externalEnergy(const Vectors&) const { return 0.0; }
+
 protected:
   //! \brief Initializes for integration of Neumann terms for a given property.
   //! \param[in] propInd Physical property index
@@ -273,9 +265,10 @@ protected:
 
 private:
   AdvectionDiffusion* AD;
-  Vectors temperature;
-  bool standalone;
   AdvectionDiffusion::WeakDirichlet weakDirBC;
+
+  Vectors temperature;
+  bool    standalone;
 };
 
 #endif
