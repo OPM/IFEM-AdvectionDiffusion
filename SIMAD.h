@@ -170,10 +170,14 @@ public:
 
   //! \brief Opens a new VTF-file and writes the model geometry to it.
   //! \param[in] fileName File name used to construct the VTF-file name from
-  //! \param nBlock Running VTF block counter
-  virtual bool saveModel(char* fileName, int& nBlock)
+  //! \param[out] geoBlk Running geometry block counter
+  //! \param[out] nBlock Running result block counter
+  virtual bool saveModel(char* fileName, int& geoBlk, int& nBlock)
   {
-    return Dim::opt.format < 0 ? true : this->writeGlvG(nBlock,fileName);
+    if (Dim::opt.format < 0) return true;
+
+    nBlock = 0;
+    return this->writeGlvG(geoBlk,fileName);
   }
 
   //! \brief Advances the time step one step forward.
