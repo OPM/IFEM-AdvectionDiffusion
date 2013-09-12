@@ -98,7 +98,6 @@ int runSimulatorStationary(bool adap, char* infile)
   Matrix eNorm, ssol;
   Vector sol, load;
   Vectors projs, gNorm;
-  int iStep = 1, nBlock = 0;
 
   DataExporter* exporter = NULL;
   if (model->opt.dumpHDF5(infile))
@@ -118,11 +117,12 @@ int runSimulatorStationary(bool adap, char* infile)
   if (adap) {
     aSim->initAdaptor(0,2);
     aSim->setupProjections();
-    do {
+    for (int iStep = 1; aSim->adaptMesh(iStep); iStep++)
+    {
       if (!aSim->solveStep(infile,iStep))
         return 5;
 
-      //New added for print norm
+      // New added for print norm
       model->solutionNorms(Vectors(1,sol),projs,eNorm,gNorm);
       // print norm of solution
       NormBase* norm = model->getNormIntegrand();
@@ -136,9 +136,9 @@ int runSimulatorStationary(bool adap, char* infile)
       delete norm;
       //end here
 
-      if (!aSim->writeGlv(infile,iStep,nBlock,2))
+      if (!aSim->writeGlv(infile,iStep,2))
         return 6;
-    } while (aSim->adaptMesh(++iStep));
+    }
   }
   else {
     if (!model->assembleSystem())
@@ -193,35 +193,33 @@ int runSimulatorStationary(bool adap, char* infile)
 
     if (model->opt.format >= 0)
     {
-      // Write VTF-file with model geometry
-      if (!model->writeGlvG(nBlock,infile))
-        return 7;
+      int geoBlk = 0, nBlock = 0;
 
-      // Write boundary tractions, if any
-      if (!model->writeGlvT(iStep,nBlock))
-        return 8;
+      // Write VTF-file with model geometry
+      if (!model->writeGlvG(geoBlk,infile))
+        return 7;
 
       // Write Dirichlet boundary conditions
       if (!model->writeGlvBC(nBlock))
         return 8;
 
       // Write load vector to VTF-file
-      if (!model->writeGlvV(load,"Source vector",iStep,nBlock))
+      if (!model->writeGlvV(load,"Source vector",1,nBlock))
         return 9;
 
       // Write solution fields to VTF-file
-      if (!model->writeGlvS(sol,iStep,nBlock))
+      if (!model->writeGlvS(sol,1,nBlock))
         return 10;
 
       // Write projected solution fields to VTF-file
       size_t i = 0;
       int iBlk = 100;
       for (pit = pOpt.begin(); pit != pOpt.end(); pit++, i++, iBlk += 10)
-        if (!model->writeGlvP(projs[i],iStep,nBlock,iBlk,pit->second.c_str()))
+        if (!model->writeGlvP(projs[i],1,nBlock,iBlk,pit->second.c_str()))
           return 11;
 
       // Write element norms
-      if (!model->writeGlvN(eNorm,iStep,nBlock,prefix))
+      if (!model->writeGlvN(eNorm,1,nBlock,prefix))
         return 12;
 
       model->writeGlvStep(1,0.0,1);
