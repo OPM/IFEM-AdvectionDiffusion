@@ -192,18 +192,15 @@ bool AdvectionDiffusion::evalBou (LocalIntegral& elmInt,
 }
 
 
-bool AdvectionDiffusion::evalSol(Vector& s, const Vector& N,
-                                 const Matrix& dNdX,
-                                 const Vec3& X,
-                                 const std::vector<int>& MNPC) const
+bool AdvectionDiffusion::evalSol (Vector& s, const FiniteElement& fe,
+                                  const Vec3&,
+                                  const std::vector<int>& MNPC) const
 {
   Vector ePhi;
-  if (utl::gather(MNPC,1,primsol.front(),ePhi))
+  if (utl::gather(MNPC,1,primsol.front(),ePhi) > 0)
     return false;
 
-  dNdX.multiply(ePhi,s,true);
-
-  return true;
+  return fe.dNdX.multiply(ePhi,s,true);
 }
 
 
@@ -215,18 +212,13 @@ bool AdvectionDiffusion::evalSol(Vector& s, const VecFunc& asol,
 }
 
 
-const char* AdvectionDiffusion::getField1Name (size_t i,
-                                               const char* prefix) const
+const char* AdvectionDiffusion::getField1Name (size_t, const char* prefix) const
 {
-  if (i >= 1)
-    i = 0;
-
-  static const char* s[1] = { "theta"};
   if (!prefix)
-    return s[i];
+    return "theta";
 
   static std::string name;
-  name = prefix + std::string(" ") + s[i];
+  name = prefix + std::string(" theta");
 
   return name.c_str();
 }
@@ -603,11 +595,8 @@ LocalIntegral* AdvectionDiffusion::WeakDirichlet::getLocalIntegral (size_t nen,
 								    bool) const
 {
   ElmMats* result = new ElmMats;
-
-  result->withLHS = true;
   result->resize(1,1);
-  result->A[0].resize(nen,nen);
-  result->b[0].resize(nen);
+  result->redim(nen);
 
   return result;
 }

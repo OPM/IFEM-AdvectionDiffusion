@@ -11,8 +11,8 @@
 //!
 //==============================================================================
 
-#ifndef _ADVECTIONDIFFUSION_H
-#define _ADVECTIONDIFFUSION_H
+#ifndef _ADVECTION_DIFFUSION_H
+#define _ADVECTION_DIFFUSION_H
 
 #include "IntegrandBase.h"
 #include "ElmMats.h"
@@ -26,9 +26,10 @@
 class AdvectionDiffusion : public IntegrandBase
 {
 public:
+  //! \brief Enum defining the available stabilization methods.
   enum Stabilization { NONE, SUPG, GLS, MS };
 
-  //! \brief \brief Class representing the weak Dirichlet integrand.
+  //! \brief Class representing the weak Dirichlet integrand.
   class WeakDirichlet : public IntegrandBase
   {
   public:
@@ -37,27 +38,32 @@ public:
     //! \param[in] CBI_ Model constant
     //! \param[in] gamma_ Adjoint factor
     WeakDirichlet(unsigned short int n, double CBI_ = 4, double gamma_ = 1.0);
-    //! \brief Empty destructor.
+    //! \brief The destructor deletes the advection field.
     virtual ~WeakDirichlet();
 
     //! \brief Returns that this integrand has no interior contributions.
     virtual bool hasInteriorTerms() const { return false; }
+
+    //! \brief Defines which FE quantities are needed by the integrand.
+    virtual int getIntegrandType() const { return ELEMENT_CORNERS; }
+
     //! \brief Returns a local integral contribution object for given element.
     //! \param[in] nen Number of nodes on element
     virtual LocalIntegral* getLocalIntegral(size_t nen, size_t, bool) const;
-    //! \brief Evaluates the integrand at a boundary point.
-    //! \param elmInt The local integral object to receive the contributions
-    //! \param[in] fe Finite element data of current integration point
-    //! \param[in] X Cartesian coordinates of current integration point
-    //! \param[in] normal Boundary normal vector at current integration point
-    virtual bool evalBou(LocalIntegral& elmInt, const FiniteElement& fe,
-			 const Vec3& X, const Vec3& normal) const;
 
     //! \brief Initializes current element for boundary integration.
     //! \param[in] MNPC Matrix of nodal point correspondance for current element
     //! \param elmInt Local integral for element
     virtual bool initElementBou(const std::vector<int>& MNPC,
                                 LocalIntegral& elmInt);
+
+    //! \brief Evaluates the integrand at a boundary point.
+    //! \param elmInt The local integral object to receive the contributions
+    //! \param[in] fe Finite element data of current integration point
+    //! \param[in] X Cartesian coordinates of current integration point
+    //! \param[in] normal Boundary normal vector at current integration point
+    virtual bool evalBou(LocalIntegral& elmInt, const FiniteElement& fe,
+                         const Vec3& X, const Vec3& normal) const;
 
     //! \brief Defines the advection field.
     void setAdvectionField(VecFunc* U) { Uad = U; }
@@ -68,19 +74,13 @@ public:
     //! \brief Defines kappa.
     void setKappa(double kappa_) { kappa = kappa_; }
 
-    //! \brief We need the element sizes
-    int getIntegrandType() const
-    {
-      return ELEMENT_CORNERS;
-    }
-
-    protected:
-      const double CBI; //!< Model constant
-      const double gamma; //!< Adjoint factor
-      VecFunc* Uad; //!< Pointer to advection field
-      RealFunc* flux; //!< Pointer to the flux field
-      unsigned short int nsd; //!< Number of space dimensions (1, 2 or, 3)
-      double kappa; //!< Diffusion coefficient
+  protected:
+    const double CBI;   //!< Model constant
+    const double gamma; //!< Adjoint factor
+    VecFunc*     Uad;   //!< Pointer to advection field
+    RealFunc*    flux;  //!< Pointer to the flux field
+    unsigned short int nsd; //!< Number of space dimensions (1, 2 or, 3)
+    double       kappa; //!< Diffusion coefficient
   };
 
   //! \brief The default constructor initializes all pointers to zero.
@@ -88,26 +88,28 @@ public:
   //! \param[in] stab Stabilization option
   AdvectionDiffusion(unsigned short int n = 3, Stabilization stab = NONE);
 
+  //! \brief Class representing the element matrices of the Advection-Diffusion
+  //! problem.
   class ElementInfo : public ElmMats
   {
-    public:
-      //! \brief Default constructor.
-      ElementInfo() {}
-      //! \brief Empty destructor.
-      virtual ~ElementInfo() {}
+  public:
+    //! \brief Default constructor.
+    ElementInfo() {}
+    //! \brief Empty destructor.
+    virtual ~ElementInfo() {}
 
-      //! \brief Returns the stabilization parameter.
-      double getTau(double kappa, double Cinv, int p) const;
+    //! \brief Returns the stabilization parameter.
+    double getTau(double kappa, double Cinv, int p) const;
 
-      Matrix eMs; //!< Stabilized matrix
-      Vector eSs; //!< Stabilized vector
-      Vector Cv;  //!< velocity + area
+    Matrix eMs; //!< Stabilized matrix
+    Vector eSs; //!< Stabilized vector
+    Vector Cv;  //!< velocity + area
 
-      double hk;  //!< element size
-      size_t iEl; //!< element index
+    double hk;  //!< element size
+    size_t iEl; //!< element index
   };
 
-  //! \brief Empty destructor.
+  //! \brief The destructor deletes the advection field.
   virtual ~AdvectionDiffusion();
 
   //! \brief Defines the source function.
@@ -158,9 +160,6 @@ public:
   //! \details This method is invoked once for each element, after the numerical
   //! integration loop over interior points is finished and before the resulting
   //! element quantities are assembled into their system level equivalents.
-  //! It can also be used to implement multiple integration point loops within
-  //! the same element, provided the necessary integration point values are
-  //! stored internally in the object during the first integration loop.
   virtual bool finalizeElement(LocalIntegral&, const TimeDomain&, size_t = 0);
 
   //! \brief Evaluates the integrand at an interior point.
@@ -168,32 +167,29 @@ public:
   //! \param[in] fe Finite element data of current integration point
   //! \param[in] X Cartesian coordinates of current integration point
   virtual bool evalInt(LocalIntegral& elmInt, const FiniteElement& fe,
-		       const Vec3& X) const;
+                       const Vec3& X) const;
 
   //! \brief Evaluates the integrand at a boundary point.
   //! \param elmInt The local integral object to receive the contributions
-  //! \param[in] fe Finite Element quantities
+  //! \param[in] fe Finite element data of current integration point
   //! \param[in] X Cartesian coordinates of current integration point
   //! \param[in] normal Boundary normal vector at current integration point
-  virtual bool evalBou(LocalIntegral& elmInt,  const FiniteElement& fe,
-		       const Vec3& X, const Vec3& normal) const;
+  virtual bool evalBou(LocalIntegral& elmInt, const FiniteElement& fe,
+                       const Vec3& X, const Vec3& normal) const;
 
   //! \brief Evaluates the secondary solution at a result point.
   //! \param[out] s Array of solution field values at current point
-  //! \param[in] N Basis function values at current point
-  //! \param[in] dNdX Basis function gradients at current point
+  //! \param[in] fe Finite element data at current point
   //! \param[in] X Cartesian coordinates of current point
   //! \param[in] MNPC Nodal point correspondance for the basis function values
-  virtual bool evalSol(Vector& s,
-		       const Vector& N, const Matrix& dNdX,
-		       const Vec3& X, const std::vector<int>& MNPC) const;
+  virtual bool evalSol(Vector& s, const FiniteElement& fe,
+                       const Vec3& X, const std::vector<int>& MNPC) const;
 
   //! \brief Evaluates the analytical secondary solution at a result point.
   //! \param[out] s The solution field values at current point
   //! \param[in] asol The analytical solution field (tensor field)
   //! \param[in] X Cartesian coordinates of current point
-  virtual bool evalSol(Vector& s,
-                       const VecFunc& asol, const Vec3& X) const;
+  virtual bool evalSol(Vector& s, const VecFunc& asol, const Vec3& X) const;
 
   //! \brief Returns the number of primary/secondary solution field components.
   //! \param[in] fld which field set to consider (1=primary, 2=secondary)
@@ -232,8 +228,7 @@ protected:
   int order;      //!< Basis order 
 
   Stabilization stab; //!< The type of stabilization used
-
-  double Cinv; //!< stabilization parameter
+  double        Cinv; //!< Stabilization parameter
 };
 
 
@@ -275,7 +270,7 @@ public:
   //! \param[in] fe Finite element data of current integration point
   //! \param[in] X Cartesian coordinates of current integration point
   virtual bool evalInt(LocalIntegral& elmInt, const FiniteElement& fe,
-		       const Vec3& X) const;
+                       const Vec3& X) const;
 
   //! \brief Finalizes the element norms after the numerical integration.
   //! \details This method is used to compute effectivity indices.
