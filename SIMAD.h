@@ -291,7 +291,7 @@ private:
 
 //! \brief Partial specialization for configurator
 template<class Dim>
-struct SolverConfigurator<SIMAD<Dim>> {
+struct SolverConfigurator< SIMAD<Dim> > {
   int setup(SIMAD<Dim>& ad,
             typename SIMAD<Dim>::SetupProps& props, char* infile)
   {
