@@ -49,6 +49,7 @@ public:
   //! stored internally in the object during the first integration loop.
   virtual bool finalizeElement(LocalIntegral&, const TimeDomain&, size_t = 0);
 
+  using AdvectionDiffusion::evalInt;
   //! \brief Evaluates the integrand at an interior point.
   //! \param elmInt The local integral object to receive the contributions
   //! \param[in] fe Finite element data of current integration point
