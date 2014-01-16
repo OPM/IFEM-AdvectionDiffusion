@@ -17,8 +17,10 @@
 #include "AdvectionDiffusion.h"
 #include "AnaSol.h"
 #include "ASMbase.h"
+#include "ASMstruct.h"
 #include "DataExporter.h"
 #include "Functions.h"
+#include "InitialConditionHandler.h"
 #include "Profiler.h"
 #include "Property.h"
 #include "TimeStep.h"
@@ -35,6 +37,12 @@
 template<class Dim> class SIMAD : public Dim
 {
 public:
+  struct SetupProps 
+  {
+    bool shareGrid;
+    SIMoutput* share;
+  };
+
   //! \brief Default constructor.
   //! \param[in] ad Integrand for advection-diffusion problem
   //! \param[in] alone Integrand is used stand-alone (controls time stepping)
@@ -253,6 +261,11 @@ public:
 
   double externalEnergy(const Vectors&) const { return 0.0; }
 
+  //! \brief Sets initial conditions
+  void setInitialConditions()
+  {
+    SIM::setInitialConditions(*this);
+  }
 protected:
   //! \brief Initializes for integration of Neumann terms for a given property.
   //! \param[in] propInd Physical property index
@@ -273,6 +286,46 @@ private:
 
   Vectors temperature;
   bool    standalone;
+};
+
+
+//! \brief Partial specialization for configurator
+template<class Dim>
+struct SolverConfigurator<SIMAD<Dim>> {
+  int setup(SIMAD<Dim>& ad,
+            typename SIMAD<Dim>::SetupProps& props, char* infile)
+  {
+    utl::profiler->start("Model input");
+
+    std::cout <<"\nTemperature solver"
+              <<"\n=====================================\n";
+    if (props.shareGrid)
+      // Let the turbulence solver use the same grid as the velocity solver
+      ad.clonePatches(props.share->getFEModel(), props.share->getGlob2LocMap());
+
+    // Reset the global element and node numbers
+    ASMstruct::resetNumbering();
+    if (!ad.read(infile))
+      return 2;
+
+    utl::profiler->stop("Model input");
+
+    // Preprocess the model and establish data structures for the algebraic system
+    if (!ad.preprocess())
+      return 3;
+
+    // Initialize the linear solvers
+    ad.setMode(SIM::DYNAMIC);
+    ad.initSystem(ad.opt.solver,1,1,false);
+    ad.setQuadratureRule(ad.opt.nGauss[0]);
+
+    // Time-step loop
+    ad.init(TimeStep());
+    ad.setVTF(props.share->getVTF());
+    ad.setInitialConditions();
+
+    return 0;
+  }
 };
 
 #endif
