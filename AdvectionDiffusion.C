@@ -23,7 +23,7 @@
 
 
 AdvectionDiffusion::AdvectionDiffusion (unsigned short int n,
-                                        AdvectionDiffusion::Stabilization s) : 
+                                        AdvectionDiffusion::Stabilization s) :
   nsd(n), kappa(1.0), Pr(1.0), order(1), stab(s), Cinv(5)
 {
   primsol.resize(1);
@@ -34,7 +34,9 @@ AdvectionDiffusion::AdvectionDiffusion (unsigned short int n,
 
 AdvectionDiffusion::~AdvectionDiffusion()
 {
-  delete source, delete Uad, delete reaction;
+  delete source;
+  delete Uad;
+  delete reaction;
 }
 
 
@@ -50,26 +52,53 @@ int AdvectionDiffusion::getIntegrandType () const
 LocalIntegral* AdvectionDiffusion::getLocalIntegral (size_t nen, size_t,
                                                      bool neumann) const
 {
-  ElementInfo* result = new ElementInfo;
+  ElementInfo* result = new ElementInfo(!neumann);
+  result->resize(neumann ? 0 : 1, 1);
+  result->redim(nen);
 
-  if (neumann) {
-    result->withLHS = false;
-    result->resize(0,1);
-    result->b[0].resize(nen,true);
-  } else {
-    result->withLHS = true;
-    result->resize(1,1);
-    result->A[0].resize(nen,nen,true);
-    result->b[0].resize(nen,true);
-  }
-  
   if (stab != NONE) {
-    result->eMs.resize(nen,nen,true);
-    result->Cv.resize(nsd+1,true);
-    result->eSs.resize(nen,true);
+    result->eMs.resize(nen,nen);
+    result->eSs.resize(nen);
+    result->Cv.resize(nsd+1);
   }
 
   return result;
+}
+
+
+/*!
+  \brief Returns the characteristic element size.
+  \param[in] XC The element corner coordinates
+  \param[in] nsd Number of space dimensions
+
+  \details The size is taken as the longest diagonal.
+*/
+
+static double getElementSize (const Vec3Vec& XC, int nsd)
+{
+  const int ndiag = (nsd-1)*2;
+  Vec3 D[ndiag];
+
+  // Compute the element diagonals
+  if (nsd == 2 && XC.size() >= 4) {
+    D[0] = XC[3] - XC[0];
+    D[1] = XC[1] - XC[2];
+  }
+  else if (nsd == 3 && XC.size() >= 8) {
+    D[0] = XC[7] - XC[0];
+    D[1] = XC[6] - XC[1];
+    D[2] = XC[4] - XC[3];
+    D[3] = XC[2] - XC[6];
+  }
+  else
+    return 0.0;
+
+  // Take our element size as the longest diagonal
+  double h = D[0].length();
+  for (int i = 1; i < ndiag; i++)
+    h = std::max(h,D[i].length());
+
+  return h;
 }
 
 
@@ -79,18 +108,14 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
 {
   ElementInfo& elMat = static_cast<ElementInfo&>(elmInt);
   if (stab != NONE)
-    elMat.hk = getElementSize(fe.XC, nsd);
+    elMat.hk = getElementSize(fe.XC,nsd);
   elMat.iEl = fe.iel;
 
-  double f = 0.f;
-  if (source)
-    f = (*source)(X);
+  double f = source ? (*source)(X) : 0.0;
 
   if (!elMat.A.empty()) {
     // evaluate reaction field
-    double react = 0.f;
-    if (reaction)
-      react = (*reaction)(X);
+    double react = reaction ? (*reaction)(X) : 0.0;
 
     // evaluate advection field
     Vec3 U;
@@ -119,7 +144,6 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
           Lu += react*fe.N(j);
           elMat.Cv(nsd+1) += fe.detJxW;
           elMat.eMs(i,j) += convV*Lu*fe.detJxW;
-      
           if (source && j == 1)
             elMat.eSs(i) += convV*f*fe.detJxW;
         }
@@ -151,7 +175,6 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
           Lu +=  react*fe.N(j);
           elMat.Cv(nsd+1) += fe.detJxW;
           elMat.eMs(i,j) += -Lav*Lu*fe.detJxW;
-          
           if (source && j == 1)
             elMat.eSs(i) += -Lav*f*fe.detJxW;
         }
@@ -244,21 +267,22 @@ const char* AdvectionDiffusion::getField2Name (size_t i,
 bool AdvectionDiffusion::finalizeElement (LocalIntegral& A,
                                           const TimeDomain&, size_t)
 {
-  if (stab != NONE) {
-    ElementInfo& E = static_cast<ElementInfo&>(A);
+  if (stab == NONE)
+    return true;
 
-    // Compute stabilization parameter
-    double tau = E.getTau(kappa, Cinv, order);
-    
-    E.eMs *=  tau;
-    E.eSs *=  tau;
-   
-    tauE(E.iEl) = tau;
-    
-    // Add stabilization terms
-    E.A[0] += E.eMs;
-    E.b[0] += E.eSs;
-  }
+  ElementInfo& E = static_cast<ElementInfo&>(A);
+
+  // Compute stabilization parameter
+  double tau = E.getTau(kappa, Cinv, order);
+
+  E.eMs *= tau;
+  E.eSs *= tau;
+
+  tauE(E.iEl) = tau;
+
+  // Add stabilization terms
+  E.A[0] += E.eMs;
+  E.b[0] += E.eSs;
 
   return true;
 }
@@ -271,16 +295,14 @@ double AdvectionDiffusion::ElementInfo::getTau(double kappa,
   double mk = std::min(1.0/(3.0*p*p), 2.0/Cinv);
 
   // find mean element advection velocity
-  double vel=0.f;
-  for (size_t k=1;k<=Cv.size()-1;++k)
-    vel += pow(Cv(k)/Cv(Cv.size()),2.0);
-
+  double vel = 0.0;
+  for (size_t k = 1; k < Cv.size(); k++)
+    vel += pow(Cv(k)/Cv.back(),2.0);
   vel = sqrt(vel);
 
-  double Pek = vel*hk/(2*kappa);
-  double Xi = std::min(mk*Pek,1.0);
+  double Xi = std::min(mk*vel*hk/(2.0*kappa),1.0);
 
-  return hk/(2*vel)*Xi;
+  return hk/(2.0*vel)*Xi;
 }
 
 
@@ -295,60 +317,8 @@ NormBase* AdvectionDiffusion::getNormIntegrand (AnaSol* asol) const
 }
 
 
-double AdvectionDiffusion::getElementSize(const std::vector<Vec3>& XC, int nsd)
-{
-  double h;
-  if (nsd == 2) {
-    // Maximum diagonal
-    h = (XC[3]-XC[0]).length();
-    h = std::max(h, (XC[1]-XC[2]).length());
-  } else {
-    // Compute the element diagonals
-    Vec3 D1(XC[7]-XC[0]);
-    Vec3 D2(XC[6]-XC[1]);
-    Vec3 D3(XC[4]-XC[3]);
-    Vec3 D4(XC[2]-XC[6]);
-
-    // and take our size as the longest one
-    h = std::max(D1.length(), D2.length());
-    h = std::max(h, D3.length());
-    h = std::max(h, D4.length());
-  }
-
-  return h;
-}
-
-
-class ADElmNorm : public LocalIntegral {
-  public:
-    ADElmNorm(LocalIntegral& n)
-    {
-      myNorm = static_cast<ElmNorm*>(&n);
-      iEl = 0;
-    }
-
-    ADElmNorm(size_t n)
-    {
-      myNorm = new ElmNorm(n);
-    }
-
-    virtual ~ADElmNorm()
-    {
-      myNorm->destruct();
-    }
-
-    virtual const LocalIntegral* ref() const { return myNorm; }
-    LocalIntegral* ref() { return myNorm; }
-
-    int iEl;
-
-    ElmNorm* myNorm;
-};
-
-
 AdvectionDiffusionNorm::AdvectionDiffusionNorm (AdvectionDiffusion& p,
-                                                RealFunc* val,
-                                                VecFunc* grad) :
+                                                RealFunc* val, VecFunc* grad) :
   NormBase(p), phi(val), gradPhi(grad)
 {
   nrcmp = myProblem.getNoFields(2);
@@ -358,79 +328,42 @@ AdvectionDiffusionNorm::AdvectionDiffusionNorm (AdvectionDiffusion& p,
 
 size_t AdvectionDiffusionNorm::getNoFields (int fld) const
 {
-  if (fld == 0)
-    return 1+prjsol.size();
-
-  if (fld == 1)
-    return gradPhi?5:2;
-
-  return gradPhi?4:2;
-}
-
-
-LocalIntegral* AdvectionDiffusionNorm::getLocalIntegral (size_t nen, size_t iEl,
-                                                         bool neumann) const
-{
-  LocalIntegral* result = NormBase::getLocalIntegral(nen,iEl,neumann);
-  if (result) {
-    ADElmNorm* norm = new ADElmNorm(static_cast<ElmNorm&>(*result));
-    norm->iEl = iEl;
-    return norm;
+  switch (fld) {
+  case 0 : return 1 + prjsol.size();
+  case 1 : return gradPhi ? 5 : 2;
+  default: return gradPhi ? 4 : 2;
   }
-  
-  // Element norms are not requested, so allocate an inter object instead that
-  // will delete itself when invoking the destruct method.
-  size_t nNorms=0;
-  for (size_t j=0;j<getNoFields(0);++j)
-    nNorms += getNoFields(1+j);
-
-  ADElmNorm* r2 = new ADElmNorm(nNorms);
-  r2->iEl = iEl;
-  return r2;
 }
 
 
 /*!
- \brief Returns the L2 norm contribution in an integration point
+  \brief Returns the L2 norm contribution in an integration point.
 */
 
-static inline double L2Norm(double val, const Vec3& U,
-                                const Vec3& grad, double kappa,
-                                double react)
+static inline double L2Norm (double val)
 {
   return val*val;
 }
 
-
 /*!
- \brief Returns the H1 semi-norm contribution in an integration point
+  \brief Returns the H1 semi-norm contribution in an integration point.
 */
 
-static inline double H1Norm(const Vec3& grad)
+static inline double H1Norm (const Vec3& grad)
 {
   return grad*grad;
 }
 
 /*!
- \brief Returns the residual in an integration point
+  \brief Returns the residual in an integration point.
 */
 
-static inline double residualNorm(double val, const Vec3& U,
-                                  const Vec3& grad, const Vec3& hess,
-                                  double kappa, double f, double react)
+static inline double residualNorm (double val, const Vec3& U,
+                                   const Vec3& grad, const Vec3& hess,
+                                   double kappa, double f, double react)
 {
-  double res = -kappa*hess.sum()+U*grad+react*val-f;
+  double res = -kappa*hess.sum() + U*grad + react*val - f;
   return res*res;
-}
-
-
-bool AdvectionDiffusionNorm::initElement (const std::vector<int>& MNPC,
-                                          const Vec3& Xc, size_t nPt,
-                                          LocalIntegral& elmInt)
-{
-  ElmNorm& norm = *static_cast<ElmNorm*>(static_cast<ADElmNorm&>(elmInt).ref());
-  return initProjection(MNPC,norm) &&
-         NormBase::initElement(MNPC,Xc,nPt,norm);
 }
 
 
@@ -439,82 +372,70 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
                                       const Vec3& X) const
 {
   AdvectionDiffusion& problem = static_cast<AdvectionDiffusion&>(myProblem);
-  ElmNorm& pnorm = *(static_cast<ElmNorm*>(static_cast<ADElmNorm&>(elmInt).ref()));
+  ElmNorm& pnorm = static_cast<ElmNorm&>(elmInt);
 
-  // evaluate the advection field
+  // Evaluate the advection field
   Vec3 U;
   if (problem.Uad)
     U = (*problem.Uad)(X);
-  double react=0;
-  if (problem.reaction)
-    react = (*problem.reaction)(X);
-  double f=0;
-  if (problem.source)
-    f = (*problem.source)(X);
 
-  double h=0;
-  if (!fe.XC.empty())
-    h = problem.getElementSize(fe.XC, problem.nsd);
-
-  int norm=0;
-
+  double react = problem.reaction ? (*problem.reaction)(X) : 0.0;
+  double f = problem.source ? (*problem.source)(X) : 0.0;
+  double h = getElementSize(fe.XC,problem.nsd);
   double val = pnorm.vec.front().dot(fe.N);
+
   Vec3 grad;
   Vec3 hess;
-  for (size_t k=1; k <= problem.nsd; ++k) {
-    for (size_t j=1; j <= fe.N.size(); ++j) {
+  for (size_t k = 1; k <= problem.nsd; k++)
+    for (size_t j = 1; j <= fe.N.size(); j++) {
       grad[k-1] += fe.dNdX(j,k)*pnorm.vec.front()(j);
-      if (getIntegrandType() & Integrand::SECOND_DERIVATIVES)
+      if (this->getIntegrandType() & Integrand::SECOND_DERIVATIVES)
         hess[k-1] += fe.d2NdX2(j,k,k)*pnorm.vec.front()(j);
     }
-  }
 
-  // Intrinsic parameter to get  L^2 norm error (upper bound)
+  // Intrinsic parameter to get L^2 norm error (upper bound)
   double kk = std::min((h/(sqrt(2)*sqrt(13))),(h*h/(3*sqrt(10)*problem.kappa)));
-   
+
+  int norm = 0;
+
   // Choice to have VMS based error
   pnorm[norm++] += kk*kk*residualNorm(val, U, grad, hess,
-     problem.kappa, f, react)*fe.detJxW;
- 
- // or Gradient based error depends on what to select here
-  //pnorm[norm++] += H1Norm(grad)*fe.detJxW;
+                                      problem.kappa, f, react)*fe.detJxW;
 
+  // or Gradient based error depends on what to select here
+  //pnorm[norm++] += H1Norm(grad)*fe.detJxW;
 
   pnorm[norm++] += H1Norm(grad)*fe.detJxW;
 
-  double eVal;
   Vec3 eGrad;
   if (phi && gradPhi) {
-    eVal = (*phi)(X);
+    double eVal = (*phi)(X);
     eGrad = (*gradPhi)(X);
 
-    // Recovery based error 
-    //pnorm[norm++] +=H1Norm(grad-eGrad)*fe.detJxW;
+    // Recovery based error
+    //pnorm[norm++] += H1Norm(grad-eGrad)*fe.detJxW;
 
-     // VMS based error estimation
-     pnorm[norm++] += L2Norm(val-eVal, U, grad-eGrad,
-      problem.kappa, react)*fe.detJxW;
+    // VMS based error estimation
+    pnorm[norm++] += L2Norm(val-eVal)*fe.detJxW;
 
-     double kk = std::min((h/(sqrt(2)*sqrt(13))),(h*h/(3*sqrt(10)*problem.kappa)));
-     pnorm[norm++] += kk*kk*residualNorm(val, U, grad, hess,
-                                problem.kappa, f, react)*fe.detJxW;
-
+    pnorm[norm++] += kk*kk*residualNorm(val, U, grad, hess,
+                                        problem.kappa, f, react)*fe.detJxW;
 
     norm++; // effectivity index
   }
 
-  for (size_t i=0;i<pnorm.psol.size();++i) {
+  for (size_t i = 0; i < pnorm.psol.size(); i++) {
     Vec3 rGrad;
-    for (size_t k=0;k<problem.nsd;++k)
+    for (size_t k = 0; k < problem.nsd; k++)
       rGrad[k] += pnorm.psol[i].dot(fe.N,k,problem.nsd);
 
     pnorm[norm++] += H1Norm(rGrad)*fe.detJxW;
     // Recovery based estimate
-    pnorm[norm++] +=H1Norm(rGrad-grad)*fe.detJxW;
+    pnorm[norm++] += H1Norm(rGrad-grad)*fe.detJxW;
 
     if (phi && gradPhi) {
-       pnorm[norm++] += H1Norm(eGrad-rGrad)*fe.detJxW;     
-       norm++; // effectivity index
+      pnorm[norm++] += H1Norm(eGrad-rGrad)*fe.detJxW;
+      norm++; // effectivity index
     }
   }
 
@@ -525,19 +446,17 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
 bool AdvectionDiffusionNorm::finalizeElement (LocalIntegral& elmInt,
                                               const TimeDomain&, size_t)
 {
-  ADElmNorm& pnorm = static_cast<ADElmNorm&>(elmInt);
-//  AdvectionDiffusion& problem = static_cast<AdvectionDiffusion&>(myProblem);
-  ElmNorm& norm = const_cast<ElmNorm&>(static_cast<const ElmNorm&>((*pnorm.ref())));
-  // norm[1] *= fabs(problem.getElementTau(pnorm.iEl));
+  ElmNorm& norm = static_cast<ElmNorm&>(elmInt);
 
   // no effectiviy indices without an analytic solution
   if (!phi)
     return true;
 
-  size_t skip = getNoFields(1);
   norm[4] = norm[3]/norm[2];
-  int j=2;
-  for (size_t i = skip; i < norm.size(); i += getNoFields(j++))
+
+  int j = 2;
+  size_t skip = this->getNoFields(1);
+  for (size_t i = skip; i < norm.size(); i += this->getNoFields(j++))
     norm[i+3] = norm[i+1]/norm[2];
 
   return true;
@@ -574,9 +493,9 @@ const char* AdvectionDiffusionNorm::getName (size_t i, size_t j,
   return name.c_str();
 }
 
+
 AdvectionDiffusion::WeakDirichlet::WeakDirichlet (unsigned short int n,
-                                                  double CBI_,
-                                                  double gamma_) :
+                                                  double CBI_, double gamma_) :
   CBI(CBI_), gamma(gamma_), Uad(NULL), nsd(n)
 {
   // Need current solution only
@@ -602,12 +521,11 @@ LocalIntegral* AdvectionDiffusion::WeakDirichlet::getLocalIntegral (size_t nen,
 }
 
 
-bool AdvectionDiffusion::WeakDirichlet::initElementBou(const std::vector<int>& MNPC,
-                                                       LocalIntegral& A)
+bool AdvectionDiffusion::WeakDirichlet::initElementBou (const std::vector<int>& MNPC,
+                                                        LocalIntegral& A)
 {
-  size_t nvec   = primsol.size();
-
   int ierr = 0;
+  size_t nvec = primsol.size();
   for (size_t i = 0; i < nvec && !primsol[i].empty() && ierr == 0; i++)
     ierr = utl::gather(MNPC,1,primsol[i],A.vec[i]);
 
@@ -638,7 +556,7 @@ bool AdvectionDiffusion::WeakDirichlet::evalBou (LocalIntegral& elmInt,
   double An = U*normal;
 
   // element size
-  double h = AdvectionDiffusion::getElementSize(fe.XC, nsd);
+  double h = getElementSize(fe.XC,nsd);
   double C = CBI*fabs(kappa)/h;
 
   // loop over test functions (i) and basis functions (j)

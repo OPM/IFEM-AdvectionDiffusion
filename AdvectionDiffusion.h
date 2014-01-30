@@ -16,7 +16,6 @@
 
 #include "IntegrandBase.h"
 #include "ElmMats.h"
-#include "Vec3.h"
 
 
 /*!
@@ -88,13 +87,12 @@ public:
   //! \param[in] stab Stabilization option
   AdvectionDiffusion(unsigned short int n = 3, Stabilization stab = NONE);
 
-  //! \brief Class representing the element matrices of the Advection-Diffusion
-  //! problem.
+  //! \brief Class representing the Advection-Diffusion element matrices.
   class ElementInfo : public ElmMats
   {
   public:
     //! \brief Default constructor.
-    ElementInfo() {}
+    ElementInfo(bool lhs = true) : ElmMats(lhs) {}
     //! \brief Empty destructor.
     virtual ~ElementInfo() {}
 
@@ -160,7 +158,7 @@ public:
   //! \details This method is invoked once for each element, after the numerical
   //! integration loop over interior points is finished and before the resulting
   //! element quantities are assembled into their system level equivalents.
-  virtual bool finalizeElement(LocalIntegral&, const TimeDomain&, size_t = 0);
+  virtual bool finalizeElement(LocalIntegral&, const TimeDomain&, size_t);
 
   //! \brief Evaluates the integrand at an interior point.
   //! \param elmInt The local integral object to receive the contributions
@@ -209,26 +207,21 @@ public:
   //! \param[in] asol Pointer to analytical solution (optional)
   virtual NormBase* getNormIntegrand(AnaSol* asol = 0) const;
 
-  //! \brief Returns characteristic element size.
-  //! \param XC The element corner coordinates
-  //! \details The size is taken as the longest diagonal.
-  static double getElementSize(const std::vector<Vec3>& XC, int nsd);
-
-public:
-  VecFunc* Uad; //!< Pointer to advection field
-  RealFunc* reaction; //<!< Pointer to the reaction field
-  RealFunc* source; //!< Pointer to source
+protected:
+  VecFunc*  Uad;      //!< Pointer to advection field
+  RealFunc* reaction; //!< Pointer to the reaction field
+  RealFunc* source;   //!< Pointer to source field
+  RealFunc* flux;     //!< Pointer to the flux field
   unsigned short int nsd; //!< Number of space dimensions (1, 2 or, 3)
   double kappa; //!< diffusion coefficient
-  double Pr;     //!< Prandtl number
-
-protected:
-  RealFunc* flux; //!< Pointer to the flux field
-  Vector tauE;    //!< Stored tau values - need for norm integration
-  int order;      //!< Basis order 
+  double Pr;    //!< Prandtl number
+  Vector tauE;  //!< Stored tau values - need for norm integration
+  int order;    //!< Basis order
 
   Stabilization stab; //!< The type of stabilization used
   double        Cinv; //!< Stabilization parameter
+
+  friend class AdvectionDiffusionNorm;
 };
 
 
@@ -249,21 +242,6 @@ public:
 
   //! \brief Defines which FE quantities are needed by the integrand.
   virtual int getIntegrandType() const { return myProblem.getIntegrandType(); }
-
-  //! \brief Returns a local integral container for the given element.
-  //! \param[in] nen Number of nodes on element
-  //! \param[in] neumann Whether or not we are assembling Neumann BC's
-  virtual LocalIntegral* getLocalIntegral(size_t nen, size_t,
-                                          bool neumann) const;
-
-  //! \brief Initializes current element for numerical integration.
-  //! \param[in] MNPC Matrix of nodal point correspondance for current element
-  //! \param[in] Xc Cartesian coordinates of the element center
-  //! \param[in] nPt Number of integration points in this element
-  //! \param elmInt The local integral object for current element
-  virtual bool initElement(const std::vector<int>& MNPC,
-                           const Vec3& Xc, size_t nPt,
-                           LocalIntegral& elmInt);
 
   //! \brief Evaluates the integrand at an interior point.
   //! \param elmInt The local integral object to receive the contributions
@@ -286,11 +264,11 @@ public:
   //! \param[in] i The norm group (one-based index)
   //! \param[in] j The norm number (one-based index)
   //! \param[in] prefix Common prefix for all norm names
-  const char* getName(size_t i, size_t j, const char* prefix) const;
+  virtual const char* getName(size_t i, size_t j, const char* prefix) const;
 
 protected:
-  RealFunc* phi;      //!< Analytical solution field
-  VecFunc*  gradPhi;  //!< Analytical gradient field
+  RealFunc* phi;     //!< Analytical solution field
+  VecFunc*  gradPhi; //!< Analytical gradient field
 };
 
 #endif
