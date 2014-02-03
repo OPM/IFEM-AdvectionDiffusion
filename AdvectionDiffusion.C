@@ -77,7 +77,7 @@ LocalIntegral* AdvectionDiffusion::getLocalIntegral (size_t nen, size_t,
 static double getElementSize (const Vec3Vec& XC, int nsd)
 {
   const int ndiag = (nsd-1)*2;
-  Vec3 D[ndiag];
+  std::vector<Vec3> D(ndiag);
 
   // Compute the element diagonals
   if (nsd == 2 && XC.size() >= 4) {
