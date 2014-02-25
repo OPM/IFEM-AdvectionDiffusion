@@ -16,7 +16,6 @@
 
 #include "AdvectionDiffusion.h"
 #include "AnaSol.h"
-#include "ASMbase.h"
 #include "ASMstruct.h"
 #include "DataExporter.h"
 #include "Functions.h"
@@ -37,7 +36,7 @@
 template<class Dim> class SIMAD : public Dim
 {
 public:
-  struct SetupProps 
+  struct SetupProps
   {
     bool shareGrid;
     SIMoutput* share;
@@ -145,7 +144,7 @@ public:
   void init(const TimeStep& tp)
   {
     int p1, p2, p3;
-    this->getPatch(0)->getOrder(p1,p2,p3);
+    Dim::myModel.front()->getOrder(p1,p2,p3);
 
     AD->setOrder(p1); // assumes equal ordered basis
     AD->setElements(this->getNoElms());
@@ -261,23 +260,20 @@ public:
 
   double externalEnergy(const Vectors&) const { return 0.0; }
 
-  //! \brief Sets initial conditions
-  void setInitialConditions()
-  {
-    SIM::setInitialConditions(*this);
-  }
+  //! \brief Sets initial conditions.
+  void setInitialConditions() { SIM::setInitialConditions(*this); }
+
 protected:
   //! \brief Initializes for integration of Neumann terms for a given property.
   //! \param[in] propInd Physical property index
   virtual bool initNeumann(size_t propInd)
   {
     typename Dim::SclFuncMap::const_iterator tit = Dim::myScalars.find(propInd);
-    if (tit != Dim::myScalars.end()) {
-      weakDirBC.setFlux(tit->second);
-      AD->setFlux(tit->second);
-    }
+    if (tit == Dim::myScalars.end()) return false;
 
-    return tit != Dim::myScalars.end();
+    weakDirBC.setFlux(tit->second);
+    AD->setFlux(tit->second);
+    return true;
   }
 
 private:
@@ -299,6 +295,7 @@ struct SolverConfigurator< SIMAD<Dim> > {
 
     std::cout <<"\nTemperature solver"
               <<"\n=====================================\n";
+
     if (props.shareGrid)
       // Let the turbulence solver use the same grid as the velocity solver
       ad.clonePatches(props.share->getFEModel(), props.share->getGlob2LocMap());
