@@ -229,6 +229,8 @@ public:
     return true;
   }
 
+  void postSolve(const TimeStep& tp) {}
+
   //! \brief Saves the converged results to VTF file of a given time step.
   //! \param[in] tp Time step identifier
   //! \param[in] nBlock Running VTF block counter
