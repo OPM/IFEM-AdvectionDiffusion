@@ -229,7 +229,7 @@ public:
     return true;
   }
 
-  void postSolve(const TimeStep& tp) {}
+  void postSolve(const TimeStep& tp,bool) {}
 
   //! \brief Saves the converged results to VTF file of a given time step.
   //! \param[in] tp Time step identifier
