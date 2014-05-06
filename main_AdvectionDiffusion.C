@@ -7,8 +7,7 @@
 //!
 //! \author Arne Morten Kvarving / SINTEF
 //!
-//! \brief Main program for the isogeometric solver for the Advection-Diffusion
-//! equation.
+//! \brief Main program for the isogeometric Advection-Diffusion solver.
 //!
 //==============================================================================
 
@@ -32,7 +31,7 @@
 
 
 /*!
-  \brief Main program for the isogeometric Advection-Diffusion equation solver.
+  \brief Main program for the isogeometric Advection-Diffusion solver.
 
   The input to the program is specified through the following
   command-line arguments. The arguments may be given in arbitrary order.
@@ -62,17 +61,16 @@
   template<class Dim>
 int runSimulatorStationary(bool adap, char* infile)
 {
+  utl::profiler->start("Model input");
+
   // Create the simulation model
   SIMAD<Dim>* model = new SIMAD<Dim>(new AdvectionDiffusion(Dim::dimension), true);
 
   SIMinput* theSim = model;
-  AdaptiveSIM* aSim = 0;
-  if (adap) {
+  AdaptiveSIM* aSim = NULL;
+  if (adap)
     theSim = aSim = new AdaptiveSIM(model);
-    IFEM::getOptions().discretization = ASM::LRSpline;
-  }
 
-  utl::profiler->start("Model input");
   // Read in model definitions
   if (!theSim->read(infile))
     return 1;
@@ -134,7 +132,6 @@ int runSimulatorStationary(bool adap, char* infile)
         std::cout << norm->getName(1,5) << ": " << gNorm[0](4)/gNorm[0](3) << std::endl;
       }
       delete norm;
-      //end here
 
       if (!aSim->writeGlv(infile,iStep,2))
         return 6;
@@ -170,14 +167,13 @@ int runSimulatorStationary(bool adap, char* infile)
     }
     delete norm;
 
-    const char* prefix[pOpt.size()+1];
-    prefix[pOpt.size()] = 0;
+    size_t j = 0;
+    const char* prefix[pOpt.size()];
+    if (model->opt.format >= 0)
+      for (pit = pOpt.begin(); pit != pOpt.end(); j++, pit++)
+        prefix[j] = pit->second.c_str();
 
-    size_t j=1;
-    for (pit = pOpt.begin(); pit != pOpt.end(); pit++)
-      prefix[j++] = pit->second.c_str();
-
-    // Print the norms 
+    // Print the norms
     for ( j=1, pit = pOpt.begin(); pit != pOpt.end() && j<=gNorm[0].size(); pit++, j++)
     {
       std::cout <<"\n\n>>> Error estimates based on "<< pit->second<<"" <<" <<<";
@@ -239,9 +235,11 @@ int runSimulatorStationary(bool adap, char* infile)
 int runSimulatorTransientImpl(char* infile, TimeIntegration::Method tIt,
                               Solver& sim, AD& model)
 {
-  SIMSolver<Solver> solver(sim);
-  // Read in model definitions
   utl::profiler->start("Model input");
+
+  SIMSolver<Solver> solver(sim);
+
+  // Read in model definitions
   if (!model.read(infile) || !solver.read(infile))
     return 1;
 
@@ -311,11 +309,11 @@ int main (int argc, char** argv)
   utl::profiler->start("Initialization");
 
   SIMoptions dummy;
-  char* infile = 0;
-  bool adap = false;
-  int i, ndim = 3;
+  int i, integrandType = Integrand::STANDARD;
   TimeIntegration::Method tInt = TimeIntegration::NONE;
-  int integrandType = Integrand::STANDARD;
+  bool twoD = false;
+  bool adap = false;
+  char* infile = NULL;
 
   int myPid = IFEM::Init(argc, argv);
 
@@ -325,7 +323,7 @@ int main (int argc, char** argv)
     else if (!strcmp(argv[i],"-adap"))
       adap = true;
     else if (!strcmp(argv[i],"-2D"))
-      ndim = 2;
+      twoD = true;
     else if (!strcmp(argv[i],"-be"))
       tInt = TimeIntegration::BE;
     else if (!strcmp(argv[i],"-bdf2"))
@@ -354,10 +352,10 @@ int main (int argc, char** argv)
   if (!infile)
   {
     std::cout <<"usage: "<< argv[0]
-	      <<" <inputfile> [-dense|-spr|-superlu[<nt>]|-samg|-petsc]\n      "
-	      <<" [-lag|-spec|-LR] [-2D] [-adap] [-nGauss <n>]"
-	      <<"\n       [-vtf <format> [-nviz <nviz>]"
-	      <<" [-nu <nu>] [-nv <nv>] [-nw <nw>]] [-hdf5]\n";
+              <<" <inputfile> [-dense|-spr|-superlu[<nt>]|-samg|-petsc]\n"
+              <<"       [-lag|-spec|-LR] [-2D] [-nGauss <n>] [-adap]\n"
+	      <<"       [-hdf5] [-vtf <format> [-nviz <nviz>]"
+	      <<" [-nu <nu>] [-nv <nv>] [-nw <nw>]]\n";
     return 0;
   }
 
@@ -377,9 +375,9 @@ int main (int argc, char** argv)
     if (opts.format >= 0)
     {
       std::cout <<"\nVTF file format: "<< (opts.format ? "BINARY":"ASCII")
-		<<"\nNumber of visualization points: "<< opts.nViz[0];
-      if (ndim > 1) std::cout <<" "<< opts.nViz[1];
-      if (ndim > 2) std::cout <<" "<< opts.nViz[2];
+                <<"\nNumber of visualization points: "<< opts.nViz[0]
+                <<" "<< opts.nViz[1];
+      if (!twoD) std::cout <<" "<< opts.nViz[2];
     }
 
     if (opts.discretization == ASM::Lagrange)
@@ -393,14 +391,15 @@ int main (int argc, char** argv)
   utl::profiler->stop("Initialization");
 
   if (tInt == TimeIntegration::NONE) {
-    if (ndim == 2)
+    if (twoD)
       return runSimulatorStationary<SIM2D>(adap, infile);
-    if (ndim == 3)
+    else
       return runSimulatorStationary<SIM3D>(adap, infile);
-  } else {
-    if (ndim == 2)
+  }
+  else {
+    if (twoD)
       return runSimulatorTransient<SIM2D>(infile, tInt, integrandType);
-    if (ndim == 3)
+    else
       return runSimulatorTransient<SIM3D>(infile, tInt, integrandType);
   }
 
