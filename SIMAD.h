@@ -39,6 +39,7 @@ public:
   struct SetupProps
   {
     bool shareGrid;
+    IntegrandBase* integrand;
     SIMoutput* share;
   };
 
@@ -46,9 +47,19 @@ public:
   //! \param[in] ad Integrand for advection-diffusion problem
   //! \param[in] alone Integrand is used stand-alone (controls time stepping)
   SIMAD(AdvectionDiffusion* ad, bool alone = false) :
-    Dim(1), AD(ad), weakDirBC(Dim::dimension, 4.0, 1.0)
+    Dim(1), AD(ad), weakDirBC(Dim::dimension, 4.0, 1.0), inputContext("advectiondiffusion")
   {
     standalone = alone;
+    Dim::myProblem = AD;
+  }
+
+  //! \brief Construct from props
+  //! \param props The properties
+  SIMAD(SetupProps& props) :
+    Dim(1), AD(static_cast<AdvectionDiffusion*>(props.integrand)),
+    weakDirBC(Dim::dimension, 4.0, 1.0), inputContext("advectiondiffusion")
+  {
+    standalone = false;
     Dim::myProblem = AD;
   }
 
@@ -67,7 +78,7 @@ public:
   //! \brief Parses a data section from an XML element.
   virtual bool parse(const TiXmlElement* elem)
   {
-    if (strcasecmp(elem->Value(),"advectiondiffusion"))
+    if (strcasecmp(elem->Value(),inputContext.c_str()))
       return this->Dim::parse(elem);
 
     const char* value = 0;
@@ -229,7 +240,7 @@ public:
     return true;
   }
 
-  void postSolve(const TimeStep& tp,bool) {}
+  bool postSolve(const TimeStep& tp,bool) {return true;}
 
   //! \brief Saves the converged results to VTF file of a given time step.
   //! \param[in] tp Time step identifier
@@ -265,6 +276,14 @@ public:
   //! \brief Sets initial conditions.
   void setInitialConditions() { SIM::setInitialConditions(*this); }
 
+  //! \brief Set context to read from input file
+  void setContext(int ctx)
+  {
+    std::stringstream str;
+    str << "advectiondiffusion-" << ctx;
+    inputContext = str.str();
+  }
+
 #ifdef HAS_PETSC
   //! \brief Set MPI communicator for the linear equation solvers
   //! \param comm The communicator to use
@@ -293,6 +312,7 @@ private:
 
   Vectors temperature;
   bool    standalone;
+  std::string inputContext; //!< Input context
 };
 
 
@@ -329,7 +349,8 @@ struct SolverConfigurator< SIMAD<Dim> > {
 
     // Time-step loop
     ad.init(TimeStep());
-    ad.setVTF(props.share->getVTF());
+    if (props.share)
+      ad.setVTF(props.share->getVTF());
     ad.setInitialConditions();
 
     return 0;
