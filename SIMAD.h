@@ -265,9 +265,10 @@ public:
 
   const Vector& getSolution(int n=0) const { return temperature[n]; }
 
-  void registerFields(DataExporter& exporter)
+  void registerFields(DataExporter& exporter, const std::string& prefix="")
   {
-    exporter.registerField("theta","temperature",DataExporter::SIM);
+    exporter.registerField("theta","temperature",DataExporter::SIM,DataExporter::PRIMARY,
+                           prefix);
     exporter.setFieldValue("theta", this, &temperature.front());
   }
 
