@@ -265,6 +265,15 @@ public:
   //! \brief Sets initial conditions.
   void setInitialConditions() { SIM::setInitialConditions(*this); }
 
+#ifdef HAS_PETSC
+  //! \brief Set MPI communicator for the linear equation solvers
+  //! \param comm The communicator to use
+  void setCommunicator(const MPI_Comm* comm)
+  {
+    this->adm.setCommunicator(comm);
+  }
+#endif
+
 protected:
   //! \brief Initializes for integration of Neumann terms for a given property.
   //! \param[in] propInd Physical property index
