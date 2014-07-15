@@ -13,13 +13,10 @@
 
 #include "AdvectionDiffusion.h"
 #include "FiniteElement.h"
-#include "Utilities.h"
-#include "ElmMats.h"
 #include "ElmNorm.h"
-#include "Tensor.h"
+#include "Utilities.h"
 #include "Vec3Oper.h"
 #include "AnaSol.h"
-#include "VTF.h"
 
 
 AdvectionDiffusion::AdvectionDiffusion (unsigned short int n,
@@ -76,8 +73,7 @@ LocalIntegral* AdvectionDiffusion::getLocalIntegral (size_t nen, size_t,
 
 static double getElementSize (const Vec3Vec& XC, int nsd)
 {
-  const int ndiag = (nsd-1)*2;
-  std::vector<Vec3> D(ndiag);
+  Vec3Vec D(nsd*2-2);
 
   // Compute the element diagonals
   if (nsd == 2 && XC.size() >= 4) {
@@ -94,8 +90,8 @@ static double getElementSize (const Vec3Vec& XC, int nsd)
     return 0.0;
 
   // Take our element size as the longest diagonal
-  double h = D[0].length();
-  for (int i = 1; i < ndiag; i++)
+  double h = D.front().length();
+  for (size_t i = 1; i < D.size(); i++)
     h = std::max(h,D[i].length());
 
   return h;
@@ -264,8 +260,7 @@ const char* AdvectionDiffusion::getField2Name (size_t i,
 }
 
 
-bool AdvectionDiffusion::finalizeElement (LocalIntegral& A,
-                                          const TimeDomain&, size_t)
+bool AdvectionDiffusion::finalizeElement (LocalIntegral& A)
 {
   if (stab == NONE)
     return true;
@@ -443,8 +438,7 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
 }
 
 
-bool AdvectionDiffusionNorm::finalizeElement (LocalIntegral& elmInt,
-                                              const TimeDomain&, size_t)
+bool AdvectionDiffusionNorm::finalizeElement (LocalIntegral& elmInt)
 {
   ElmNorm& norm = static_cast<ElmNorm&>(elmInt);
 

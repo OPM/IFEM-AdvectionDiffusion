@@ -154,11 +154,12 @@ public:
   virtual LocalIntegral* getLocalIntegral(size_t nen, size_t,
                                           bool neumann) const;
 
+  using IntegrandBase::finalizeElement;
   //! \brief Finalizes the element quantities after the numerical integration.
   //! \details This method is invoked once for each element, after the numerical
   //! integration loop over interior points is finished and before the resulting
   //! element quantities are assembled into their system level equivalents.
-  virtual bool finalizeElement(LocalIntegral&, const TimeDomain&, size_t);
+  virtual bool finalizeElement(LocalIntegral& elmInt);
 
   //! \brief Evaluates the integrand at an interior point.
   //! \param elmInt The local integral object to receive the contributions
@@ -250,10 +251,10 @@ public:
   virtual bool evalInt(LocalIntegral& elmInt, const FiniteElement& fe,
                        const Vec3& X) const;
 
+  using NormBase::finalizeElement;
   //! \brief Finalizes the element norms after the numerical integration.
   //! \details This method is used to compute effectivity indices.
-  //! \param elmInt The local integral object to receive the contributions
-  virtual bool finalizeElement(LocalIntegral& elmInt, const TimeDomain&,size_t);
+  virtual bool finalizeElement(LocalIntegral& elmInt);
 
   //! \brief Returns the number of norm groups or size of a specified group.
   //! \param[in] group The norm group to return the size of

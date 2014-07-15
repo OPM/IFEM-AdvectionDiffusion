@@ -1,29 +1,26 @@
 // $Id$
 //==============================================================================
 //!
-//! \file AdvectionDiffusionBDF.h
+//! \file AdvectionDiffusionExplicit.h
 //!
-//! \date Jun 12 2012
+//! \date Oct 29 2012
 //!
 //! \author Arne Morten Kvarving / SINTEF
 //!
-//! \brief Integrand implementations for time-dependent Advection-Diffusion
-//!         problems.
+//! \brief Integrand implementations for time-dependent Advection-Diffusion.
 //!
 //==============================================================================
 
-#ifndef _ADVECTIONDIFFUSION_EXPLICIT_H
-#define _ADVECTIONDIFFUSION_EXPLICIT_H
+#ifndef _ADVECTION_DIFFUSION_EXPLICIT_H
+#define _ADVECTION_DIFFUSION_EXPLICIT_H
 
 #include "AdvectionDiffusion.h"
-#include "ElmMats.h"
-#include "Vec3.h"
 
 
 /*!
-  \brief Class representing the integrand of a time-dependent 
+  \brief Class representing the integrand of a time-dependent
          Advection-Diffusion problem.
-  \details Time stepping is done using an explicit (RK type) method
+  \details Time stepping is done using an explicit (RK type) method.
 */
 
 class AdvectionDiffusionExplicit : public AdvectionDiffusion
@@ -31,23 +28,20 @@ class AdvectionDiffusionExplicit : public AdvectionDiffusion
 public:
   //! \brief The default constructor initializes all pointers to zero.
   //! \param[in] n Number of spatial dimensions
-  //! \param[in] order Temporal order (1,2)
-  //! \param[in] stab Integrand formulation
+  //! \param[in] itg_type The integrand type to use
+  //! \param[in] form Integrand formulation
   AdvectionDiffusionExplicit(unsigned short int n = 3,
-                             int itg_type_=Integrand::STANDARD,
-                             int form = 0);
+                             int itg_type = STANDARD, int form = 0);
 
   //! \brief Empty destructor.
-  virtual ~AdvectionDiffusionExplicit();
+  virtual ~AdvectionDiffusionExplicit() {}
 
+  using AdvectionDiffusion::finalizeElement;
   //! \brief Finalizes the element quantities after the numerical integration.
   //! \details This method is invoked once for each element, after the numerical
   //! integration loop over interior points is finished and before the resulting
   //! element quantities are assembled into their system level equivalents.
-  //! It can also be used to implement multiple integration point loops within
-  //! the same element, provided the necessary integration point values are
-  //! stored internally in the object during the first integration loop.
-  virtual bool finalizeElement(LocalIntegral&, const TimeDomain&, size_t = 0);
+  virtual bool finalizeElement(LocalIntegral&);
 
   using AdvectionDiffusion::evalInt;
   //! \brief Evaluates the integrand at an interior point.
@@ -63,13 +57,10 @@ public:
   virtual LocalIntegral* getLocalIntegral(size_t nen, size_t,
                                           bool neumann) const;
 
-  //! \brief Returns the integrand type
+  //! \brief Returns the integrand type.
   virtual int getIntegrandType() const
-  { 
-    if (stab == NONE)
-      return Integrand::STANDARD;
-
-    return Integrand::SECOND_DERIVATIVES | Integrand::G_MATRIX;
+  {
+    return stab == NONE ? STANDARD : SECOND_DERIVATIVES | G_MATRIX;
   }
 };
 

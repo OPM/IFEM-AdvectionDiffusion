@@ -13,20 +13,16 @@
 //==============================================================================
 
 #include "AdvectionDiffusionBDF.h"
-#include "CFDenums.h"
 #include "FiniteElement.h"
-#include "Utilities.h"
-#include "ElmMats.h"
-#include "ElmNorm.h"
-#include "Tensor.h"
-#include "StabilizationUtils.h"
 #include "TimeDomain.h"
-#include "Vec3Oper.h"
+#include "Utilities.h"
+#include "StabilizationUtils.h"
+#include "CFDenums.h"
 
 
 AdvectionDiffusionBDF::AdvectionDiffusionBDF (unsigned short int n, int order,
                                               int itg_type, int form) :
-  AdvectionDiffusion(n, itg_type == Integrand::STANDARD?NONE:SUPG),
+  AdvectionDiffusion(n, itg_type == STANDARD ? NONE : SUPG),
   formulation(form), bdf(order)
 {
   primsol.resize(order);
@@ -37,11 +33,6 @@ AdvectionDiffusionBDF::AdvectionDiffusionBDF (unsigned short int n, int order,
 
   registerVector("nut", &nut);
   registerVector("grid velocity", &ux);
-}
-
-
-AdvectionDiffusionBDF::~AdvectionDiffusionBDF()
-{
 }
 
 
@@ -164,8 +155,7 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
 }
 
 
-bool AdvectionDiffusionBDF::finalizeElement(LocalIntegral& A, 
-                                            const TimeDomain&, size_t)
+bool AdvectionDiffusionBDF::finalizeElement (LocalIntegral& A)
 {
   if (stab != NONE) {
     ElementInfo& E = static_cast<ElementInfo&>(A);
