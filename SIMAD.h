@@ -41,6 +41,8 @@ public:
     bool shareGrid;
     IntegrandBase* integrand;
     SIMoutput* share;
+
+    SetupProps() : shareGrid(false), integrand(NULL), share(NULL) {}
   };
 
   //! \brief Default constructor.
@@ -321,7 +323,7 @@ private:
 template<class Dim>
 struct SolverConfigurator< SIMAD<Dim> > {
   int setup(SIMAD<Dim>& ad,
-            typename SIMAD<Dim>::SetupProps& props, char* infile)
+            const typename SIMAD<Dim>::SetupProps& props, char* infile)
   {
     utl::profiler->start("Model input");
 
