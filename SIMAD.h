@@ -53,6 +53,7 @@ public:
   {
     standalone = alone;
     Dim::myProblem = AD;
+    this->myHeading = "Advection-Diffusion solver";
   }
 
   //! \brief Construct from props
@@ -63,6 +64,7 @@ public:
   {
     standalone = false;
     Dim::myProblem = AD;
+    this->myHeading = "Advection-Diffusion solver";
   }
 
   //! \brief The destructor clears the VTF-file pointer, unless stand-alone.
@@ -277,7 +279,8 @@ public:
 
   void registerFields(DataExporter& exporter, const std::string& prefix="")
   {
-    exporter.registerField("theta","temperature",DataExporter::SIM,DataExporter::PRIMARY,
+    exporter.registerField("theta","temperature",DataExporter::SIM,
+                           DataExporter::PRIMARY|DataExporter::RESTART,
                            prefix);
     exporter.setFieldValue("theta", this, &temperature.front());
   }
@@ -334,9 +337,6 @@ struct SolverConfigurator< SIMAD<Dim> > {
             const typename SIMAD<Dim>::SetupProps& props, char* infile)
   {
     utl::profiler->start("Model input");
-
-    std::cout <<"\nTemperature solver"
-              <<"\n=====================================\n";
 
     if (props.shareGrid)
       // Let the turbulence solver use the same grid as the velocity solver
