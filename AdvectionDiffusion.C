@@ -21,7 +21,7 @@
 
 AdvectionDiffusion::AdvectionDiffusion (unsigned short int n,
                                         AdvectionDiffusion::Stabilization s) :
-  nsd(n), kappa(1.0), Pr(1.0), order(1), stab(s), Cinv(5)
+  nsd(n), kappa(1.0), kFunc(NULL), Pr(1.0), order(1), stab(s), Cinv(5)
 {
   primsol.resize(1);
 
@@ -490,7 +490,7 @@ const char* AdvectionDiffusionNorm::getName (size_t i, size_t j,
 
 AdvectionDiffusion::WeakDirichlet::WeakDirichlet (unsigned short int n,
                                                   double CBI_, double gamma_) :
-  CBI(CBI_), gamma(gamma_), Uad(NULL), nsd(n)
+  CBI(CBI_), gamma(gamma_), Uad(NULL), nsd(n), kFunc(NULL)
 {
   // Need current solution only
   primsol.resize(1);
@@ -553,18 +553,24 @@ bool AdvectionDiffusion::WeakDirichlet::evalBou (LocalIntegral& elmInt,
   double h = getElementSize(fe.XC,nsd);
   double C = CBI*fabs(kappa)/h;
 
+  double kap = kappa;
+  if (kFunc) {
+    double val = fe.N.dot(elMat.vec[0]);
+    kap = (*kFunc)(val);
+  }
+
   // loop over test functions (i) and basis functions (j)
   for (size_t i = 1; i <= fe.N.size(); ++i) {
     double addI = 0.0;
     for (int k=1; k <= nsd; ++k)
       addI += fe.dNdX(i,k)*normal[k-1];
-    addI *= gamma*kappa;
+    addI *= gamma*kap;
     for (size_t j = 1; j <= fe.N.size(); ++j) {
       // adjoint
       double addJ = 0.0;
       for (int k=1; k <= nsd; ++k)
         addJ += fe.dNdX(j,k)*normal[k-1];
-      elMat.A[0](i,j) += (-kappa*addJ+An*fe.N(j))*fe.N(i)*fe.detJxW;
+      elMat.A[0](i,j) += (-kap*addJ+An*fe.N(j))*fe.N(i)*fe.detJxW;
 
       // inflow
       if (An < 0)

@@ -111,6 +111,14 @@ public:
         AD->setKappa(atof(value));
         weakDirBC.setKappa(atof(value));
       }
+      else if ((value = utl::getValue(child,"conductivity"))) {
+        std::string type;
+        utl::getAttribute(child,"type",type);
+        std::cout <<"Thermal conductivity: "<< value << std::endl;
+        ScalarFunc* func = utl::parseTimeFunc(value, type);
+        AD->setKappa(func);
+        weakDirBC.setKappa(func);
+      }
       else if ((value = utl::getValue(child,"prandtl"))) {
         std::cout <<"Prandtl number: "<< value << std::endl;
         AD->setPrandtlNumber(atof(value));

@@ -103,13 +103,17 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
   if (reaction)
     react = (*reaction)(X);
 
+  double theta=0;
+  for (int t=0;t<bdf.getOrder();++t) {
+    double val = fe.N.dot(elMat.vec[t]);
+    if (kFunc && t == 0)
+      nut = (*kFunc)(val);
+    theta += -bdf[1+t]/time.dt*val;
+  }
+
   double tau=0;
   if (stab == SUPG)
     tau = StabilizationUtils::getTauPt(time.dt, nut, U, fe.G);
-
-  double theta=0;
-  for (int t=0;t<bdf.getOrder();++t)
-    theta += -bdf[1+t]/time.dt*fe.N.dot(elMat.vec[t]);
 
   // Integrate source, if defined
   if (source)

@@ -73,6 +73,9 @@ public:
     //! \brief Defines kappa.
     void setKappa(double kappa_) { kappa = kappa_; }
 
+    //! \brief Defines kappa function
+    void setKappa(ScalarFunc* kappa_) { kFunc = kappa_; }
+
   protected:
     const double CBI;   //!< Model constant
     const double gamma; //!< Adjoint factor
@@ -80,6 +83,7 @@ public:
     RealFunc*    flux;  //!< Pointer to the flux field
     unsigned short int nsd; //!< Number of space dimensions (1, 2 or, 3)
     double       kappa; //!< Diffusion coefficient
+    ScalarFunc*    kFunc; //!< Diffusion coefficient function
   };
 
   //! \brief The default constructor initializes all pointers to zero.
@@ -118,6 +122,9 @@ public:
 
   //! \brief Defines kappa.
   void setKappa(double kappa_) { kappa = kappa_; }
+
+  //! \brief Defines kappa.
+  void setKappa(ScalarFunc* kappa_) { kFunc = kappa_; }
 
   //! \brief Defines the stabilization type.
   void setStabilization(Stabilization s) { stab = s; }
@@ -215,6 +222,7 @@ protected:
   RealFunc* flux;     //!< Pointer to the flux field
   unsigned short int nsd; //!< Number of space dimensions (1, 2 or, 3)
   double kappa; //!< diffusion coefficient
+  ScalarFunc* kFunc;  //!< Diffusion coefficient function
   double Pr;    //!< Prandtl number
   Vector tauE;  //!< Stored tau values - need for norm integration
   int order;    //!< Basis order
