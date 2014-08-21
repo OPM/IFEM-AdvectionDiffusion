@@ -215,6 +215,9 @@ public:
   //! \param[in] asol Pointer to analytical solution (optional)
   virtual NormBase* getNormIntegrand(AnaSol* asol = 0) const;
 
+  //! \brief Advance the integrand
+  virtual void advanceStep() {}
+
 protected:
   VecFunc*  Uad;      //!< Pointer to advection field
   RealFunc* reaction; //!< Pointer to the reaction field

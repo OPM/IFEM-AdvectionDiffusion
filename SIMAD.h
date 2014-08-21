@@ -218,6 +218,8 @@ public:
     for (int n = nNusols-1; n > 0; n--)
       temperature[n] = temperature[n-1];
 
+    AD->advanceStep();
+
     return true;
   }
 

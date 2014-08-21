@@ -65,6 +65,7 @@ public:
     return stab == NONE ? STANDARD : SECOND_DERIVATIVES | G_MATRIX;
   }
 
+  //! \brief Advance the time stepping scheme
   virtual void advanceStep() { bdf.advanceStep(); }
 
 protected:
