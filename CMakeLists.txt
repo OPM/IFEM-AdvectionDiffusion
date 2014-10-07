@@ -15,7 +15,7 @@ ENDIF(NOT IFEM_CONFIGURED)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IFEM_CXX_FLAGS}")
 
-INCLUDE_DIRECTORIES(${IFEM_INCLUDES} ../Common)
+INCLUDE_DIRECTORIES(${IFEM_INCLUDES} ../Common ${PROJECT_SOURCE_DIR})
 
 SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
@@ -30,12 +30,13 @@ IF (NOT IFEM_PRECONFIGURED)
   ADD_SUBDIRECTORY(../Common CommonIFEM.dir)
 ENDIF(NOT IFEM_PRECONFIGURED)
 
-ADD_EXECUTABLE(AdvectionDiffusion AdvectionDiffusion.C 
-                                  AdvectionDiffusionBDF.C
-                                  AdvectionDiffusionExplicit.C
-                                  main_AdvectionDiffusion.C)
+add_library(CommonAD AdvectionDiffusion.C
+                     AdvectionDiffusionBDF.C
+                     AdvectionDiffusionExplicit.C)
 
-TARGET_LINK_LIBRARIES(AdvectionDiffusion ${IFEM_LIBRARIES} CommonIFEM)
+ADD_EXECUTABLE(AdvectionDiffusion main_AdvectionDiffusion.C)
+
+TARGET_LINK_LIBRARIES(AdvectionDiffusion CommonAD ${IFEM_LIBRARIES} CommonIFEM)
 
 # Installation
 INSTALL(TARGETS AdvectionDiffusion DESTINATION bin)
@@ -60,3 +61,17 @@ ELSE(IFEM_USE_PARALLEL_PETSC)
     IFEM_ADD_TEST(${TESTFILE} AdvectionDiffusion)
   ENDFOREACH()
 ENDIF(IFEM_USE_PARALLEL_PETSC)
+list(APPEND TEST_APPS AdvectionDiffusion)
+
+# Unit tests
+IFEM_add_test_app(${PROJECT_SOURCE_DIR}/Test/*.C
+                  ${PROJECT_SOURCE_DIR}/Test
+                  AdvectionDiffusion
+                  CommonAD ${IFEM_LIBRARIES} CommonIFEM)
+
+if(IFEM_COMMON_APP_BUILD)
+  set(TEST_APPS ${TEST_APPS} PARENT_SCOPE)
+  set(UNIT_TEST_NUMBER ${UNIT_TEST_NUMBER} PARENT_SCOPE)
+else()
+  add_check_target()
+endif()
