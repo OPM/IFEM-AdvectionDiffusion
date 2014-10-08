@@ -120,14 +120,23 @@ public:
   //! \brief Defines the Cinv stabilization parameter.
   void setCinv(double Cinv_) { Cinv = Cinv_; }
 
+  //! \brief Obtain the current Cinv value.
+  double getCinv() const { return Cinv; }
+
   //! \brief Defines kappa.
   void setKappa(double kappa_) { kappa = kappa_; }
+
+  //! \brief Obtain current kappa.
+  double getKappa() const { return kappa; }
 
   //! \brief Defines kappa.
   void setKappa(ScalarFunc* kappa_) { kFunc = kappa_; }
 
   //! \brief Defines the stabilization type.
   void setStabilization(Stabilization s) { stab = s; }
+
+  //! \brief Obtain the current stabilization type.
+  Stabilization getStabilization() const { return stab; }
 
   //! \brief Defines the advection field.
   void setAdvectionField(VecFunc* U) { Uad = U; }
@@ -146,6 +155,9 @@ public:
 
   //! \brief Defines the Prandtl number.
   void setPrandtlNumber(double Pr_) { Pr = Pr_; }
+
+  //! \brief Obtain the current Prandtl number.
+  double getPrandtlNumber() const { return Pr; }
 
   //! \brief Returns a previously calculated tau value for the given element.
   //! \brief param[in] e The element number

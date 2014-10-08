@@ -25,6 +25,7 @@
     <advectionfield>3|1</advectionfield>
 <reactionfield>1</reactionfield>
    <stabilization type="MS" Cinv="1.0"/>
-    <kappa>1e-6</kappa>
+   <kappa>1e-6</kappa>
+   <prandtl>0.5</prandtl>
   </advectiondiffusion>
 </simulation>
