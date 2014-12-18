@@ -104,8 +104,8 @@ int runSimulatorStationary(bool adap, char* infile)
     exporter->registerField("u","velocity",DataExporter::SIM,
                             DataExporter::PRIMARY);
     exporter->setFieldValue("u",model, &sol);
-    exporter->registerWriter(new HDF5Writer(model->opt.hdf5));
-    exporter->registerWriter(new XMLWriter(model->opt.hdf5));
+    exporter->registerWriter(new HDF5Writer(model->opt.hdf5,model->getProcessAdm()));
+    exporter->registerWriter(new XMLWriter(model->opt.hdf5,model->getProcessAdm()));
   }
 
   model->initSystem(model->opt.solver,1,1);
@@ -261,8 +261,8 @@ int runSimulatorTransientImpl(char* infile, TimeIntegration::Method tIt,
     exporter->registerField("theta","temperature",DataExporter::SIM,
                             DataExporter::PRIMARY);
     exporter->setFieldValue("theta", &model, &model.getSolution());
-    exporter->registerWriter(new HDF5Writer(model.opt.hdf5));
-    exporter->registerWriter(new XMLWriter(model.opt.hdf5));
+    exporter->registerWriter(new HDF5Writer(model.opt.hdf5,model.getProcessAdm()));
+    exporter->registerWriter(new XMLWriter(model.opt.hdf5,model.getProcessAdm()));
   }
 
   model.init(solver.getTimePrm());
