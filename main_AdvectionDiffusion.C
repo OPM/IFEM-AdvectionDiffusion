@@ -75,6 +75,8 @@ int runSimulatorStationary(bool adap, char* infile)
   if (!theSim->read(infile))
     return 1;
 
+  model->opt.print(std::cout,true) << std::endl;
+
   utl::profiler->stop("Model input");
 
   // Establish the FE data structures
@@ -243,6 +245,8 @@ int runSimulatorTransientImpl(char* infile, TimeIntegration::Method tIt,
   if (!model.read(infile) || !solver.read(infile))
     return 1;
 
+  model.opt.print(std::cout,true) << std::endl;
+
   utl::profiler->stop("Model input");
 
   // Establish the FE data structures
@@ -364,29 +368,12 @@ int main (int argc, char** argv)
 
   if (myPid == 0)
   {
-    const SIMoptions& opts = IFEM::getOptions();
     std::cout <<"\n >>> IFEM Advection-Diffusion equation solver <<<"
 	      <<"\n ====================================\n"
 	      <<"\n Executing command:\n";
     for (i = 0; i < argc; i++) std::cout <<" "<< argv[i];
-    std::cout <<"\n\nInput file: "<< infile
-	      <<"\nEquation solver: "<< opts.solver
-	      <<"\nNumber of Gauss points: "<< opts.nGauss[0];
-    if (opts.format >= 0)
-    {
-      std::cout <<"\nVTF file format: "<< (opts.format ? "BINARY":"ASCII")
-                <<"\nNumber of visualization points: "<< opts.nViz[0]
-                <<" "<< opts.nViz[1];
-      if (!twoD) std::cout <<" "<< opts.nViz[2];
-    }
-
-    if (opts.discretization == ASM::Lagrange)
-      std::cout <<"\nLagrangian basis functions are used";
-    else if (opts.discretization == ASM::Spectral)
-      std::cout <<"\nSpectral basis functions are used";
-    else if (opts.discretization == ASM::LRSpline)
-      std::cout <<"\nLR-spline basis functions are used";
-    std::cout << std::endl;
+    std::cout <<"\n\nInput file: "<< infile;
+    IFEM::getOptions().print(std::cout) << std::endl;
   }
   utl::profiler->stop("Initialization");
 
@@ -396,12 +383,9 @@ int main (int argc, char** argv)
     else
       return runSimulatorStationary<SIM3D>(adap, infile);
   }
-  else {
-    if (twoD)
-      return runSimulatorTransient<SIM2D>(infile, tInt, integrandType);
-    else
-      return runSimulatorTransient<SIM3D>(infile, tInt, integrandType);
-  }
 
-  return 1; // Should not be here
+  if (twoD)
+    return runSimulatorTransient<SIM2D>(infile, tInt, integrandType);
+  else
+    return runSimulatorTransient<SIM3D>(infile, tInt, integrandType);
 }
