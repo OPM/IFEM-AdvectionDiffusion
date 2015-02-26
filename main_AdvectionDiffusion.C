@@ -312,8 +312,7 @@ int main (int argc, char** argv)
   Profiler prof(argv[0]);
   utl::profiler->start("Initialization");
 
-  SIMoptions dummy;
-  int i, integrandType = Integrand::STANDARD;
+  int integrandType = Integrand::STANDARD;
   TimeIntegration::Method tInt = TimeIntegration::NONE;
   bool twoD = false;
   bool adap = false;
@@ -321,8 +320,8 @@ int main (int argc, char** argv)
 
   int myPid = IFEM::Init(argc, argv);
 
-  for (i = 1; i < argc; i++)
-    if (dummy.parseOldOptions(argc,argv,i))
+  for (int i = 1; i < argc; i++)
+    if (SIMoptions::ignoreOldOptions(argc,argv,i))
       ; // ignore the obsolete option
     else if (!strcmp(argv[i],"-adap"))
       adap = true;
@@ -371,7 +370,7 @@ int main (int argc, char** argv)
     std::cout <<"\n >>> IFEM Advection-Diffusion equation solver <<<"
 	      <<"\n ====================================\n"
 	      <<"\n Executing command:\n";
-    for (i = 0; i < argc; i++) std::cout <<" "<< argv[i];
+    for (int i = 0; i < argc; i++) std::cout <<" "<< argv[i];
     std::cout <<"\n\nInput file: "<< infile;
     IFEM::getOptions().print(std::cout) << std::endl;
   }
