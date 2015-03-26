@@ -75,7 +75,7 @@ int runSimulatorStationary(bool adap, char* infile)
   if (!theSim->read(infile))
     return 1;
 
-  model->opt.print(std::cout,true) << std::endl;
+  model->opt.print(IFEM::cout,true) << std::endl;
 
   utl::profiler->stop("Model input");
 
@@ -126,12 +126,12 @@ int runSimulatorStationary(bool adap, char* infile)
       model->solutionNorms(Vectors(1,sol),projs,eNorm,gNorm);
       // print norm of solution
       NormBase* norm = model->getNormIntegrand();
-      std::cout << norm->getName(1,1) << ": " << gNorm[0](1) << std::endl;
-      std::cout << norm->getName(1,2) << ": " << gNorm[0](2) << std::endl;
+      IFEM::cout << norm->getName(1,1) << ": " << gNorm[0](1) << std::endl;
+      IFEM::cout << norm->getName(1,2) << ": " << gNorm[0](2) << std::endl;
       if (gNorm[0].size() > 3) {
-        std::cout << norm->getName(1,3) << ": " << gNorm[0](3) << std::endl;
-        std::cout << norm->getName(1,4) << ": " << gNorm[0](4) << " :"<< std::endl;
-        std::cout << norm->getName(1,5) << ": " << gNorm[0](4)/gNorm[0](3) << std::endl;
+        IFEM::cout << norm->getName(1,3) << ": " << gNorm[0](3) << std::endl;
+        IFEM::cout << norm->getName(1,4) << ": " << gNorm[0](4) << " :"<< std::endl;
+        IFEM::cout << norm->getName(1,5) << ": " << gNorm[0](4)/gNorm[0](3) << std::endl;
       }
       delete norm;
 
@@ -160,12 +160,12 @@ int runSimulatorStationary(bool adap, char* infile)
 
     // print norm of solution
     NormBase* norm = model->getNormIntegrand();
-    std::cout << norm->getName(1,1) << ": " << gNorm[0](1) << std::endl;
-    std::cout << norm->getName(1,2) << ": " << gNorm[0](2) << std::endl;
+    IFEM::cout << norm->getName(1,1) << ": " << gNorm[0](1) << std::endl;
+    IFEM::cout << norm->getName(1,2) << ": " << gNorm[0](2) << std::endl;
     if (gNorm[0].size() > 3) {
-      std::cout << norm->getName(1,3) << ": " << gNorm[0](3) << std::endl;
-      std::cout << norm->getName(1,4) << ": " << gNorm[0](4) << std::endl;
-      std::cout << norm->getName(1,5) << ": " << gNorm[0](4)/gNorm[0](3) << std::endl;
+      IFEM::cout << norm->getName(1,3) << ": " << gNorm[0](3) << std::endl;
+      IFEM::cout << norm->getName(1,4) << ": " << gNorm[0](4) << std::endl;
+      IFEM::cout << norm->getName(1,5) << ": " << gNorm[0](4)/gNorm[0](3) << std::endl;
     }
     delete norm;
 
@@ -178,14 +178,14 @@ int runSimulatorStationary(bool adap, char* infile)
     // Print the norms
     for ( j=1, pit = pOpt.begin(); pit != pOpt.end() && j<=gNorm[0].size(); pit++, j++)
     {
-      std::cout <<"\n\n>>> Error estimates based on "<< pit->second<<"" <<" <<<";
+      IFEM::cout <<"\n\n>>> Error estimates based on "<< pit->second<<"" <<" <<<";
 
-      std::cout <<"\n |e|_H^1, e=u^r-u^h : " <<gNorm[j](2)<<std::endl;
+      IFEM::cout <<"\n |e|_H^1, e=u^r-u^h : " <<gNorm[j](2)<<std::endl;
       if (model->haveAnaSol() && j <= gNorm.size())
       {
-        std::cout <<"\n |e|_H^1, e=u-u^r : " <<gNorm[j](3)<<std::endl;
-        std::cout <<"\n |e|_H^1, e=u-u^h : " <<gNorm[0](3)<<std::endl;
-        std::cout <<"\nEffectivity index (recovery) : "<< gNorm[j](2)/gNorm[0](3)<<std::endl;
+        IFEM::cout <<"\n |e|_H^1, e=u-u^r : " <<gNorm[j](3)<<std::endl;
+        IFEM::cout <<"\n |e|_H^1, e=u-u^h : " <<gNorm[0](3)<<std::endl;
+        IFEM::cout <<"\nEffectivity index (recovery) : "<< gNorm[j](2)/gNorm[0](3)<<std::endl;
       }
     }
 
@@ -245,7 +245,7 @@ int runSimulatorTransientImpl(char* infile, TimeIntegration::Method tIt,
   if (!model.read(infile) || !solver.read(infile))
     return 1;
 
-  model.opt.print(std::cout,true) << std::endl;
+  model.opt.print(IFEM::cout,true) << std::endl;
 
   utl::profiler->stop("Model input");
 
@@ -318,7 +318,7 @@ int main (int argc, char** argv)
   bool adap = false;
   char* infile = NULL;
 
-  int myPid = IFEM::Init(argc, argv);
+  IFEM::Init(argc, argv);
 
   for (int i = 1; i < argc; i++)
     if (SIMoptions::ignoreOldOptions(argc,argv,i))
@@ -365,15 +365,12 @@ int main (int argc, char** argv)
   if (adap)
     IFEM::getOptions().discretization = ASM::LRSpline;
 
-  if (myPid == 0)
-  {
-    std::cout <<"\n >>> IFEM Advection-Diffusion equation solver <<<"
-	      <<"\n ====================================\n"
-	      <<"\n Executing command:\n";
-    for (int i = 0; i < argc; i++) std::cout <<" "<< argv[i];
-    std::cout <<"\n\nInput file: "<< infile;
-    IFEM::getOptions().print(std::cout) << std::endl;
-  }
+  IFEM::cout <<"\n >>> IFEM Advection-Diffusion equation solver <<<"
+             <<"\n ====================================\n"
+	     <<"\n Executing command:\n";
+  for (int i = 0; i < argc; i++) IFEM::cout <<" "<< argv[i];
+  IFEM::cout <<"\n\nInput file: "<< infile;
+  IFEM::getOptions().print(IFEM::cout) << std::endl;
   utl::profiler->stop("Initialization");
 
   if (tInt == TimeIntegration::NONE) {
