@@ -72,8 +72,7 @@ public:
 
     //! \brief Defines kappa.
     void setKappa(double kappa_) { kappa = kappa_; }
-
-    //! \brief Defines kappa function
+    //! \brief Defines the kappa function.
     void setKappa(ScalarFunc* kappa_) { kFunc = kappa_; }
 
   protected:
@@ -83,7 +82,7 @@ public:
     RealFunc*    flux;  //!< Pointer to the flux field
     unsigned short int nsd; //!< Number of space dimensions (1, 2 or, 3)
     double       kappa; //!< Diffusion coefficient
-    ScalarFunc*    kFunc; //!< Diffusion coefficient function
+    ScalarFunc*  kFunc; //!< Diffusion coefficient function
   };
 
   //! \brief The default constructor initializes all pointers to zero.
@@ -119,18 +118,15 @@ public:
 
   //! \brief Defines the Cinv stabilization parameter.
   void setCinv(double Cinv_) { Cinv = Cinv_; }
-
-  //! \brief Obtain the current Cinv value.
+  //! \brief Returns the current Cinv value.
   double getCinv() const { return Cinv; }
 
   //! \brief Defines kappa.
   void setKappa(double kappa_) { kappa = kappa_; }
-
-  //! \brief Obtain current kappa.
-  double getKappa() const { return kappa; }
-
-  //! \brief Defines kappa.
+  //! \brief Defines the kappa function.
   void setKappa(ScalarFunc* kappa_) { kFunc = kappa_; }
+  //! \brief Returns current kappa.
+  double getKappa() const { return kappa; }
 
   //! \brief Defines the stabilization type.
   void setStabilization(Stabilization s) { stab = s; }
@@ -150,13 +146,13 @@ public:
   //! \brief Defines the global number of elements.
   void setElements(size_t els) { tauE.resize(els); }
 
-  //! \brief Set the basis order
+  //! \brief Sets the basis order.
   void setOrder(int p) { order = p; }
 
   //! \brief Defines the Prandtl number.
   void setPrandtlNumber(double Pr_) { Pr = Pr_; }
 
-  //! \brief Obtain the current Prandtl number.
+  //! \brief Returns the current Prandtl number.
   double getPrandtlNumber() const { return Pr; }
 
   //! \brief Returns a previously calculated tau value for the given element.
@@ -227,7 +223,7 @@ public:
   //! \param[in] asol Pointer to analytical solution (optional)
   virtual NormBase* getNormIntegrand(AnaSol* asol = 0) const;
 
-  //! \brief Advance the integrand
+  //! \brief Advances the integrand one time step forward.
   virtual void advanceStep() {}
 
 protected:
@@ -263,9 +259,6 @@ public:
   AdvectionDiffusionNorm(AdvectionDiffusion& p, RealFunc* u=0, VecFunc* du=0);
   //! \brief Empty destructor.
   virtual ~AdvectionDiffusionNorm() {}
-
-  //! \brief Defines which FE quantities are needed by the integrand.
-  virtual int getIntegrandType() const { return myProblem.getIntegrandType(); }
 
   //! \brief Evaluates the integrand at an interior point.
   //! \param elmInt The local integral object to receive the contributions
