@@ -71,11 +71,12 @@ public:
 
   //! \brief The destructor clears the VTF-file pointer, unless stand-alone.
   //! \details This is needed when the VTF-file is assumed to be owned by
-  //! another SIM-object, is deleted by the SIMbase destructor of that object.
+  //! another SIM-object and is deleted by the SIMbase destructor of that one.
   virtual ~SIMAD()
   {
     if (!standalone)
       this->setVTF(NULL);
+    Dim::myInts.clear();
   }
 
   //! \brief Parses a data section from an input stream (depreciated).
