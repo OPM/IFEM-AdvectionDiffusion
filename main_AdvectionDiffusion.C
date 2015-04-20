@@ -271,7 +271,7 @@ int runSimulatorTransientImpl(char* infile, TimeIntegration::Method tIt,
 
   model.init(solver.getTimePrm());
 
-  if (!solver.solveProblem(infile, exporter))
+  if (solver.solveProblem(infile, exporter))
     return 5;
 
   delete exporter;
