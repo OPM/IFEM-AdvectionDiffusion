@@ -22,8 +22,9 @@
 
 AdvectionDiffusion::AdvectionDiffusion (unsigned short int n,
                                         AdvectionDiffusion::Stabilization s) :
-  nsd(n), order(1), stab(s), Cinv(5)
+  order(1), stab(s), Cinv(5)
 {
+  nsd = n;
   primsol.resize(1);
 
   source = 0, Uad = 0, flux = 0, reaction = 0;
@@ -216,14 +217,6 @@ bool AdvectionDiffusion::evalSol (Vector& s, const FiniteElement& fe,
     return false;
 
   return fe.dNdX.multiply(ePhi,s,true);
-}
-
-
-bool AdvectionDiffusion::evalSol(Vector& s, const VecFunc& asol,
-                                 const Vec3& X) const
-{
-  s = Vector(asol(X).ptr(),nsd);
-  return true;
 }
 
 
@@ -476,8 +469,9 @@ std::string AdvectionDiffusionNorm::getName (size_t i, size_t j,
 
 AdvectionDiffusion::WeakDirichlet::WeakDirichlet (unsigned short int n,
                                                   double CBI_, double gamma_) :
-  CBI(CBI_), gamma(gamma_), Uad(NULL), nsd(n)
+  CBI(CBI_), gamma(gamma_), Uad(NULL)
 {
+  nsd = n;
   // Need current solution only
   primsol.resize(1);
 }

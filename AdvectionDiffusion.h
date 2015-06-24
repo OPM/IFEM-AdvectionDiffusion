@@ -83,7 +83,6 @@ public:
     VecFunc*     Uad;   //!< Pointer to advection field
     RealFunc*    flux;  //!< Pointer to the flux field
     AD::FluidProperties props; //!< Fluid properties
-    unsigned short int nsd; //!< Number of space dimensions (1, 2 or, 3)
   };
 
   //! \brief The default constructor initializes all pointers to zero.
@@ -187,12 +186,6 @@ public:
   virtual bool evalSol(Vector& s, const FiniteElement& fe,
                        const Vec3& X, const std::vector<int>& MNPC) const;
 
-  //! \brief Evaluates the analytical secondary solution at a result point.
-  //! \param[out] s The solution field values at current point
-  //! \param[in] asol The analytical solution field (tensor field)
-  //! \param[in] X Cartesian coordinates of current point
-  virtual bool evalSol(Vector& s, const VecFunc& asol, const Vec3& X) const;
-
   //! \brief Returns the number of primary/secondary solution field components.
   //! \param[in] fld which field set to consider (1=primary, 2=secondary)
   virtual size_t getNoFields(int fld = 1) const { return fld > 1 ? nsd : 1; }
@@ -225,7 +218,6 @@ protected:
   RealFunc* reaction; //!< Pointer to the reaction field
   RealFunc* source;   //!< Pointer to source field
   RealFunc* flux;     //!< Pointer to the flux field
-  unsigned short int nsd; //!< Number of space dimensions (1, 2 or, 3)
   Vector tauE;  //!< Stored tau values - need for norm integration
   int order;    //!< Basis order
 
