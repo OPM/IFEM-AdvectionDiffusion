@@ -17,15 +17,16 @@
 #include "AdvectionDiffusion.h"
 #include "AnaSol.h"
 #include "ASMstruct.h"
-#include "DataExporter.h"
 #include "Functions.h"
 #include "InitialConditionHandler.h"
-#include "Profiler.h"
 #include "Property.h"
 #include "SIMoutput.h"
 #include "SIMSolver.h"
+#include "IFEM.h"
 #include "TimeStep.h"
+#include "Profiler.h"
 #include "Utilities.h"
+#include "DataExporter.h"
 #include "tinyxml.h"
 
 
@@ -96,15 +97,15 @@ public:
         std::string type;
         utl::getAttribute(child,"type",type,true);
         if (type == "supg") {
-          std::cout << "SUPG stabilization is enabled." << std::endl;
+          IFEM::cout <<"SUPG stabilization is enabled."<< std::endl;
           AD->setStabilization(AdvectionDiffusion::SUPG);
         }
         else if (type == "gls") {
-          std::cout << "GLS stabilization is enabled." << std::endl;
+          IFEM::cout <<"GLS stabilization is enabled."<< std::endl;
           AD->setStabilization(AdvectionDiffusion::GLS);
         }
         else if (type == "ms") {
-          std::cout << "MS stabilization is enabled." << std::endl;
+          IFEM::cout <<"MS stabilization is enabled."<< std::endl;
           AD->setStabilization(AdvectionDiffusion::MS);
         }
         double Cinv;
@@ -112,37 +113,37 @@ public:
           AD->setCinv(Cinv);
       }
       else if ((value = utl::getValue(child,"kappa"))) {
-        std::cout <<"Kappa: "<< value << std::endl;
+        IFEM::cout <<"Kappa: "<< value << std::endl;
         AD->setKappa(atof(value));
         weakDirBC.setKappa(atof(value));
       }
       else if ((value = utl::getValue(child,"conductivity"))) {
         std::string type;
         utl::getAttribute(child,"type",type);
-        std::cout <<"Thermal conductivity: "<< value << std::endl;
+        IFEM::cout <<"Thermal conductivity: "<< value << std::endl;
         ScalarFunc* func = utl::parseTimeFunc(value, type);
         AD->setKappa(func);
         weakDirBC.setKappa(func);
       }
       else if ((value = utl::getValue(child,"prandtl"))) {
-        std::cout <<"Prandtl number: "<< value << std::endl;
+        IFEM::cout <<"Prandtl number: "<< value << std::endl;
         AD->setPrandtlNumber(atof(value));
       }
       else if ((value = utl::getValue(child,"advectionfield"))) {
         AD->setAdvectionField(new VecFuncExpr(value,""));
         weakDirBC.setAdvectionField(new VecFuncExpr(value,""));
-        std::cout <<"Advection field: "<< value << std::endl;
+        IFEM::cout <<"Advection field: "<< value << std::endl;
       }
       else if ((value = utl::getValue(child,"reactionfield"))) {
         AD->setReactionField(new EvalFunction(value));
-        std::cout <<"Reaction field: "<< value << std::endl;
+        IFEM::cout <<"Reaction field: "<< value << std::endl;
       }
       else if ((value = utl::getValue(child,"source"))) {
         AD->setSource(new EvalFunction(value));
-        std::cout <<"Source field: "<< value << std::endl;
+        IFEM::cout <<"Source field: "<< value << std::endl;
       }
       else if (strcasecmp(child->Value(),"anasol") == 0) {
-        std::cout <<"\tAnalytical solution: Expression"<< std::endl;
+        IFEM::cout <<"\tAnalytical solution: Expression"<< std::endl;
         if (!Dim::mySol)
           Dim::mySol = new AnaSol(child);
 
@@ -231,8 +232,8 @@ public:
   {
     PROFILE1("SIMAD::solveStep");
 
-    if (Dim::myPid == 0 && Dim::msgLevel >= 0 && standalone)
-      std::cout <<"\n  step = "<< tp.step <<"  time = "<< tp.time.t << std::endl;
+    if (Dim::msgLevel >= 0 && standalone)
+      IFEM::cout <<"\n  step = "<< tp.step <<"  time = "<< tp.time.t << std::endl;
 
     Vector dummy;
     this->updateDirichlet(tp.time.t, &dummy);
@@ -248,10 +249,9 @@ public:
       size_t iMax[1];
       double dMax[1];
       double normL2 = this->solutionNorms(temperature.front(),dMax,iMax,1);
-      if (Dim::myPid == 0)
-        std::cout <<"Temperature summary: L2-norm        : "<< normL2
-                  <<"\n                   Max temperature : "<< dMax[0]
-                  << std::endl;
+      IFEM::cout <<"Temperature summary: L2-norm        : "<< normL2
+                 <<"\n                   Max temperature : "<< dMax[0]
+                 << std::endl;
     }
 
     return true;
