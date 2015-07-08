@@ -130,9 +130,14 @@ public:
         AD->setPrandtlNumber(atof(value));
       }
       else if ((value = utl::getValue(child,"advectionfield"))) {
-        AD->setAdvectionField(new VecFuncExpr(value,""));
-        weakDirBC.setAdvectionField(new VecFuncExpr(value,""));
-        IFEM::cout <<"Advection field: "<< value << std::endl;
+        std::string variables;
+        utl::getAttribute(child,"variables",variables);
+        AD->setAdvectionField(new VecFuncExpr(value,variables));
+        weakDirBC.setAdvectionField(new VecFuncExpr(value,variables));
+        IFEM::cout <<"Advection field: "<< value;
+        if (!variables.empty())
+          IFEM::cout <<" (variables: "<< variables <<")";
+        IFEM::cout << std::endl;
       }
       else if ((value = utl::getValue(child,"reactionfield"))) {
         AD->setReactionField(new EvalFunction(value));
@@ -299,7 +304,7 @@ public:
   void setContext(int ctx)
   {
     std::stringstream str;
-    str << "advectiondiffusion-" << ctx;
+    str <<"advectiondiffusion-"<< ctx;
     inputContext = str.str();
   }
 
