@@ -14,6 +14,7 @@
 
 #include "AdvectionDiffusionExplicit.h"
 #include "FiniteElement.h"
+#include "WeakOperators.h"
 
 
 AdvectionDiffusionExplicit::AdvectionDiffusionExplicit (unsigned short int n,
@@ -49,20 +50,12 @@ bool AdvectionDiffusionExplicit::evalInt (LocalIntegral& elmInt,
 
   // Integrate source, if defined
   if (source)
-    elMat.b.front().add(fe.N,(*source)(X)*fe.detJxW);
+    WeakOperators::Source(elMat.b.front(), fe, (*source)(X));
 
-  // loop over test functions (i) and basis functions (j)
-  for (size_t i = 1; i <= fe.N.size(); ++i) {
-    for (size_t j = 1; j <= fe.N.size(); ++j) {
-      double laplace = 0.0, advect = 0.0;
-      for (size_t k = 1;k <= nsd; ++k) {
-        laplace += fe.dNdX(i,k)*fe.dNdX(j,k);
-        advect += U[k-1]*fe.dNdX(j,k);
-      }
-      elMat.A[1](i,j) -= (nut*laplace+fe.N(i)*(advect+react*fe.N(j)))*fe.detJxW;
-      elMat.A[0](i,j) += fe.N(i)*fe.N(j)*fe.detJxW;
-    }
-  }
+  WeakOperators::Laplacian(elMat.A[1], fe, -nut);
+  WeakOperators::Mass(elMat.A[0], fe, 1.0);
+  WeakOperators::Mass(elMat.A[1], fe, -react);
+  WeakOperators::Advection(elMat.A[1], fe, U, -1.0);
 
   return true;
 }

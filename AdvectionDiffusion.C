@@ -17,6 +17,7 @@
 #include "Utilities.h"
 #include "Vec3Oper.h"
 #include "AnaSol.h"
+#include "WeakOperators.h"
 
 
 AdvectionDiffusion::AdvectionDiffusion (unsigned short int n,
@@ -118,18 +119,13 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
     if (Uad)
       U = (*Uad)(X);
 
+    WeakOperators::Laplacian(elMat.A[0], fe, kappa);
+    WeakOperators::Mass(elMat.A[0], fe, react);
+    WeakOperators::Advection(elMat.A[0], fe, U, 1.0);
+
     // loop over test functions (i) and basis functions (j)
     for (size_t i = 1; i <= fe.N.size(); ++i) {
       for (size_t j = 1; j <= fe.N.size(); ++j) {
-        double laplace = 0.0, advect = 0.0;
-        for (size_t k = 1;k <= nsd; ++k) {
-          laplace += fe.dNdX(i,k)*fe.dNdX(j,k);
-          advect += U[k-1]*fe.dNdX(j,k);
-        }
-        advect *= fe.N(i);
-
-        elMat.A[0](i,j) += (kappa*laplace+advect+react*fe.N(i)*fe.N(j))*fe.detJxW;
-
         if (stab == SUPG) {
           double convV=0, Lu=0;
           for (size_t k = 1;k <= nsd;k++) {

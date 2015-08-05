@@ -18,6 +18,7 @@
 #include "Utilities.h"
 #include "StabilizationUtils.h"
 #include "CFDenums.h"
+#include "WeakOperators.h"
 
 
 AdvectionDiffusionBDF::AdvectionDiffusionBDF (unsigned short int n, int order,
@@ -119,6 +120,10 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
   if (source)
     theta += (*source)(X);
 
+  // Laplacian terms
+  WeakOperators::Laplacian(elMat.A[0], fe, nut);
+  WeakOperators::Mass(elMat.A[0], fe, bdf[0]/time.dt+react);
+
   // loop over test functions (i) and basis functions (j)
   for (size_t i = 1; i <= fe.N.size(); ++i) {
     double convI = 0.0;
@@ -129,18 +134,15 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
       convI *= tau*fe.detJxW;
     }
     for (size_t j = 1; j <= fe.N.size(); ++j) {
-      double laplace = 0.0, advect = 0.0;
-      for (size_t k = 1;k <= nsd; ++k) {
-        laplace += fe.dNdX(i,k)*fe.dNdX(j,k);
+      double advect = 0.0;
+      for (size_t k = 1;k <= nsd; ++k)
         advect += U[k-1]*fe.dNdX(j,k);
-      }
       advect *= fe.N(i);
 
-      elMat.A[0](i,j) += (nut*laplace+advect+
-                          (bdf[0]/time.dt+react)*fe.N(i)*fe.N(j))*fe.detJxW;
+      elMat.A[0](i,j) += advect*fe.detJxW;
 
       if (stab == SUPG) {
-        laplace = 0.0;
+        double laplace = 0.0;
         for (size_t k = 1;k <= nsd;k++) {
           // Diffusion
           laplace -= fe.d2NdX2(j,k,k);
@@ -153,7 +155,7 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
       elMat.eSs(i) += theta*convI;
   }
 
-  elMat.b.front().add(fe.N, theta*fe.detJxW);
+  WeakOperators::Source(elMat.b.front(), fe, theta);
 
   return true;
 }
