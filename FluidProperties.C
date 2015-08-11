@@ -64,4 +64,31 @@ void FluidProperties::printLog() const
 }
 
 
+double FluidProperties::getMassAdvectionConstant() const
+{
+  if (scaling == PR_RA)
+    return 1.0;
+
+  return getMassDensity()*getHeatCapacity();
+}
+
+
+double FluidProperties::getDiffusionConstant() const
+{
+  if (scaling == PR_RA)
+    return 1.0/sqrt(Ra*Pr);
+
+  return getDiffusivity();
+}
+
+
+double FluidProperties::getReactionConstant() const
+{
+  if (scaling == PR_RA)
+    return 1.0/(sqrt(Ra*Pr)*getDiffusivity());
+
+  return 1.0;
+}
+
+
 }

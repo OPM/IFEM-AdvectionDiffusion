@@ -58,6 +58,15 @@ public:
 
   //! \brief Return Rayleigh number.
   double getRayleighNumber() const { return Ra; }
+
+  //! \brief Return mass and advection constant according to scaling.
+  double getMassAdvectionConstant() const;
+
+  //! \brief Returns the diffusion constant acccording to scaling.
+  double getDiffusionConstant() const;
+
+  //! \brief Returns the reaction constant acccording to scaling.
+  double getReactionConstant() const;
 protected:
   // Physical properties (constant)
   double rho;   //!< Mass density.

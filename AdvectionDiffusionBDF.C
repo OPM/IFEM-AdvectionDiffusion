@@ -90,23 +90,24 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
   if (reaction)
     react = (*reaction)(X);
 
-  double rhoC = props.getMassDensity()*props.getHeatCapacity();
   double theta=0;
   for (int t=0;t<bdf.getOrder();++t) {
     double val = fe.N.dot(elMat.vec[t]);
-    theta += -rhoC*bdf[1+t]/time.dt*val;
+    theta += -props.getMassAdvectionConstant()*bdf[1+t]/time.dt*val;
   }
 
   double tau=0;
   if (stab == SUPG)
-    tau = StabilizationUtils::getTauPt(time.dt, props.getDiffusivity(), Vector(U.ptr(),nsd), fe.G);
+    tau = StabilizationUtils::getTauPt(time.dt, props.getDiffusivity(),
+                                       Vector(U.ptr(),nsd), fe.G);
 
   // Integrate source, if defined
   if (source)
     theta += (*source)(X);
 
-  WeakOperators::Laplacian(elMat.A[0], fe, props.getDiffusivity());
-  WeakOperators::Mass(elMat.A[0], fe, bdf[0]/time.dt+react);
+  WeakOperators::Laplacian(elMat.A[0], fe, props.getDiffusionConstant());
+  WeakOperators::Mass(elMat.A[0], fe, props.getMassAdvectionConstant()*bdf[0]/time.dt +
+                                      react*props.getReactionConstant());
 
   // loop over test functions (i) and basis functions (j)
   for (size_t i = 1; i <= fe.N.size(); ++i) {
@@ -121,7 +122,7 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
       double advect = 0.0;
       for (size_t k = 1;k <= nsd; ++k)
         advect += U[k-1]*fe.dNdX(j,k);
-      advect *= fe.N(i)*rhoC;
+      advect *= fe.N(i)*props.getMassAdvectionConstant();
 
       elMat.A[0](i,j) += advect*fe.detJxW;
 
@@ -131,8 +132,9 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
           // Diffusion
           laplace -= fe.d2NdX2(j,k,k);
         }
-        elMat.eMs(i,j) += (props.getDiffusivity()*laplace+advect+
-                           (rhoC*bdf[0]/time.dt+react)*fe.N(j))*convI;
+        elMat.eMs(i,j) += (props.getDiffusionConstant()*laplace+advect+
+                           (props.getMassAdvectionConstant()*bdf[0]/time.dt+
+                            props.getReactionConstant()*react)*fe.N(j))*convI;
       }
     }
     if (stab == SUPG)
