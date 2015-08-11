@@ -36,13 +36,13 @@
   Advection-Diffusion problem using NURBS-based finite elements.
 */
 
-template<class Dim> class SIMAD : public Dim
+template<class Dim, class Integrand=AdvectionDiffusion> class SIMAD : public Dim
 {
 public:
   struct SetupProps
   {
     bool shareGrid;
-    IntegrandBase* integrand;
+    Integrand* integrand;
     SIMoutput* share;
 
     SetupProps() : shareGrid(false), integrand(NULL), share(NULL) {}
@@ -51,22 +51,22 @@ public:
   //! \brief Default constructor.
   //! \param[in] ad Integrand for advection-diffusion problem
   //! \param[in] alone Integrand is used stand-alone (controls time stepping)
-  SIMAD(AdvectionDiffusion* ad, bool alone = false) :
+  SIMAD(Integrand& ad, bool alone = false) :
     Dim(1), AD(ad), weakDirBC(Dim::dimension, 4.0, 1.0), inputContext("advectiondiffusion")
   {
     standalone = alone;
-    Dim::myProblem = AD;
+    Dim::myProblem = &AD;
     this->myHeading = "Advection-Diffusion solver";
   }
 
   //! \brief Construct from props
   //! \param props The properties
   SIMAD(SetupProps& props) :
-    Dim(1), AD(static_cast<AdvectionDiffusion*>(props.integrand)),
+    Dim(1), AD(*props.integrand),
     weakDirBC(Dim::dimension, 4.0, 1.0), inputContext("advectiondiffusion")
   {
     standalone = false;
-    Dim::myProblem = AD;
+    Dim::myProblem = &AD;
     this->myHeading = "Advection-Diffusion solver";
   }
 
@@ -77,6 +77,7 @@ public:
   {
     if (!standalone)
       this->setVTF(NULL);
+    Dim::myProblem = nullptr;
     Dim::myInts.clear();
   }
 
@@ -96,29 +97,29 @@ public:
         utl::getAttribute(child,"type",type,true);
         if (type == "supg") {
           IFEM::cout <<"SUPG stabilization is enabled."<< std::endl;
-          AD->setStabilization(AdvectionDiffusion::SUPG);
+          AD.setStabilization(AdvectionDiffusion::SUPG);
         }
         else if (type == "gls") {
           IFEM::cout <<"GLS stabilization is enabled."<< std::endl;
-          AD->setStabilization(AdvectionDiffusion::GLS);
+          AD.setStabilization(AdvectionDiffusion::GLS);
         }
         else if (type == "ms") {
           IFEM::cout <<"MS stabilization is enabled."<< std::endl;
-          AD->setStabilization(AdvectionDiffusion::MS);
+          AD.setStabilization(AdvectionDiffusion::MS);
         }
         double Cinv;
         if (utl::getAttribute(child,"Cinv",Cinv))
-          AD->setCinv(Cinv);
+          AD.setCinv(Cinv);
       }
       else if (!strcasecmp(child->Value(),"fluidproperties")) {
-        AD->getFluidProperties().parse(child);
+        AD.getFluidProperties().parse(child);
         weakDirBC.getFluidProperties().parse(child);
-        AD->getFluidProperties().printLog();
+        AD.getFluidProperties().printLog();
       }
       else if ((value = utl::getValue(child,"advectionfield"))) {
         std::string variables;
         utl::getAttribute(child,"variables",variables);
-        AD->setAdvectionField(new VecFuncExpr(value,variables));
+        AD.setAdvectionField(new VecFuncExpr(value,variables));
         weakDirBC.setAdvectionField(new VecFuncExpr(value,variables));
         IFEM::cout <<"Advection field: "<< value;
         if (!variables.empty())
@@ -126,11 +127,11 @@ public:
         IFEM::cout << std::endl;
       }
       else if ((value = utl::getValue(child,"reactionfield"))) {
-        AD->setReactionField(new EvalFunction(value));
+        AD.setReactionField(new EvalFunction(value));
         IFEM::cout <<"Reaction field: "<< value << std::endl;
       }
       else if ((value = utl::getValue(child,"source"))) {
-        AD->setSource(new EvalFunction(value));
+        AD.setSource(new EvalFunction(value));
         IFEM::cout <<"Source field: "<< value << std::endl;
       }
       else if (strcasecmp(child->Value(),"anasol") == 0) {
@@ -164,8 +165,8 @@ public:
     int p1, p2, p3;
     Dim::myModel.front()->getOrder(p1,p2,p3);
 
-    AD->setOrder(p1); // assumes equal ordered basis
-    AD->setElements(this->getNoElms());
+    AD.setOrder(p1); // assumes equal ordered basis
+    AD.setElements(this->getNoElms());
 
     // Initialize temperature solution vectors
     size_t n, nSols = this->getNoSolutions();
@@ -192,7 +193,7 @@ public:
   }
 
   //! \brief Defines the global number of elements.
-  virtual bool preprocessB() { AD->setElements(this->getNoElms());return true; }
+  virtual bool preprocessB() { AD.setElements(this->getNoElms());return true; }
 
   //! \brief Opens a new VTF-file and writes the model geometry to it.
   //! \param[in] fileName File name used to construct the VTF-file name from
@@ -214,7 +215,7 @@ public:
     for (int n = nNusols-1; n > 0; n--)
       temperature[n] = temperature[n-1];
 
-    AD->advanceStep();
+    AD.advanceStep();
 
     return true;
   }
@@ -336,12 +337,12 @@ protected:
     if (tit == Dim::myScalars.end()) return false;
 
     weakDirBC.setFlux(tit->second);
-    AD->setFlux(tit->second);
+    AD.setFlux(tit->second);
     return true;
   }
 
 private:
-  AdvectionDiffusion* AD;
+  Integrand& AD;
   AdvectionDiffusion::WeakDirichlet weakDirBC;
 
   Vectors temperature;
@@ -351,10 +352,10 @@ private:
 
 
 //! \brief Partial specialization for configurator
-template<class Dim>
-struct SolverConfigurator< SIMAD<Dim> > {
-  int setup(SIMAD<Dim>& ad,
-            const typename SIMAD<Dim>::SetupProps& props, char* infile)
+template<class Dim, class Integrand>
+struct SolverConfigurator< SIMAD<Dim,Integrand> > {
+  int setup(SIMAD<Dim,Integrand>& ad,
+            const typename SIMAD<Dim,Integrand>::SetupProps& props, char* infile)
   {
     utl::profiler->start("Model input");
 

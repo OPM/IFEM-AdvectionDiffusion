@@ -18,7 +18,8 @@
 
 TEST(TestSIMAD, Parse)
 {
-  SIMAD<SIM2D> sim(new AdvectionDiffusionBDF(2, 2, 0), true);
+  AdvectionDiffusionBDF integrand(2, 2, 0);
+  SIMAD<SIM2D,AdvectionDiffusionBDF> sim(integrand, true);
   EXPECT_TRUE(sim.read("Lshape.xinp"));
 
   const AdvectionDiffusionBDF& ad =

@@ -64,7 +64,8 @@ int runSimulatorStationary(bool adap, char* infile)
   utl::profiler->start("Model input");
 
   // Create the simulation model
-  SIMAD<Dim>* model = new SIMAD<Dim>(new AdvectionDiffusion(Dim::dimension), true);
+  AdvectionDiffusion integrand(Dim::dimension);
+  SIMAD<Dim>* model = new SIMAD<Dim>(integrand, true);
 
   SIMinput* theSim = model;
   AdaptiveSIM* aSim = NULL;
@@ -286,23 +287,23 @@ int runSimulatorTransient(char* infile, TimeIntegration::Method tIt,
                           int integrandType)
 {
   if (tIt == TimeIntegration::BE || tIt == TimeIntegration::BDF2) {
-    SIMAD<Dim> model(new AdvectionDiffusionBDF(Dim::dimension,
-                                               tIt==TimeIntegration::BE?1:2,
-                                               integrandType), true);
-    return runSimulatorTransientImpl<SIMAD<Dim>, SIMAD<Dim> >(infile, tIt,
-                                                              model, model);
+    AdvectionDiffusionBDF integrand(Dim::dimension,
+                                    tIt==TimeIntegration::BE?1:2,
+                                    integrandType);
+    SIMAD<Dim,AdvectionDiffusionBDF> model(integrand, true);
+    return runSimulatorTransientImpl(infile, tIt, model, model);
   } else if (tIt >= TimeIntegration::HEUNEULER) {
-    SIMAD<Dim> model(new AdvectionDiffusionExplicit(Dim::dimension,
-                                                    integrandType), true);
-    TimeIntegration::SIMExplicitRKE<SIMAD<Dim> > sim(model, tIt);
-    return runSimulatorTransientImpl<TimeIntegration::SIMExplicitRKE<SIMAD<Dim> >,
-                                     SIMAD<Dim> >(infile, tIt, sim, model);
+    AdvectionDiffusionExplicit integrand(Dim::dimension, integrandType);
+    typedef SIMAD<Dim,AdvectionDiffusionExplicit> ADSIM;
+    ADSIM model(integrand, true);
+    TimeIntegration::SIMExplicitRKE<ADSIM> sim(model, tIt);
+    return runSimulatorTransientImpl(infile, tIt, sim, model);
   } else {
-    SIMAD<Dim> model(new AdvectionDiffusionExplicit(Dim::dimension,
-                                                    integrandType), true);
-    TimeIntegration::SIMExplicitRK<SIMAD<Dim> > sim(model, tIt);
-    return runSimulatorTransientImpl<TimeIntegration::SIMExplicitRK<SIMAD<Dim> >,
-                                     SIMAD<Dim> >(infile, tIt, sim, model);
+    typedef SIMAD<Dim,AdvectionDiffusionExplicit> ADSIM;
+    AdvectionDiffusionExplicit integrand(Dim::dimension, integrandType);
+    ADSIM model(integrand, true);
+    TimeIntegration::SIMExplicitRK<ADSIM> sim(model, tIt);
+    return runSimulatorTransientImpl(infile, tIt, sim, model);
   }
 
   return 1; // should not be here
