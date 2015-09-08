@@ -26,7 +26,7 @@ AdvectionDiffusionBDF::AdvectionDiffusionBDF (unsigned short int n, int order,
   AdvectionDiffusion(n, itg_type == STANDARD ? NONE : SUPG),
   formulation(form), bdf(order)
 {
-  primsol.resize(order);
+  primsol.resize(1+order);
   velocity.resize(order);
   registerVector("velocity1", &velocity[0]);
   if (order == 2)
@@ -47,7 +47,7 @@ bool AdvectionDiffusionBDF::initElement(const std::vector<int>& MNPC,
   int ierr = 0;
   for (size_t i = 0; i < primsol.size() && ierr == 0; i++) {
     ierr = utl::gather(MNPC,1,primsol[i],A.vec[i]);
-    if (!Uad)
+    if (!Uad && i < primsol.size()-1)
       ierr = utl::gather(MNPC,nsd,velocity[i],A.vec[i+primsol.size()]);
   }
 
@@ -92,7 +92,7 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
 
   double theta=0;
   for (int t=0;t<bdf.getOrder();++t) {
-    double val = fe.N.dot(elMat.vec[t]);
+    double val = fe.N.dot(elMat.vec[t+1]);
     theta += -props.getMassAdvectionConstant()*bdf[1+t]/time.dt*val;
   }
 

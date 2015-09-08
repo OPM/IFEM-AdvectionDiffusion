@@ -241,8 +241,8 @@ public:
       size_t iMax[1];
       double dMax[1];
       double normL2 = this->solutionNorms(temperature.front(),dMax,iMax,1);
-      IFEM::cout <<"Temperature summary: L2-norm        : "<< normL2
-                 <<"\n                   Max temperature : "<< dMax[0]
+      IFEM::cout <<"\n  Temperature summary:  L2-norm        : "<< normL2
+                 <<"\n                       Max temperature : "<< dMax[0]
                  << std::endl;
     }
 
