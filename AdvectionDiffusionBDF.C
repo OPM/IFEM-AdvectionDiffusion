@@ -31,8 +31,6 @@ AdvectionDiffusionBDF::AdvectionDiffusionBDF (unsigned short int n, int order,
   registerVector("velocity1", &velocity[0]);
   if (order == 2)
     registerVector("velocity2", &velocity[1]);
-
-  registerVector("nut", &nut);
   registerVector("grid velocity", &ux);
 }
 
@@ -42,8 +40,6 @@ bool AdvectionDiffusionBDF::initElement(const std::vector<int>& MNPC,
 {
   size_t nvec   = primsol.size() + velocity.size();
   size_t nfield = nvec;
-  if (formulation & CFD::RANS)
-    nfield++;
   if (formulation & CFD::ALE)
     nfield++;
 
@@ -55,11 +51,8 @@ bool AdvectionDiffusionBDF::initElement(const std::vector<int>& MNPC,
       ierr = utl::gather(MNPC,nsd,velocity[i],A.vec[i+primsol.size()]);
   }
 
-  if (formulation & CFD::RANS)
-    ierr = utl::gather(MNPC,1,nut,A.vec[nvec++]);
-
   if (formulation & CFD::ALE)
-    ierr = utl::gather(MNPC,nsd,nut,A.vec[nvec++]);
+    ierr = utl::gather(MNPC,nsd,ux,A.vec[primsol.size()+velocity.size()]);
 
   if (ierr == 0)
     return true;
@@ -78,50 +71,41 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
 {
   ElementInfo& elMat = static_cast<ElementInfo&>(elmInt);
 
-  Vector U;
-  U.resize(nsd);
-  double nut = kappa;
-  if (Uad) {
-    Vec3 Ua = (*Uad)(X);
-    for (int i=0;i<nsd;++i)
-      U[i] = Ua[i];
-  } else {
+  Vec3 U;
+  if (Uad)
+    U = (*Uad)(X);
+  else {
     for (size_t i=1;i<=nsd;++i) {
       double tmp[2] = {0};
       for (int j=0; j<bdf.getOrder();++j)
         tmp[j] = elMat.vec[primsol.size()+j].dot(fe.N,i-1,nsd);
       U[i-1] = bdf.extrapolate(tmp);
     }
-    size_t nvec = primsol.size() + velocity.size();
-    if (formulation & CFD::RANS)
-      nut += fe.N.dot(elMat.vec[nvec++])/Pr;
     if (formulation & CFD::ALE) {
       for (size_t i=1;i<=nsd;++i)
-        U(i) -= elMat.vec[nvec++].dot(fe.N,i-1,nsd);
+        U[i-1] -= elMat.vec[primsol.size()+velocity.size()].dot(fe.N,i-1,nsd);
     }
   }
   double react = 0;
   if (reaction)
     react = (*reaction)(X);
 
+  double rhoC = props.getMassDensity()*props.getHeatCapacity();
   double theta=0;
   for (int t=0;t<bdf.getOrder();++t) {
     double val = fe.N.dot(elMat.vec[t]);
-    if (kFunc && t == 0)
-      nut = (*kFunc)(val);
-    theta += -bdf[1+t]/time.dt*val;
+    theta += -rhoC*bdf[1+t]/time.dt*val;
   }
 
   double tau=0;
   if (stab == SUPG)
-    tau = StabilizationUtils::getTauPt(time.dt, nut, U, fe.G);
+    tau = StabilizationUtils::getTauPt(time.dt, props.getDiffusivity(), Vector(U.ptr(),nsd), fe.G);
 
   // Integrate source, if defined
   if (source)
     theta += (*source)(X);
 
-  // Laplacian terms
-  WeakOperators::Laplacian(elMat.A[0], fe, nut);
+  WeakOperators::Laplacian(elMat.A[0], fe, props.getDiffusivity());
   WeakOperators::Mass(elMat.A[0], fe, bdf[0]/time.dt+react);
 
   // loop over test functions (i) and basis functions (j)
@@ -137,7 +121,7 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
       double advect = 0.0;
       for (size_t k = 1;k <= nsd; ++k)
         advect += U[k-1]*fe.dNdX(j,k);
-      advect *= fe.N(i);
+      advect *= fe.N(i)*rhoC;
 
       elMat.A[0](i,j) += advect*fe.detJxW;
 
@@ -147,8 +131,8 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
           // Diffusion
           laplace -= fe.d2NdX2(j,k,k);
         }
-        elMat.eMs(i,j) += (nut*laplace+advect+
-                           (bdf[0]/time.dt+react)*fe.N(j))*convI;
+        elMat.eMs(i,j) += (props.getDiffusivity()*laplace+advect+
+                           (rhoC*bdf[0]/time.dt+react)*fe.N(j))*convI;
       }
     }
     if (stab == SUPG)

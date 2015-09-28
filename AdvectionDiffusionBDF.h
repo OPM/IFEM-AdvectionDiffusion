@@ -73,7 +73,6 @@ protected:
   TimeIntegration::BDF bdf;  //!< BDF helper class
 
   Vectors velocity; //!< The advecting velocity field
-  Vector  nut;      //!< The turbulent viscosity field
   Vector  ux;       //!< Grid velocity (ALE)
 };
 

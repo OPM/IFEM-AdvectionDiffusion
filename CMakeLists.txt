@@ -32,7 +32,8 @@ ENDIF(NOT IFEM_PRECONFIGURED)
 
 add_library(CommonAD AdvectionDiffusion.C
                      AdvectionDiffusionBDF.C
-                     AdvectionDiffusionExplicit.C)
+                     AdvectionDiffusionExplicit.C
+                     FluidProperties.C)
 
 ADD_EXECUTABLE(AdvectionDiffusion main_AdvectionDiffusion.C)
 

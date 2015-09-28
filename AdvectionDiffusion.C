@@ -22,7 +22,7 @@
 
 AdvectionDiffusion::AdvectionDiffusion (unsigned short int n,
                                         AdvectionDiffusion::Stabilization s) :
-  nsd(n), kappa(1.0), kFunc(NULL), Pr(1.0), order(1), stab(s), Cinv(5)
+  nsd(n), order(1), stab(s), Cinv(5)
 {
   primsol.resize(1);
 
@@ -119,7 +119,7 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
     if (Uad)
       U = (*Uad)(X);
 
-    WeakOperators::Laplacian(elMat.A[0], fe, kappa);
+    WeakOperators::Laplacian(elMat.A[0], fe, props.getDiffusivity());
     WeakOperators::Mass(elMat.A[0], fe, react);
     WeakOperators::Advection(elMat.A[0], fe, U, 1.0);
 
@@ -130,7 +130,7 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
           double convV=0, Lu=0;
           for (size_t k = 1;k <= nsd;k++) {
             convV += U[k-1]*fe.dNdX(i,k);
-            Lu += U[k-1]*fe.dNdX(j,k)-kappa*fe.d2NdX2(j,k,k);
+            Lu += U[k-1]*fe.dNdX(j,k)-props.getDiffusivity()*fe.d2NdX2(j,k,k);
             elMat.Cv(k) += U[k-1]*fe.detJxW;
           }
           Lu += react*fe.N(j);
@@ -143,8 +143,8 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
         if (stab == GLS) {
           double Lv=0, Lu=0;
           for (size_t k = 1;k <= nsd;k++) {
-            Lv += U[k-1]*fe.dNdX(i,k)-kappa*fe.d2NdX2(i,k,k);
-            Lu += U[k-1]*fe.dNdX(j,k)-kappa*fe.d2NdX2(j,k,k);
+            Lv += U[k-1]*fe.dNdX(i,k)-props.getDiffusivity()*fe.d2NdX2(i,k,k);
+            Lu += U[k-1]*fe.dNdX(j,k)-props.getDiffusivity()*fe.d2NdX2(j,k,k);
             elMat.Cv(k) += U[k-1]*fe.detJxW;
           }
           Lv += react*fe.N(i);
@@ -159,8 +159,8 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
         if (stab == MS) {
           double Lav=0, Lu=0;
           for (size_t k = 1;k <= nsd;k++) {
-            Lav += -U[k-1]*fe.dNdX(i,k)-kappa*fe.d2NdX2(i,k,k);
-            Lu += U[k-1]*fe.dNdX(j,k)-kappa*fe.d2NdX2(j,k,k);
+            Lav += -U[k-1]*fe.dNdX(i,k)-props.getDiffusivity()*fe.d2NdX2(i,k,k);
+            Lu += U[k-1]*fe.dNdX(j,k)-props.getDiffusivity()*fe.d2NdX2(j,k,k);
             elMat.Cv(k) += U[k-1]*fe.detJxW;
           }
           Lav += react*fe.N(i);
@@ -264,7 +264,7 @@ bool AdvectionDiffusion::finalizeElement (LocalIntegral& A)
   ElementInfo& E = static_cast<ElementInfo&>(A);
 
   // Compute stabilization parameter
-  double tau = E.getTau(kappa, Cinv, order);
+  double tau = E.getTau(props.getDiffusivity(), Cinv, order);
 
   E.eMs *= tau;
   E.eSs *= tau;
@@ -385,13 +385,13 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
     }
 
   // Intrinsic parameter to get L^2 norm error (upper bound)
-  double kk = std::min((h/(sqrt(2)*sqrt(13))),(h*h/(3*sqrt(10)*problem.kappa)));
+  double kk = std::min((h/(sqrt(2)*sqrt(13))),(h*h/(3*sqrt(10)*problem.props.getDiffusivity())));
 
   int norm = 0;
 
   // Choice to have VMS based error
   pnorm[norm++] += kk*kk*residualNorm(val, U, grad, hess,
-                                      problem.kappa, f, react)*fe.detJxW;
+                                      problem.props.getDiffusivity(), f, react)*fe.detJxW;
 
   // or Gradient based error depends on what to select here
   //pnorm[norm++] += H1Norm(grad)*fe.detJxW;
@@ -410,7 +410,7 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
     pnorm[norm++] += L2Norm(val-eVal)*fe.detJxW;
 
     pnorm[norm++] += kk*kk*residualNorm(val, U, grad, hess,
-                                        problem.kappa, f, react)*fe.detJxW;
+                                        problem.props.getDiffusivity(), f, react)*fe.detJxW;
 
     norm++; // effectivity index
   }
@@ -486,7 +486,7 @@ const char* AdvectionDiffusionNorm::getName (size_t i, size_t j,
 
 AdvectionDiffusion::WeakDirichlet::WeakDirichlet (unsigned short int n,
                                                   double CBI_, double gamma_) :
-  CBI(CBI_), gamma(gamma_), Uad(NULL), nsd(n), kFunc(NULL)
+  CBI(CBI_), gamma(gamma_), Uad(NULL), nsd(n)
 {
   // Need current solution only
   primsol.resize(1);
@@ -547,13 +547,8 @@ bool AdvectionDiffusion::WeakDirichlet::evalBou (LocalIntegral& elmInt,
 
   // element size
   double h = getElementSize(fe.XC,nsd);
-  double C = CBI*fabs(kappa)/h;
-
-  double kap = kappa;
-  if (kFunc) {
-    double val = fe.N.dot(elMat.vec[0]);
-    kap = (*kFunc)(val);
-  }
+  double C = CBI*fabs(props.getDiffusivity())/h;
+  double kap = props.getDiffusivity();
 
   // loop over test functions (i) and basis functions (j)
   for (size_t i = 1; i <= fe.N.size(); ++i) {

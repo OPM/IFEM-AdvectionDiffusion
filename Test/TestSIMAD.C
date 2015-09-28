@@ -25,7 +25,7 @@ TEST(TestSIMAD, Parse)
         static_cast<const AdvectionDiffusionBDF&>(*sim.getProblem());
 
   ASSERT_FLOAT_EQ(ad.getCinv(), 1.0);
-  ASSERT_FLOAT_EQ(ad.getKappa(), 1e-6);
-  ASSERT_FLOAT_EQ(ad.getPrandtlNumber(), 0.5);
+  ASSERT_FLOAT_EQ(ad.getFluidProperties().getDiffusivity(), 1e-6);
+  ASSERT_FLOAT_EQ(ad.getFluidProperties().getPrandtlNumber(), 0.5);
   EXPECT_EQ(ad.getStabilization(), AdvectionDiffusion::MS);
 }

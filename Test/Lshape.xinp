@@ -23,8 +23,9 @@
   <advectiondiffusion>
     <source>100*sqrt((x-0.5)*(x-0.5)+(y-0.5)*(y-0.5))*(sqrt((x-0.5)*(x-0.5)+(y-0.5)*(y-0.5))-0.5)*(sqrt((x-0.5)*(x-0.5)+(y-0.5)*(y-0.5))-1/sqrt(2))</source>
     <advectionfield>3|1</advectionfield>
-<reactionfield>1</reactionfield>
-   <stabilization type="MS" Cinv="1.0"/>
+    <reactionfield>1</reactionfield>
+    <stabilization type="MS" Cinv="1.0"/>
+    <fluidproperties kappa="1e-6" Pr="0.5"/>
    <kappa>1e-6</kappa>
    <prandtl>0.5</prandtl>
   </advectiondiffusion>

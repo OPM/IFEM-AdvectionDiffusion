@@ -16,6 +16,7 @@
 
 #include "IntegrandBase.h"
 #include "ElmMats.h"
+#include "FluidProperties.h"
 
 
 /*!
@@ -70,19 +71,19 @@ public:
     //! \brief Defines the flux function.
     void setFlux(RealFunc* f) { flux = f; }
 
-    //! \brief Defines kappa.
-    void setKappa(double kappa_) { kappa = kappa_; }
-    //! \brief Defines the kappa function.
-    void setKappa(ScalarFunc* kappa_) { kFunc = kappa_; }
+    //! \brief Obtain a reference to fluid properties.
+    AD::FluidProperties& getFluidProperties() { return props; }
+
+    //! \brief Obtain a const reference to material data.
+    const AD::FluidProperties& getFluidProperties() const { return props; }
 
   protected:
     const double CBI;   //!< Model constant
     const double gamma; //!< Adjoint factor
     VecFunc*     Uad;   //!< Pointer to advection field
     RealFunc*    flux;  //!< Pointer to the flux field
+    AD::FluidProperties props; //!< Fluid properties
     unsigned short int nsd; //!< Number of space dimensions (1, 2 or, 3)
-    double       kappa; //!< Diffusion coefficient
-    ScalarFunc*  kFunc; //!< Diffusion coefficient function
   };
 
   //! \brief The default constructor initializes all pointers to zero.
@@ -121,13 +122,6 @@ public:
   //! \brief Returns the current Cinv value.
   double getCinv() const { return Cinv; }
 
-  //! \brief Defines kappa.
-  void setKappa(double kappa_) { kappa = kappa_; }
-  //! \brief Defines the kappa function.
-  void setKappa(ScalarFunc* kappa_) { kFunc = kappa_; }
-  //! \brief Returns current kappa.
-  double getKappa() const { return kappa; }
-
   //! \brief Defines the stabilization type.
   void setStabilization(Stabilization s) { stab = s; }
 
@@ -148,12 +142,6 @@ public:
 
   //! \brief Sets the basis order.
   void setOrder(int p) { order = p; }
-
-  //! \brief Defines the Prandtl number.
-  void setPrandtlNumber(double Pr_) { Pr = Pr_; }
-
-  //! \brief Returns the current Prandtl number.
-  double getPrandtlNumber() const { return Pr; }
 
   //! \brief Returns a previously calculated tau value for the given element.
   //! \brief param[in] e The element number
@@ -226,17 +214,22 @@ public:
   //! \brief Advances the integrand one time step forward.
   virtual void advanceStep() {}
 
+  //! \brief Obtain a reference to fluid properties.
+  AD::FluidProperties& getFluidProperties() { return props; }
+
+  //! \brief Obtain a const reference to material data.
+  const AD::FluidProperties& getFluidProperties() const { return props; }
+
 protected:
   VecFunc*  Uad;      //!< Pointer to advection field
   RealFunc* reaction; //!< Pointer to the reaction field
   RealFunc* source;   //!< Pointer to source field
   RealFunc* flux;     //!< Pointer to the flux field
   unsigned short int nsd; //!< Number of space dimensions (1, 2 or, 3)
-  double kappa; //!< diffusion coefficient
-  ScalarFunc* kFunc;  //!< Diffusion coefficient function
-  double Pr;    //!< Prandtl number
   Vector tauE;  //!< Stored tau values - need for norm integration
   int order;    //!< Basis order
+
+  AD::FluidProperties props; //!< Fluid properties.
 
   Stabilization stab; //!< The type of stabilization used
   double        Cinv; //!< Stabilization parameter

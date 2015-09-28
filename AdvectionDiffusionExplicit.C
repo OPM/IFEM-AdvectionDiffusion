@@ -45,7 +45,7 @@ bool AdvectionDiffusionExplicit::evalInt (LocalIntegral& elmInt,
 
   Vec3 U;
   if (Uad) U = (*Uad)(X);
-  double nut = kappa;
+  double nut = props.getDiffusivity();
   double react = reaction ? (*reaction)(X) : 0.0;
 
   // Integrate source, if defined
