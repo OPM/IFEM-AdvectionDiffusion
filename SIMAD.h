@@ -80,9 +80,7 @@ public:
     Dim::myInts.clear();
   }
 
-  //! \brief Parses a data section from an input stream (depreciated).
-  virtual bool parse(char*, std::istream&) { return false; }
-
+  using Dim::parse;
   //! \brief Parses a data section from an XML element.
   virtual bool parse(const TiXmlElement* elem)
   {
@@ -173,7 +171,7 @@ public:
 
   void init() { TimeStep dummy; this->init(dummy); }
 
-  void init(const TimeStep& tp)
+  bool init(const TimeStep& tp)
   {
     int p1, p2, p3;
     Dim::myModel.front()->getOrder(p1,p2,p3);
@@ -189,6 +187,7 @@ public:
       temperature[n].resize(this->getNoDOFs(),true);
       this->registerField(str,temperature[n]);
     }
+    return true;
   }
 
   //! \brief Preprocessing performed before the FEM model generation.
@@ -262,7 +261,7 @@ public:
     return true;
   }
 
-  bool postSolve(const TimeStep& tp,bool) {return true;}
+  bool postSolve(const TimeStep& tp,bool) { return true; }
 
   //! \brief Saves the converged results to VTF file of a given time step.
   //! \param[in] tp Time step identifier
