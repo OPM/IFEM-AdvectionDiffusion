@@ -251,6 +251,29 @@ public:
 
   bool postSolve(const TimeStep& tp,bool) { return true; }
 
+  //! \brief Evaluates and prints out solution norms.
+  void printFinalNorms(const TimeStep& tp)
+  {
+    Vectors gNorm;
+    this->setMode(SIM::RECOVERY);
+    this->setQuadratureRule(Dim::opt.nGauss[1]);
+    if (!this->solutionNorms(tp.time,temperature,gNorm))
+      return;
+    else if (gNorm.empty())
+      return;
+
+    IFEM::cout <<"L2 norm |t^h| = a(t^h,t^h)^0.5      : "<< gNorm[0](1);
+    IFEM::cout <<"\nH1 norm |t^h| = a(t^h,t^h)^0.5      : "<< gNorm[0](2);
+    if (this->haveAnaSol() && gNorm[0].size() >= 6)
+      IFEM::cout <<"\nL2 norm |t|   = (t,t)^0.5           : "<< gNorm[0](3)
+                 <<"\nH1 norm |t|   = a(t,t)^0.5          : "<< gNorm[0](5)
+                 <<"\nL2 norm |e|   = (e,e)^0,5, e=t-t^h  : "<< gNorm[0](4)
+                 <<"\nH1 norm |e|   = a(e,e)^0.5, e=t-t^h : "<< gNorm[0](6)
+                 <<"\nExact relative error (%)            : "
+                 << gNorm[0](6)/gNorm[0](5)*100.0;
+    IFEM::cout << std::endl;
+  }
+
   //! \brief Saves the converged results to VTF file of a given time step.
   //! \param[in] tp Time step identifier
   //! \param[in] nBlock Running VTF block counter

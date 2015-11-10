@@ -1,0 +1,44 @@
+Square-ad-RaPr.xinp -2D -bdf2 -msgLevel 1
+
+Number of elements    64
+Number of nodes       100
+Number of dofs        100
+Number of constraints 36
+Number of unknowns    64
+  step = 1  time = 0.1
+L2-norm            : 0.00765693
+Max temperature    : 0.0332778
+  step = 2  time = 0.2
+L2-norm            : 0.015238
+Max temperature    : 0.0662231
+  step = 3  time = 0.3
+L2-norm            : 0.0226676
+Max temperature    : 0.0985067
+  step = 4  time = 0.4
+L2-norm            : 0.0298714
+Max temperature    : 0.129806
+  step = 5  time = 0.5
+L2-norm            : 0.0367775
+Max temperature    : 0.159809
+  step = 6  time = 0.6
+L2-norm            : 0.0433168
+Max temperature    : 0.188214
+  step = 7  time = 0.7
+L2-norm            : 0.0494241
+Max temperature    : 0.214739
+  step = 8  time = 0.8
+L2-norm            : 0.0550382
+Max temperature    : 0.239119
+  step = 9  time = 0.9
+L2-norm            : 0.0601031
+Max temperature    : 0.261109
+  step = 10  time = 1
+L2-norm            : 0.0645681
+Max temperature    : 0.28049
+L2 norm |t^h| = a(t^h,t^h)^0.5      : 0.0473227
+H1 norm |t^h| = a(t^h,t^h)^0.5      : 0.00188079
+L2 norm |t|   = (t,t)^0.5           : 0.0474115
+H1 norm |t|   = a(t,t)^0.5          : 0.00841642
+L2 norm |e|   = (e,e)^0,5, e=t-t^h  : 0.000108233
+H1 norm |e|   = a(e,e)^0.5, e=t-t^h : 5.76254e-05
+Exact relative error (%)            : 0.684678
