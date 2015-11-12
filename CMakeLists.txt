@@ -30,10 +30,10 @@ IF (NOT IFEM_PRECONFIGURED)
   ADD_SUBDIRECTORY(../Common CommonIFEM.dir)
 ENDIF(NOT IFEM_PRECONFIGURED)
 
-add_library(CommonAD AdvectionDiffusion.C
-                     AdvectionDiffusionBDF.C
-                     AdvectionDiffusionExplicit.C
-                     FluidProperties.C)
+add_library(CommonAD STATIC AdvectionDiffusion.C
+                            AdvectionDiffusionBDF.C
+                            AdvectionDiffusionExplicit.C
+                            FluidProperties.C)
 
 ADD_EXECUTABLE(AdvectionDiffusion main_AdvectionDiffusion.C)
 
