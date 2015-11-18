@@ -45,7 +45,7 @@ public:
     Integrand* integrand;
     SIMoutput* share;
 
-    SetupProps() : shareGrid(false), integrand(NULL), share(NULL) {}
+    SetupProps() : shareGrid(false), integrand(nullptr), share(nullptr) {}
   };
 
   //! \brief Default constructor.
@@ -76,7 +76,7 @@ public:
   virtual ~SIMAD()
   {
     if (!standalone)
-      this->setVTF(NULL);
+      this->setVTF(nullptr);
     Dim::myProblem = nullptr;
     Dim::myInts.clear();
   }

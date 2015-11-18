@@ -90,7 +90,7 @@ public:
   //! \brief The only constructor initializes its data members.
   //! \param[in] p The heat equation problem to evaluate norms for
   //! \param[in] a The analytical aolution (optional)
-  ADNorm(AdvectionDiffusion& p, AnaSol* a = NULL);
+  ADNorm(AdvectionDiffusion& p, AnaSol* a = nullptr);
   //! \brief Empty destructor.
   virtual ~ADNorm() {}
 

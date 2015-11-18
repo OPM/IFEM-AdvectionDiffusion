@@ -68,7 +68,7 @@ int runSimulatorStationary(bool adap, char* infile)
   SIMAD<Dim>* model = new SIMAD<Dim>(integrand, true);
 
   SIMinput* theSim = model;
-  AdaptiveSIM* aSim = NULL;
+  AdaptiveSIM* aSim = nullptr;
   if (adap)
     theSim = aSim = new AdaptiveSIM(model);
 
@@ -100,7 +100,7 @@ int runSimulatorStationary(bool adap, char* infile)
   Vector sol, load;
   Vectors projs, gNorm;
 
-  DataExporter* exporter = NULL;
+  DataExporter* exporter = nullptr;
   if (model->opt.dumpHDF5(infile))
   {
     exporter = new DataExporter(true);
@@ -258,7 +258,7 @@ int runSimulatorTransientImpl(char* infile, TimeIntegration::Method tIt,
   model.initSystem(model.opt.solver,1,1);
   model.setQuadratureRule(model.opt.nGauss[0],true);
 
-  DataExporter* exporter=NULL;
+  DataExporter* exporter=nullptr;
   if (model.opt.dumpHDF5(infile))
   {
     exporter = new DataExporter(true, model.getDumpInterval(),
@@ -319,7 +319,7 @@ int main (int argc, char** argv)
   TimeIntegration::Method tInt = TimeIntegration::NONE;
   bool twoD = false;
   bool adap = false;
-  char* infile = NULL;
+  char* infile = nullptr;
 
   IFEM::Init(argc, argv);
 

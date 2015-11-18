@@ -469,7 +469,7 @@ std::string AdvectionDiffusionNorm::getName (size_t i, size_t j,
 
 AdvectionDiffusion::WeakDirichlet::WeakDirichlet (unsigned short int n,
                                                   double CBI_, double gamma_) :
-  CBI(CBI_), gamma(gamma_), Uad(NULL)
+  CBI(CBI_), gamma(gamma_), Uad(nullptr)
 {
   nsd = n;
   // Need current solution only
