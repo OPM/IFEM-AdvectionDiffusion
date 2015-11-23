@@ -227,32 +227,26 @@ bool AdvectionDiffusion::evalSol(Vector& s, const VecFunc& asol,
 }
 
 
-const char* AdvectionDiffusion::getField1Name (size_t, const char* prefix) const
+std::string AdvectionDiffusion::getField1Name (size_t, const char* prefix) const
 {
   if (!prefix)
     return "theta";
 
-  static std::string name;
-  name = prefix + std::string(" theta");
-
-  return name.c_str();
+  return prefix + std::string(" theta");
 }
 
 
-const char* AdvectionDiffusion::getField2Name (size_t i,
+std::string AdvectionDiffusion::getField2Name (size_t i,
                                                const char* prefix) const
 {
   if (i > 2)
-    return 0;
+    return "";
 
   static const char* s[3] = { "theta_x", "theta_y", "theta_z" };
   if (!prefix)
     return s[i];
 
-  static std::string name;
-  name = prefix + std::string(" ") + s[i];
-
-  return name.c_str();
+  return prefix + std::string(" ") + s[i];
 }
 
 
