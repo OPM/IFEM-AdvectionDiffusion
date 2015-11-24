@@ -221,7 +221,7 @@ size_t ADNorm::getNoFields (int group) const
 }
 
 
-const char* ADNorm::getName (size_t i, size_t j,
+std::string ADNorm::getName (size_t i, size_t j,
                              const char* prefix) const
 {
   if (i == 0 || j == 0 || j > 4)
@@ -245,11 +245,7 @@ const char* ADNorm::getName (size_t i, size_t j,
   if (!prefix)
     return s[k];
 
-  static std::string name;
-  name = prefix + std::string(" ");
-  name += s[k];
-
-  return name.c_str();
+  return prefix + std::string(" ") + s[k];
 }
 
 

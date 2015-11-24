@@ -447,7 +447,7 @@ bool AdvectionDiffusionNorm::finalizeElement (LocalIntegral& elmInt)
 }
 
 
-const char* AdvectionDiffusionNorm::getName (size_t i, size_t j,
+std::string AdvectionDiffusionNorm::getName (size_t i, size_t j,
                                              const char* prefix) const
 {
   static const char* s[5] = {
@@ -470,11 +470,7 @@ const char* AdvectionDiffusionNorm::getName (size_t i, size_t j,
   if (!prefix)
     return n[j-1];
 
-  static std::string name;
-  name = prefix + std::string(" ");
-  name += n[j-1];
-
-  return name.c_str();
+  return prefix + std::string(" ") + n[j-1];
 }
 
 
