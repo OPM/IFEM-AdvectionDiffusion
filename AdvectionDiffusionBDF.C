@@ -38,8 +38,8 @@ AdvectionDiffusionBDF::AdvectionDiffusionBDF (unsigned short int n, int order,
 }
 
 
-bool AdvectionDiffusionBDF::initElement(const std::vector<int>& MNPC,
-                                        LocalIntegral& A)
+bool AdvectionDiffusionBDF::initElement (const std::vector<int>& MNPC,
+                                         LocalIntegral& A)
 {
   size_t nvec   = primsol.size() + velocity.size();
   size_t nfield = nvec;
@@ -171,7 +171,7 @@ ADNorm::ADNorm(AdvectionDiffusion& p, AnaSol* a) : NormBase(p)
 
 
 bool ADNorm::evalInt (LocalIntegral& elmInt, const FiniteElement& fe,
-                          const Vec3& X) const
+                      const Vec3& X) const
 {
   ElmNorm& pnorm = static_cast<ElmNorm&>(elmInt);
   AdvectionDiffusion& hep = static_cast<AdvectionDiffusion&>(myProblem);
@@ -210,14 +210,10 @@ bool ADNorm::evalInt (LocalIntegral& elmInt, const FiniteElement& fe,
 
 size_t ADNorm::getNoFields (int group) const
 {
-  size_t nf = 1;
   if (group < 1)
-    for (size_t i = 0; i < prjsol.size(); i++)
-      nf += prjsol.empty() ? 0 : 1;
+    return this->NormBase::getNoFields();
   else
-    nf = anasol ? 6 : 2;
-
-  return nf;
+    return anasol ? 6 : 2;
 }
 
 
