@@ -286,16 +286,16 @@ public:
       return true;
 
     int iDump = 1 + tp.step/Dim::opt.saveInc;
+    if (!this->writeGlvS1(temperature.front(),iDump,nBlock,
+                          tp.time.t,"temperature",89))
+      return false;
+    else if (!standalone)
+      return true;
 
-    // Write solution fields
-    bool result = this->writeGlvS(temperature.front(), iDump, nBlock,
-                                  tp.time.t, true, "temperature", 89);
-
-    return (!standalone || this->writeGlvStep(iDump, tp.time.t)) && result;
+    return this->writeGlvStep(iDump,tp.time.t);
   }
 
   Vector& getSolution(int n=0) { return temperature[n]; }
-
   const Vector& getSolution(int n=0) const { return temperature[n]; }
 
   void registerFields(DataExporter& exporter, const std::string& prefix="")
