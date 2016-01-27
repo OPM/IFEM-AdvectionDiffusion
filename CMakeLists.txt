@@ -1,6 +1,6 @@
-PROJECT(AdvectionDiffusion)
+project(AdvectionDiffusion)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+cmake_minimum_required(VERSION 2.6)
 
 # Add local modules
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
@@ -8,63 +8,60 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
                       $ENV{HOME}/cmake/Modules)
 
 # Required packages
-SET(IFEM_PRECONFIGURED ${IFEM_CONFIGURED})
 IF (NOT IFEM_CONFIGURED)
-  FIND_PACKAGE(IFEM REQUIRED)
+  find_package(IFEM REQUIRED)
+  include_directories(${IFEM_INCLUDE_DIRS})
+  add_definitions(${IFEM_DEFINITIONS})
 ENDIF(NOT IFEM_CONFIGURED)
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IFEM_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IFEM_CXX_FLAGS}")
 
-INCLUDE_DIRECTORIES(${IFEM_INCLUDES} ../Common ${PROJECT_SOURCE_DIR})
+include_directories(${IFEM_INCLUDES} ../Common ${PROJECT_SOURCE_DIR})
 
-SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
-IF(NOT WIN32)
+if(NOT WIN32)
   # Emit position-independent code, suitable for dynamic linking
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
   # Enable all warnings
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-ENDIF(NOT WIN32)
-
-IF (NOT IFEM_PRECONFIGURED)
-  ADD_SUBDIRECTORY(../Common CommonIFEM.dir)
-ENDIF(NOT IFEM_PRECONFIGURED)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+endif()
 
 add_library(CommonAD STATIC AdvectionDiffusion.C
                             AdvectionDiffusionBDF.C
                             AdvectionDiffusionExplicit.C
                             FluidProperties.C)
 
-ADD_EXECUTABLE(AdvectionDiffusion main_AdvectionDiffusion.C)
+add_executable(AdvectionDiffusion main_AdvectionDiffusion.C)
 
-TARGET_LINK_LIBRARIES(AdvectionDiffusion CommonAD ${IFEM_LIBRARIES} CommonIFEM)
+target_link_libraries(AdvectionDiffusion CommonAD IFEMAppCommon ${IFEM_LIBRARIES})
 
 # Installation
-INSTALL(TARGETS AdvectionDiffusion DESTINATION bin)
+install(TARGETS AdvectionDiffusion DESTINATION bin)
 
 # Testing
-ENABLE_TESTING()
+enable_testing()
+include(IFEMTesting)
 
 # Generate regtest script with correct paths
-CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/../Common/scripts/regtest.sh.in
-               regtest.sh)
+configure_file(${IFEM_REGTEST_SCRIPT} regtest.sh)
 
-IF(IFEM_USE_PARALLEL_PETSC)
+if(IFEM_USE_PARALLEL_PETSC)
   # Add parallel tests here
-ELSE(IFEM_USE_PARALLEL_PETSC)
-  FILE(GLOB AD_TESTFILES RELATIVE ${PROJECT_SOURCE_DIR}/Test
+else()
+  file(GLOB AD_TESTFILES RELATIVE ${PROJECT_SOURCE_DIR}/Test
                          ${PROJECT_SOURCE_DIR}/Test/*.reg)
-  FOREACH(TESTFILE ${AD_TESTFILES})
-    IFEM_ADD_TEST(${TESTFILE} AdvectionDiffusion)
-  ENDFOREACH()
-ENDIF(IFEM_USE_PARALLEL_PETSC)
+  foreach(TESTFILE ${AD_TESTFILES})
+    ifem_add_test(${TESTFILE} AdvectionDiffusion)
+  endforeach()
+endif()
 list(APPEND TEST_APPS AdvectionDiffusion)
 
 # Unit tests
 IFEM_add_test_app(${PROJECT_SOURCE_DIR}/Test/*.C
                   ${PROJECT_SOURCE_DIR}/Test
                   AdvectionDiffusion
-                  CommonAD ${IFEM_LIBRARIES} CommonIFEM)
+                  CommonAD IFEMAppCommon ${IFEM_LIBRARIES})
 
 if(IFEM_COMMON_APP_BUILD)
   set(TEST_APPS ${TEST_APPS} PARENT_SCOPE)
