@@ -30,47 +30,16 @@
 #include <ctype.h>
 
 
-/*!
-  \brief Main program for the isogeometric Advection-Diffusion solver.
-
-  The input to the program is specified through the following
-  command-line arguments. The arguments may be given in arbitrary order.
-
-  \arg \a input-file : Input file with model definition
-  \arg -dense :   Use the dense LAPACK matrix equation solver
-  \arg -spr :     Use the SPR direct equation solver
-  \arg -superlu : Use the sparse SuperLU equation solver
-  \arg -samg :    Use the sparse algebraic multi-grid equation solver
-  \arg -petsc :   Use equation solver from PETSc library
-  \arg -lag : Use Lagrangian basis functions instead of splines/NURBS
-  \arg -spec : Use Spectral basis functions instead of splines/NURBS
-  \arg -LR : Use LR-spline basis functions instead of tensorial splines/NURBS
-  \arg -nGauss \a n : Number of Gauss points over a knot-span in each direction
-  \arg -vtf \a format : VTF-file format (-1=NONE, 0=ASCII, 1=BINARY)
-  \arg -nviz \a nviz : Number of visualization points over each knot-span
-  \arg -nu \a nu : Number of visualization points per knot-span in u-direction
-  \arg -nv \a nv : Number of visualization points per knot-span in v-direction
-  \arg -nw \a nw : Number of visualization points per knot-span in w-direction
-  \arg -hdf5 : Write primary and projected secondary solution to HDF5 file
-  \arg -2D : Use two-parametric simulation driver
-  \arg -adap : Use adaptive simulation driver with LR-splines discretization
-  \arg -BE : Time dependent (BE) simulation
-  \arg -BDF2 : Time dependent (BDF2) simulation
-*/
-
-  template<class Dim>
-int runSimulatorStationary(bool adap, char* infile)
+template<class AD>
+int runSimulatorStationary(char* infile, AD* model, bool adap)
 {
   utl::profiler->start("Model input");
 
   // Create the simulation model
-  AdvectionDiffusion integrand(Dim::dimension);
-  SIMAD<Dim>* model = new SIMAD<Dim>(integrand, true);
-
   SIMinput* theSim = model;
   AdaptiveSIM* aSim = nullptr;
   if (adap)
-    theSim = aSim = new AdaptiveSIM(model);
+    theSim = aSim = new AdaptiveSIM(*model);
 
   // Read in model definitions
   if (!theSim->read(infile))
@@ -111,8 +80,7 @@ int runSimulatorStationary(bool adap, char* infile)
     exporter->registerWriter(new XMLWriter(model->opt.hdf5,model->getProcessAdm()));
   }
 
-  model->initSystem(model->opt.solver,1,1);
-  model->setAssociatedRHS(0,0);
+  model->initSystem(model->opt.solver);
   model->init();
 
   if (adap) {
@@ -228,13 +196,13 @@ int runSimulatorStationary(bool adap, char* infile)
       exporter->dumpTimeLevel();
   }
 
+  delete aSim;
   delete exporter;
-  delete theSim;
   return 0;
 }
 
 
-  template<class Solver, class AD>
+template<class Solver, class AD>
 int runSimulatorTransientImpl(char* infile, TimeIntegration::Method tIt,
                               Solver& sim, AD& model)
 {
@@ -282,33 +250,65 @@ int runSimulatorTransientImpl(char* infile, TimeIntegration::Method tIt,
 }
 
 
-  template<class Dim>
-int runSimulatorTransient(char* infile, TimeIntegration::Method tIt,
-                          int integrandType)
+template<class Dim>
+int runSimulator(char* infile, bool adap,
+                 TimeIntegration::Method tIt, int integrandType)
 {
-  if (tIt == TimeIntegration::BE || tIt == TimeIntegration::BDF2) {
+  if (tIt == TimeIntegration::NONE)  {
+    AdvectionDiffusion integrand(Dim::dimension);
+    SIMAD<Dim> model(integrand,true);
+    return runSimulatorStationary(infile, &model, adap);
+  }
+  else if (tIt == TimeIntegration::BE || tIt == TimeIntegration::BDF2) {
     AdvectionDiffusionBDF integrand(Dim::dimension,
                                     tIt==TimeIntegration::BE?1:2,
                                     integrandType);
     SIMAD<Dim,AdvectionDiffusionBDF> model(integrand, true);
     return runSimulatorTransientImpl(infile, tIt, model, model);
-  } else if (tIt >= TimeIntegration::HEUNEULER) {
-    AdvectionDiffusionExplicit integrand(Dim::dimension, integrandType);
-    typedef SIMAD<Dim,AdvectionDiffusionExplicit> ADSIM;
-    ADSIM model(integrand, true);
-    TimeIntegration::SIMExplicitRKE<ADSIM> sim(model, tIt);
-    return runSimulatorTransientImpl(infile, tIt, sim, model);
-  } else {
-    typedef SIMAD<Dim,AdvectionDiffusionExplicit> ADSIM;
-    AdvectionDiffusionExplicit integrand(Dim::dimension, integrandType);
-    ADSIM model(integrand, true);
-    TimeIntegration::SIMExplicitRK<ADSIM> sim(model, tIt);
-    return runSimulatorTransientImpl(infile, tIt, sim, model);
   }
-
-  return 1; // should not be here
+  else {
+    AdvectionDiffusionExplicit integrand(Dim::dimension, integrandType);
+    typedef SIMAD<Dim,AdvectionDiffusionExplicit> ADSIM;
+    ADSIM model(integrand, true);
+    if (tIt >= TimeIntegration::HEUNEULER) {
+      TimeIntegration::SIMExplicitRKE<ADSIM> sim(model, tIt);
+      return runSimulatorTransientImpl(infile, tIt, sim, model);
+    }
+    else {
+      TimeIntegration::SIMExplicitRK<ADSIM> sim(model, tIt);
+      return runSimulatorTransientImpl(infile, tIt, sim, model);
+    }
+  }
 }
 
+
+/*!
+  \brief Main program for the isogeometric Advection-Diffusion solver.
+
+  The input to the program is specified through the following
+  command-line arguments. The arguments may be given in arbitrary order.
+
+  \arg \a input-file : Input file with model definition
+  \arg -dense :   Use the dense LAPACK matrix equation solver
+  \arg -spr :     Use the SPR direct equation solver
+  \arg -superlu : Use the sparse SuperLU equation solver
+  \arg -samg :    Use the sparse algebraic multi-grid equation solver
+  \arg -petsc :   Use equation solver from PETSc library
+  \arg -lag : Use Lagrangian basis functions instead of splines/NURBS
+  \arg -spec : Use Spectral basis functions instead of splines/NURBS
+  \arg -LR : Use LR-spline basis functions instead of tensorial splines/NURBS
+  \arg -nGauss \a n : Number of Gauss points over a knot-span in each direction
+  \arg -vtf \a format : VTF-file format (-1=NONE, 0=ASCII, 1=BINARY)
+  \arg -nviz \a nviz : Number of visualization points over each knot-span
+  \arg -nu \a nu : Number of visualization points per knot-span in u-direction
+  \arg -nv \a nv : Number of visualization points per knot-span in v-direction
+  \arg -nw \a nw : Number of visualization points per knot-span in w-direction
+  \arg -hdf5 : Write primary and projected secondary solution to HDF5 file
+  \arg -2D : Use two-parametric simulation driver
+  \arg -adap : Use adaptive simulation driver with LR-splines discretization
+  \arg -BE : Time dependent (BE) simulation
+  \arg -BDF2 : Time dependent (BDF2) simulation
+*/
 
 int main (int argc, char** argv)
 {
@@ -321,7 +321,7 @@ int main (int argc, char** argv)
   bool adap = false;
   char* infile = nullptr;
 
-  IFEM::Init(argc, argv);
+  IFEM::Init(argc,argv,"Advection-Diffusion solver");
 
   for (int i = 1; i < argc; i++)
     if (SIMoptions::ignoreOldOptions(argc,argv,i))
@@ -368,23 +368,12 @@ int main (int argc, char** argv)
   if (adap)
     IFEM::getOptions().discretization = ASM::LRSpline;
 
-  IFEM::cout <<"\n >>> IFEM Advection-Diffusion equation solver <<<"
-             <<"\n ====================================\n"
-	     <<"\n Executing command:\n";
-  for (int i = 0; i < argc; i++) IFEM::cout <<" "<< argv[i];
-  IFEM::cout <<"\n\nInput file: "<< infile;
+  IFEM::cout <<"\nInput file: "<< infile;
   IFEM::getOptions().print(IFEM::cout) << std::endl;
   utl::profiler->stop("Initialization");
 
-  if (tInt == TimeIntegration::NONE) {
-    if (twoD)
-      return runSimulatorStationary<SIM2D>(adap, infile);
-    else
-      return runSimulatorStationary<SIM3D>(adap, infile);
-  }
-
   if (twoD)
-    return runSimulatorTransient<SIM2D>(infile, tInt, integrandType);
+    return runSimulator<SIM2D>(infile,adap,tInt,integrandType);
   else
-    return runSimulatorTransient<SIM3D>(infile, tInt, integrandType);
+    return runSimulator<SIM3D>(infile,adap,tInt,integrandType);
 }
