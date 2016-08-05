@@ -17,7 +17,6 @@
 #include "TimeDomain.h"
 #include "Utilities.h"
 #include "StabilizationUtils.h"
-#include "CFDenums.h"
 #include "WeakOperators.h"
 #include "ElmNorm.h"
 #include "AnaSol.h"
@@ -25,10 +24,10 @@
 
 
 AdvectionDiffusionBDF::AdvectionDiffusionBDF (unsigned short int n, int order,
-                                              int itg_type, int form) :
-  AdvectionDiffusion(n, itg_type == STANDARD ? NONE : SUPG),
-  formulation(form), bdf(order)
+                                              int itg_type, bool useALE)
+  : AdvectionDiffusion(n, itg_type == STANDARD ? NONE : SUPG), bdf(order)
 {
+  ALEformulation = useALE;
   primsol.resize(1+order);
   velocity.resize(order);
   registerVector("velocity1", &velocity[0]);
@@ -43,7 +42,7 @@ bool AdvectionDiffusionBDF::initElement (const std::vector<int>& MNPC,
 {
   size_t nvec   = primsol.size() + velocity.size();
   size_t nfield = nvec;
-  if (formulation & CFD::ALE)
+  if (ALEformulation)
     nfield++;
 
   A.vec.resize(nfield);
@@ -54,7 +53,7 @@ bool AdvectionDiffusionBDF::initElement (const std::vector<int>& MNPC,
       ierr = utl::gather(MNPC,nsd,velocity[i],A.vec[i+primsol.size()]);
   }
 
-  if (formulation & CFD::ALE)
+  if (ALEformulation)
     ierr = utl::gather(MNPC,nsd,ux,A.vec[primsol.size()+velocity.size()]);
 
   if (ierr == 0)
@@ -64,7 +63,6 @@ bool AdvectionDiffusionBDF::initElement (const std::vector<int>& MNPC,
             << ierr <<" node numbers out of range."<< std::endl;
   return false;
 }
-
 
 
 bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
@@ -84,10 +82,9 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
         tmp[j] = elMat.vec[primsol.size()+j].dot(fe.N,i-1,nsd);
       U[i-1] = bdf.extrapolate(tmp);
     }
-    if (formulation & CFD::ALE) {
+    if (ALEformulation)
       for (size_t i=1;i<=nsd;++i)
         U[i-1] -= elMat.vec[primsol.size()+velocity.size()].dot(fe.N,i-1,nsd);
-    }
   }
   double react = 0;
   if (reaction)

@@ -32,15 +32,17 @@ public:
   //! \param[in] n Number of spatial dimensions
   //! \param[in] order Temporal order (1,2)
   //! \param[in] itg_type The integrand type to use
-  //! \param[in] stab Integrand formulation
+  //! \param[in] useALE If \e true, use ALE formulation
   AdvectionDiffusionBDF(unsigned short int n = 3, int order = 1,
-                        int itg_type = STANDARD, int form = 0);
+                        int itg_type = STANDARD, bool useALE = false);
 
   //! \brief Empty destructor.
   virtual ~AdvectionDiffusionBDF() {}
 
+  using AdvectionDiffusion::initElement;
   //! \brief Initializes current element for numerical integration.
   //! \param[in] MNPC Matrix of nodal point correspondance for current element
+  //! \param A Local integral for element
   virtual bool initElement(const std::vector<int>& MNPC, LocalIntegral& A);
 
   using AdvectionDiffusion::finalizeElement;
@@ -65,7 +67,7 @@ public:
     return stab == NONE ? STANDARD : SECOND_DERIVATIVES | G_MATRIX;
   }
 
-  //! \brief Advance the time stepping scheme
+  //! \brief Advances the time stepping scheme.
   virtual void advanceStep() { bdf.advanceStep(); }
 
   //! \brief Returns a pointer to an Integrand for solution norm evaluation.
@@ -76,13 +78,17 @@ public:
   virtual NormBase* getNormIntegrand(AnaSol* asol = 0) const;
 
 protected:
-  int formulation;           //!< Formulation (STANDARD, RANS, ALE)
-  TimeIntegration::BDF bdf;  //!< BDF helper class
+  bool      ALEformulation; //!< Formulation switch (STANDARD or ALE)
+  TimeIntegration::BDF bdf; //!< BDF helper class
 
   Vectors velocity; //!< The advecting velocity field
   Vector  ux;       //!< Grid velocity (ALE)
 };
 
+
+/*!
+  \brief Class representing the integrand of Advection-Diffusion energy norms.
+*/
 
 class ADNorm : public NormBase
 {
