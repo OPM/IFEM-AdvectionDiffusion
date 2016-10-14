@@ -17,7 +17,6 @@
 #include "TimeDomain.h"
 #include "Utilities.h"
 #include "StabilizationUtils.h"
-#include "WeakOperators.h"
 #include "ElmNorm.h"
 #include "AnaSol.h"
 #include "Vec3Oper.h"
@@ -105,8 +104,8 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
   if (source)
     theta += (*source)(X);
 
-  WeakOperators::Laplacian(elMat.A[0], fe, props.getDiffusionConstant());
-  WeakOperators::Mass(elMat.A[0], fe, props.getMassAdvectionConstant()*bdf[0]/time.dt +
+  WeakOps::Laplacian(elMat.A[0], fe, props.getDiffusionConstant());
+  WeakOps::Mass(elMat.A[0], fe, props.getMassAdvectionConstant()*bdf[0]/time.dt +
                                       react*props.getReactionConstant());
 
   // loop over test functions (i) and basis functions (j)
@@ -141,7 +140,7 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
       elMat.eSs(i) += theta*convI;
   }
 
-  WeakOperators::Source(elMat.b.front(), fe, theta);
+  WeakOps::Source(elMat.b.front(), fe, theta);
 
   return true;
 }

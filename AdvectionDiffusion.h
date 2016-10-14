@@ -16,6 +16,7 @@
 
 #include "IntegrandBase.h"
 #include "ElmMats.h"
+#include "EqualOrderOperators.h"
 #include "FluidProperties.h"
 
 
@@ -26,6 +27,8 @@
 class AdvectionDiffusion : public IntegrandBase
 {
 public:
+  using WeakOps = EqualOrderOperators::Weak; //!< Convenience renaming
+
   //! \brief Enum defining the available stabilization methods.
   enum Stabilization { NONE, SUPG, GLS, MS };
 
