@@ -38,13 +38,12 @@
 template<class Dim, class Integrand=AdvectionDiffusion> class SIMAD : public Dim
 {
 public:
+  //! \brief Setup properties.
   struct SetupProps
   {
-    bool shareGrid;
-    Integrand* integrand;
-    SIMoutput* share;
-
-    SetupProps() : shareGrid(false), integrand(nullptr), share(nullptr) {}
+    bool shareGrid = false; //!< True to share grid with some other simulator
+    Integrand* integrand = nullptr; //!< Integrand to use
+    SIMoutput* share = nullptr; //!< Simulator to share grid with
   };
 
   //! \brief Default constructor.
@@ -58,7 +57,7 @@ public:
     this->myHeading = "Advection-Diffusion solver";
   }
 
-  //! \brief Construct from props
+  //! \brief Construct from properties
   //! \param props The properties
   SIMAD(SetupProps& props) :
     Dim(1), AD(*props.integrand),
@@ -157,9 +156,8 @@ public:
   //! \brief Returns the name of this simulator (for use in the HDF5 export).
   virtual std::string getName() const { return "AdvectionDiffusion"; }
 
-  void init() { TimeStep dummy; this->init(dummy); }
-
-  bool init(const TimeStep& tp)
+  //! \brief Initialize simulator.
+  bool init(const TimeStep& tp=TimeStep())
   {
     int p1, p2, p3;
     Dim::myModel.front()->getOrder(p1,p2,p3);
@@ -249,6 +247,7 @@ public:
     return true;
   }
 
+  //! \brief No solution postprocessing.
   bool postSolve(const TimeStep& tp,bool) { return true; }
 
   //! \brief Evaluates and prints out solution norms.
@@ -285,7 +284,7 @@ public:
       return true;
 
     int iDump = 1 + tp.step/Dim::opt.saveInc;
-    if (!this->writeGlvS1(temperature.front(),iDump,nBlock,
+    if (!this->writeGlvS1(this->getSolution(0),iDump,nBlock,
                           tp.time.t,"temperature",89))
       return false;
     else if (!standalone)
@@ -294,15 +293,26 @@ public:
     return this->writeGlvStep(iDump,tp.time.t);
   }
 
+  //! \brief Obtain a reference to a solution vector.
   Vector& getSolution(int n=0) { return temperature[n]; }
-  const Vector& getSolution(int n=0) const { return temperature[n]; }
 
+  //! \brief Obtain a reference to a solution vector.
+  //! \details If set, returns external vector for index 0.
+  const Vector& getSolution(int n=0) const
+  {
+    if (n == 0 && solution)
+      return *solution;
+
+    return temperature[n];
+  }
+
+  //! \brief Register fields for simulation result export.
   void registerFields(DataExporter& exporter, const std::string& prefix="")
   {
     exporter.registerField("theta","temperature",DataExporter::SIM,
                            DataExporter::PRIMARY|DataExporter::RESTART,
                            prefix);
-    exporter.setFieldValue("theta", this, &temperature.front());
+    exporter.setFieldValue("theta", this, &this->getSolution(0));
   }
 
   double externalEnergy(const Vectors&) const { return 0.0; }
@@ -324,6 +334,9 @@ public:
   }
 #endif
 
+  //! \brief Set externally provided solution vector (adaptive).
+  void setSol(const Vector* sol) { solution = sol; }
+
 protected:
   //! \brief Initializes for integration of Neumann terms for a given property.
   //! \param[in] propInd Physical property index
@@ -338,11 +351,12 @@ protected:
   }
 
 private:
-  Integrand& AD;
-  AdvectionDiffusion::WeakDirichlet weakDirBC;
+  Integrand& AD; //!< Problem integrand definition
+  AdvectionDiffusion::WeakDirichlet weakDirBC; //!< Weak Dirichlet integrand
 
-  Vectors temperature;
-  bool    standalone;
+  const Vector* solution = nullptr; //!< Externally provided solution vector (adaptive simulators).
+  Vectors temperature; //!< Temperature solutioni vectors
+  bool    standalone; //!< True if simulator runs standalone (i.e. we own the VTF object).
   std::string inputContext; //!< Input context
 };
 

@@ -356,9 +356,9 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
   if (problem.Uad)
     U = (*problem.Uad)(X);
 
-  double react = problem.reaction ? (*problem.reaction)(X) : 0.0;
-  double f = problem.source ? (*problem.source)(X) : 0.0;
-  double h = getElementSize(fe.XC,problem.nsd);
+  //double react = problem.reaction ? (*problem.reaction)(X) : 0.0;
+  //double f = problem.source ? (*problem.source)(X) : 0.0;
+  //double h = getElementSize(fe.XC,problem.nsd);
   double val = pnorm.vec.front().dot(fe.N);
 
   Vec3 grad;
@@ -371,32 +371,34 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
     }
 
   // Intrinsic parameter to get L^2 norm error (upper bound)
-  double kk = std::min((h/(sqrt(2)*sqrt(13))),(h*h/(3*sqrt(10)*problem.props.getDiffusivity())));
+  //double kk = std::min((h/(sqrt(2)*sqrt(13))),(h*h/(3*sqrt(10)*problem.props.getDiffusivity())));
 
   int norm = 0;
 
   // Choice to have VMS based error
-  pnorm[norm++] += kk*kk*residualNorm(val, U, grad, hess,
-                                      problem.props.getDiffusivity(), f, react)*fe.detJxW;
+//  pnorm[norm++] += kk*kk*residualNorm(val, U, grad, hess,
+//                                      problem.props.getDiffusivity(), f, react)*fe.detJxW;
 
   // or Gradient based error depends on what to select here
-  //pnorm[norm++] += H1Norm(grad)*fe.detJxW;
-
   pnorm[norm++] += H1Norm(grad)*fe.detJxW;
+
+  pnorm[norm++] += L2Norm(val)*fe.detJxW;
 
   Vec3 eGrad;
   if (phi && gradPhi) {
-    double eVal = (*phi)(X);
+//    double eVal = (*phi)(X);
     eGrad = (*gradPhi)(X);
 
+    pnorm[norm++] += H1Norm(eGrad)*fe.detJxW;
+
     // Recovery based error
-    //pnorm[norm++] += H1Norm(grad-eGrad)*fe.detJxW;
+    pnorm[norm++] += H1Norm(grad-eGrad)*fe.detJxW;
 
     // VMS based error estimation
-    pnorm[norm++] += L2Norm(val-eVal)*fe.detJxW;
+    //pnorm[norm++] += L2Norm(val-eVal)*fe.detJxW;
 
-    pnorm[norm++] += kk*kk*residualNorm(val, U, grad, hess,
-                                        problem.props.getDiffusivity(), f, react)*fe.detJxW;
+//    pnorm[norm++] += kk*kk*residualNorm(val, U, grad, hess,
+//                                        problem.props.getDiffusivity(), f, react)*fe.detJxW;
 
     norm++; // effectivity index
   }
