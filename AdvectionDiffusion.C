@@ -17,7 +17,6 @@
 #include "Utilities.h"
 #include "Vec3Oper.h"
 #include "AnaSol.h"
-#include "WeakOperators.h"
 
 
 AdvectionDiffusion::AdvectionDiffusion (unsigned short int n,
@@ -120,9 +119,9 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
     if (Uad)
       U = (*Uad)(X);
 
-    WeakOperators::Laplacian(elMat.A[0], fe, props.getDiffusivity());
-    WeakOperators::Mass(elMat.A[0], fe, react);
-    WeakOperators::Advection(elMat.A[0], fe, U, 1.0);
+    WeakOps::Laplacian(elMat.A[0], fe, props.getDiffusivity());
+    WeakOps::Mass(elMat.A[0], fe, react);
+    WeakOps::Advection(elMat.A[0], fe, U, 1.0);
 
     // loop over test functions (i) and basis functions (j)
     for (size_t i = 1; i <= fe.N.size(); ++i) {
@@ -177,7 +176,7 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
 
   // Integrate source, if defined
   if (source)
-    elMat.b.front().add(fe.N,f*fe.detJxW);
+    WeakOps::Source(elMat.b.front(), fe, f);
 
   return true;
 }
@@ -202,7 +201,7 @@ bool AdvectionDiffusion::evalBou (LocalIntegral& elmInt,
   double T = (*flux)(X);
 
   // Integrate the Neumann value
-  elMat.b.front().add(fe.N,T*fe.detJxW);
+  WeakOps::Source(elMat.b.front(), fe, T);
 
   return true;
 }

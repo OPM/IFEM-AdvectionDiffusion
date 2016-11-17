@@ -14,7 +14,6 @@
 
 #include "AdvectionDiffusionExplicit.h"
 #include "FiniteElement.h"
-#include "WeakOperators.h"
 
 
 AdvectionDiffusionExplicit::AdvectionDiffusionExplicit (unsigned short int n,
@@ -50,12 +49,12 @@ bool AdvectionDiffusionExplicit::evalInt (LocalIntegral& elmInt,
 
   // Integrate source, if defined
   if (source)
-    WeakOperators::Source(elMat.b.front(), fe, (*source)(X));
+    WeakOps::Source(elMat.b.front(), fe, (*source)(X));
 
-  WeakOperators::Laplacian(elMat.A[1], fe, -nut);
-  WeakOperators::Mass(elMat.A[0], fe, 1.0);
-  WeakOperators::Mass(elMat.A[1], fe, -react);
-  WeakOperators::Advection(elMat.A[1], fe, U, -1.0);
+  WeakOps::Laplacian(elMat.A[1], fe, -nut);
+  WeakOps::Mass(elMat.A[0], fe, 1.0);
+  WeakOps::Mass(elMat.A[1], fe, -react);
+  WeakOps::Advection(elMat.A[1], fe, U, -1.0);
 
   return true;
 }
