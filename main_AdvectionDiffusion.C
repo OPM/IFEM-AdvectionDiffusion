@@ -36,7 +36,7 @@ int runSimulatorStationary(char* infile, AD* model, bool adap)
   utl::profiler->start("Model input");
 
   // Create the simulation model
-  SIMinput* theSim = model;
+  SIMadmin* theSim = model;
   AdaptiveSIM* aSim = nullptr;
   if (adap)
     theSim = aSim = new AdaptiveSIM(*model);
