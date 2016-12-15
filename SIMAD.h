@@ -18,7 +18,6 @@
 #include "AnaSol.h"
 #include "ASMstruct.h"
 #include "Functions.h"
-#include "InitialConditionHandler.h"
 #include "Property.h"
 #include "SIMoutput.h"
 #include "SIMSolver.h"
@@ -307,9 +306,6 @@ public:
   }
 
   double externalEnergy(const Vectors&) const { return 0.0; }
-
-  //! \brief Sets initial conditions.
-  void setInitialConditions() { SIM::setInitialConditions(*this); }
 
   //! \brief Set context to read from input file
   void setContext(int ctx)
