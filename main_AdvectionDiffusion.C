@@ -17,7 +17,9 @@
 #include "SIMExplicitRK.h"
 #include "SIMExplicitRKE.h"
 #include "SIMSolver.h"
+#include "SIMSolverAdap.h"
 #include "SIMAD.h"
+#include "AppCommon.h"
 #include "AdvectionDiffusionBDF.h"
 #include "AdvectionDiffusionExplicit.h"
 #include "AdaptiveSIM.h"
@@ -30,175 +32,39 @@
 #include <ctype.h>
 
 
-template<class AD>
-int runSimulatorStationary(char* infile, AD* model, bool adap)
+template<template<class T> class Solver=SIMSolver, class AD>
+int runSimulatorStationary(char* infile, AD& model)
 {
   utl::profiler->start("Model input");
-
-  // Create the simulation model
-  SIMadmin* theSim = model;
-  AdaptiveSIM* aSim = nullptr;
-  if (adap)
-    theSim = aSim = new AdaptiveSIM(*model);
+  Solver<AD> solver(model);
 
   // Read in model definitions
-  if (!theSim->read(infile))
+  if (!model.read(infile) || !solver.read(infile))
     return 1;
 
-  model->opt.print(IFEM::cout,true) << std::endl;
+  model.opt.print(IFEM::cout,true) << std::endl;
 
   utl::profiler->stop("Model input");
 
   // Establish the FE data structures
-  if (!model->preprocess())
+  if (!model.preprocess())
     return 1;
 
-  SIMoptions::ProjectionMap& pOpt = model->opt.project;
-  SIMoptions::ProjectionMap::const_iterator pit;
+  model.setQuadratureRule(model.opt.nGauss[0],true);
+  model.setMode(SIM::STATIC);
 
-  // Set default projection method (tensor splines only)
-  if (model->opt.discretization < ASM::Spline)
-    pOpt.clear(); // No projection if Lagrange/Spectral
-  else if (model->opt.discretization == ASM::Spline && pOpt.empty())
-    pOpt[SIMoptions::GLOBAL] = "Greville point projection";
+  std::unique_ptr<DataExporter> exporter;
+  if (model.opt.dumpHDF5(infile))
+    if (model.opt.discretization < ASM::Spline && !model.opt.hdf5.empty())
+      IFEM::cout <<"\n ** HDF5 output is available for spline discretization only"
+        <<". Deactivating...\n"<< std::endl;
+    else
+      exporter.reset(SIM::handleDataOutput(model, solver, model.opt.hdf5, false, 1, 1));
 
-  model->setQuadratureRule(model->opt.nGauss[0],true);
-  model->setMode(SIM::STATIC);
+  model.initSystem(model.opt.solver);
+  model.init();
 
-  Matrix eNorm, ssol;
-  Vector sol, load;
-  Vectors projs, gNorm;
-
-  DataExporter* exporter = nullptr;
-  if (model->opt.dumpHDF5(infile))
-  {
-    exporter = new DataExporter(true);
-    exporter->registerField("u","velocity",DataExporter::SIM,
-                            DataExporter::PRIMARY);
-    exporter->setFieldValue("u",model, &sol);
-    exporter->registerWriter(new HDF5Writer(model->opt.hdf5,model->getProcessAdm()));
-    exporter->registerWriter(new XMLWriter(model->opt.hdf5,model->getProcessAdm()));
-  }
-
-  model->initSystem(model->opt.solver);
-  model->init();
-
-  if (adap) {
-    aSim->initAdaptor(0,2);
-    aSim->setupProjections();
-    for (int iStep = 1; aSim->adaptMesh(iStep); iStep++)
-    {
-      if (!aSim->solveStep(infile,iStep))
-        return 5;
-
-      // New added for print norm
-      model->solutionNorms(Vectors(1,sol),projs,eNorm,gNorm);
-      // print norm of solution
-      NormBase* norm = model->getNormIntegrand();
-      IFEM::cout << norm->getName(1,1) << ": " << gNorm[0](1) << std::endl;
-      IFEM::cout << norm->getName(1,2) << ": " << gNorm[0](2) << std::endl;
-      if (gNorm[0].size() > 3) {
-        IFEM::cout << norm->getName(1,3) << ": " << gNorm[0](3) << std::endl;
-        IFEM::cout << norm->getName(1,4) << ": " << gNorm[0](4) << " :"<< std::endl;
-        IFEM::cout << norm->getName(1,5) << ": " << gNorm[0](4)/gNorm[0](3) << std::endl;
-      }
-      delete norm;
-
-      if (!aSim->writeGlv(infile,iStep,2))
-        return 6;
-    }
-  }
-  else {
-    if (!model->assembleSystem())
-      return 2;
-
-    // Solve the linear system of equations
-    if (!model->solveSystem(sol,1))
-      return 3;
-
-    // Project onto the splines basis
-    for (pit = pOpt.begin(); pit != pOpt.end(); pit++)
-      if (!model->project(ssol,sol,pit->first))
-        return 4;
-      else
-        projs.push_back(ssol);
-
-    model->setMode(SIM::RECOVERY);
-    model->setQuadratureRule(model->opt.nGauss[1]);
-    model->solutionNorms(Vectors(1,sol),projs,eNorm,gNorm);
-
-    // print norm of solution
-    NormBase* norm = model->getNormIntegrand();
-    IFEM::cout << norm->getName(1,1) << ": " << gNorm[0](1) << std::endl;
-    IFEM::cout << norm->getName(1,2) << ": " << gNorm[0](2) << std::endl;
-    if (gNorm[0].size() > 3) {
-      IFEM::cout << norm->getName(1,3) << ": " << gNorm[0](3) << std::endl;
-      IFEM::cout << norm->getName(1,4) << ": " << gNorm[0](4) << std::endl;
-      IFEM::cout << norm->getName(1,5) << ": " << gNorm[0](4)/gNorm[0](3) << std::endl;
-    }
-    delete norm;
-
-    size_t j = 0;
-    const char* prefix[pOpt.size()];
-    if (model->opt.format >= 0)
-      for (pit = pOpt.begin(); pit != pOpt.end(); j++, pit++)
-        prefix[j] = pit->second.c_str();
-
-    // Print the norms
-    for ( j=1, pit = pOpt.begin(); pit != pOpt.end() && j<=gNorm[0].size(); pit++, j++)
-    {
-      IFEM::cout <<"\n\n>>> Error estimates based on "<< pit->second<<"" <<" <<<";
-
-      IFEM::cout <<"\n |e|_H^1, e=u^r-u^h : " <<gNorm[j](2)<<std::endl;
-      if (model->haveAnaSol() && j <= gNorm.size())
-      {
-        IFEM::cout <<"\n |e|_H^1, e=u-u^r : " <<gNorm[j](3)<<std::endl;
-        IFEM::cout <<"\n |e|_H^1, e=u-u^h : " <<gNorm[0](3)<<std::endl;
-        IFEM::cout <<"\nEffectivity index (recovery) : "<< gNorm[j](2)/gNorm[0](3)<<std::endl;
-      }
-    }
-
-    if (model->opt.format >= 0)
-    {
-      int geoBlk = 0, nBlock = 0;
-
-      // Write VTF-file with model geometry
-      if (!model->writeGlvG(geoBlk,infile))
-        return 7;
-
-      // Write Dirichlet boundary conditions
-      if (!model->writeGlvBC(nBlock))
-        return 8;
-
-      // Write load vector to VTF-file
-      if (!model->writeGlvV(load,"Source vector",1,nBlock))
-        return 9;
-
-      // Write solution fields to VTF-file
-      if (!model->writeGlvS(sol,1,nBlock))
-        return 10;
-
-      // Write projected solution fields to VTF-file
-      size_t i = 0;
-      int iBlk = 100;
-      for (pit = pOpt.begin(); pit != pOpt.end(); pit++, i++, iBlk += 10)
-        if (!model->writeGlvP(projs[i],1,nBlock,iBlk,pit->second.c_str()))
-          return 11;
-
-      // Write element norms
-      if (!model->writeGlvN(eNorm,1,nBlock,prefix))
-        return 12;
-
-      model->writeGlvStep(1,0.0,1);
-    }
-    model->closeGlv();
-    if (exporter)
-      exporter->dumpTimeLevel();
-  }
-
-  delete aSim;
-  delete exporter;
-  return 0;
+  return solver.solveProblem(infile, exporter.get(), "Solving Advection-Diffusion problem", false);
 }
 
 
@@ -226,26 +92,21 @@ int runSimulatorTransientImpl(char* infile, TimeIntegration::Method tIt,
   model.initSystem(model.opt.solver,1,1);
   model.setQuadratureRule(model.opt.nGauss[0],true);
 
-  DataExporter* exporter=nullptr;
+  std::unique_ptr<DataExporter> exporter;
   if (model.opt.dumpHDF5(infile))
-  {
-    exporter = new DataExporter(true, model.getDumpInterval(),
-                                TimeIntegration::Steps(tIt));
-    exporter->registerField("theta","temperature",DataExporter::SIM,
-                            DataExporter::PRIMARY);
-    exporter->setFieldValue("theta", &model, &model.getSolution());
-    exporter->registerWriter(new HDF5Writer(model.opt.hdf5,model.getProcessAdm()));
-    exporter->registerWriter(new XMLWriter(model.opt.hdf5,model.getProcessAdm()));
-  }
+    if (model.opt.discretization < ASM::Spline && !model.opt.hdf5.empty())
+      IFEM::cout <<"\n ** HDF5 output is available for spline discretization only"
+        <<". Deactivating...\n"<< std::endl;
+    else
+      exporter.reset(SIM::handleDataOutput(model, solver, model.opt.hdf5, false, 1, 1));
 
   model.init(solver.getTimePrm());
 
-  if (solver.solveProblem(infile, exporter))
+  if (solver.solveProblem(infile, exporter.get()))
     return 5;
 
   model.printFinalNorms(solver.getTimePrm());
 
-  delete exporter;
   return 0;
 }
 
@@ -257,7 +118,10 @@ int runSimulator(char* infile, bool adap,
   if (tIt == TimeIntegration::NONE)  {
     AdvectionDiffusion integrand(Dim::dimension);
     SIMAD<Dim> model(integrand,true);
-    return runSimulatorStationary(infile, &model, adap);
+    if (adap)
+      return runSimulatorStationary<SIMSolverAdap>(infile, model);
+    else
+      return runSimulatorStationary(infile, model);
   }
   else if (tIt == TimeIntegration::BE || tIt == TimeIntegration::BDF2) {
     AdvectionDiffusionBDF integrand(Dim::dimension,
