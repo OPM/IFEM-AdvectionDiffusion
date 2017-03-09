@@ -52,12 +52,13 @@ int runSimulatorStationary(char* infile, AD& model)
   utl::profiler->stop("Model input");
 
   std::unique_ptr<DataExporter> exporter;
-  if (model.opt.dumpHDF5(infile))
+  if (model.opt.dumpHDF5(infile)) {
     if (model.opt.discretization < ASM::Spline && !model.opt.hdf5.empty())
       IFEM::cout <<"\n ** HDF5 output is available for spline discretization only"
         <<". Deactivating...\n"<< std::endl;
     else
       exporter.reset(SIM::handleDataOutput(model, solver, model.opt.hdf5, false, 1, 1));
+  }
 
   return solver.solveProblem(infile, exporter.get(), "Solving Advection-Diffusion problem", false);
 }
@@ -84,12 +85,13 @@ int runSimulatorTransientImpl(char* infile, TimeIntegration::Method tIt,
   utl::profiler->stop("Model input");
 
   std::unique_ptr<DataExporter> exporter;
-  if (model.opt.dumpHDF5(infile))
+  if (model.opt.dumpHDF5(infile)) {
     if (model.opt.discretization < ASM::Spline && !model.opt.hdf5.empty())
       IFEM::cout <<"\n ** HDF5 output is available for spline discretization only"
         <<". Deactivating...\n"<< std::endl;
     else
       exporter.reset(SIM::handleDataOutput(model, solver, model.opt.hdf5, false, 1, 1));
+  }
 
   if ((res=solver.solveProblem(infile, exporter.get())))
     return res;
@@ -112,9 +114,10 @@ int runSimulator(char* infile, const AdvectionDiffusionArgs& args)
       return runSimulatorStationary(infile, model);
   }
   else if (args.timeMethod == TimeIntegration::BE ||
-           args.timeMethod == TimeIntegration::BDF2) {
+           args.timeMethod == TimeIntegration::BDF2 ||
+           args.timeMethod == TimeIntegration::THETA) {
     AdvectionDiffusionBDF integrand(Dim::dimension,
-                                    args.timeMethod==TimeIntegration::BE?1:2,
+                                    args.timeMethod,
                                     args.integrandType);
     SIMAD<Dim,AdvectionDiffusionBDF> model(integrand, true);
     return runSimulatorTransientImpl(infile, args.timeMethod, model, model);
@@ -185,6 +188,8 @@ int main (int argc, char** argv)
       args.timeMethod = TimeIntegration::BE;
     else if (!strcmp(argv[i],"-bdf2"))
       args.timeMethod = TimeIntegration::BDF2;
+    else if (!strcmp(argv[i],"-cn"))
+      args.timeMethod = TimeIntegration::THETA;
     else if (!strcmp(argv[i],"-euler"))
       args.timeMethod = TimeIntegration::EULER;
     else if (!strcmp(argv[i],"-heun"))

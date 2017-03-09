@@ -22,16 +22,18 @@
 #include "Vec3Oper.h"
 
 
-AdvectionDiffusionBDF::AdvectionDiffusionBDF (unsigned short int n, int order,
+AdvectionDiffusionBDF::AdvectionDiffusionBDF (unsigned short int n,
+                                              TimeIntegration::Method method,
                                               int itg_type, bool useALE)
-  : AdvectionDiffusion(n, itg_type == STANDARD ? NONE : SUPG), bdf(order)
+  : AdvectionDiffusion(n, itg_type == STANDARD ? NONE : SUPG),
+    bdf(TimeIntegration::Steps(method)),
+    timeMethod(method)
 {
   ALEformulation = useALE;
-  primsol.resize(1+order);
-  velocity.resize(order);
+  primsol.resize(3);
+  velocity.resize(2);
   registerVector("velocity1", &velocity[0]);
-  if (order == 2)
-    registerVector("velocity2", &velocity[1]);
+  registerVector("velocity2", &velocity[1]);
   registerVector("grid velocity", &ux);
 }
 
@@ -48,7 +50,7 @@ bool AdvectionDiffusionBDF::initElement (const std::vector<int>& MNPC,
   int ierr = 0;
   for (size_t i = 0; i < primsol.size() && ierr == 0; i++) {
     ierr = utl::gather(MNPC,1,primsol[i],A.vec[i]);
-    if (!Uad && i < primsol.size()-1)
+    if (!Uad && i < velocity.size())
       ierr = utl::gather(MNPC,nsd,velocity[i],A.vec[i+primsol.size()]);
   }
 
@@ -71,20 +73,25 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
 {
   ElementInfo& elMat = static_cast<ElementInfo&>(elmInt);
 
-  Vec3 U;
-  if (Uad)
-    U = (*Uad)(X);
-  else {
-    for (size_t i=1;i<=nsd;++i) {
-      double tmp[2] = {0};
-      for (int j=0; j<bdf.getOrder();++j)
-        tmp[j] = elMat.vec[primsol.size()+j].dot(fe.N,i-1,nsd);
-      U[i-1] = bdf.extrapolate(tmp);
-    }
-    if (ALEformulation)
-      for (size_t i=1;i<=nsd;++i)
-        U[i-1] -= elMat.vec[primsol.size()+velocity.size()].dot(fe.N,i-1,nsd);
+  std::vector<Vec3> U(2);
+  Vec4 Xt(static_cast<const Vec4&>(X));
+  if (timeMethod == TimeIntegration::THETA)
+    Xt.t -= time.dt;
+  if (Uad) {
+    U[0] = (*Uad)(X);
+    U[1] = (*Uad)(Xt);
+   } else {
+    std::vector<Vec3> tmp(bdf.getOrder());
+    for (int j=0; j<bdf.getOrder();++j)
+      for (size_t i=0;i<nsd;++i)
+        tmp[j][i] = elMat.vec[primsol.size()+j].dot(fe.N,i,nsd);
+    U[0] = bdf.extrapolate(tmp);
   }
+
+  if (ALEformulation)
+    for (size_t i=1;i<=nsd;++i)
+      U[0][i-1] -= elMat.vec[primsol.size()+velocity.size()].dot(fe.N,i-1,nsd);
+
   double react = 0;
   if (reaction)
     react = (*reaction)(X);
@@ -98,15 +105,41 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
   double tau=0;
   if (stab == SUPG)
     tau = StabilizationUtils::getTauPt(time.dt, props.getDiffusivity(),
-                                       Vector(U.ptr(),nsd), fe.G);
+                                       Vector(U[0].ptr(),nsd), fe.G);
 
   // Integrate source, if defined
-  if (source)
-    theta += (*source)(X);
+  if (source) {
+    if (timeMethod == TimeIntegration::THETA)
+      theta += 0.5*((*source)(X) + (*source)(Xt));
+    else
+      theta += (*source)(X);
+  }
 
-  WeakOps::Laplacian(elMat.A[0], fe, props.getDiffusionConstant());
-  WeakOps::Mass(elMat.A[0], fe, props.getMassAdvectionConstant()*bdf[0]/time.dt +
-                                      react*props.getReactionConstant());
+  double timeCoef = timeMethod == TimeIntegration::THETA ? 0.5 : 1;
+  double mu = props.getDiffusionConstant()*timeCoef;
+  double reac = react*props.getReactionConstant()*timeCoef;
+  double s = props.getMassAdvectionConstant()*bdf[0]/time.dt;
+
+  WeakOps::Laplacian(elMat.A[0], fe, mu);
+  WeakOps::Mass(elMat.A[0], fe, s + reac);
+
+  if (timeMethod == TimeIntegration::THETA) {
+    Matrix grad(1,nsd);
+    Vector g;
+    fe.dNdX.multiply(elMat.vec[1], g, true);
+    grad = g;
+    ResidualOps::Laplacian(elMat.b[0], fe, grad, -mu);
+    theta -= 0.5*U[1]*g;
+    if (reaction)
+      theta -= 0.5*props.getReactionConstant()*(*reaction)(Xt);
+  }
+
+  WeakOps::Source(elMat.b.front(), fe, theta);
+
+  if (stab == NONE) {
+    WeakOps::Advection(elMat.A[0], fe, U[0], timeCoef);
+    return true;
+  }
 
   // loop over test functions (i) and basis functions (j)
   for (size_t i = 1; i <= fe.N.size(); ++i) {
@@ -114,13 +147,13 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
     if (stab == SUPG) {
       // Convection for test functions
       for (size_t k = 1;k <= nsd;k++)
-        convI += U[k-1]*fe.dNdX(i,k);
+        convI += U[0][k-1]*fe.dNdX(i,k);
       convI *= tau*fe.detJxW;
     }
     for (size_t j = 1; j <= fe.N.size(); ++j) {
       double advect = 0.0;
       for (size_t k = 1;k <= nsd; ++k)
-        advect += U[k-1]*fe.dNdX(j,k);
+        advect += U[0][k-1]*fe.dNdX(j,k);
       advect *= fe.N(i)*props.getMassAdvectionConstant();
 
       elMat.A[0](i,j) += advect*fe.detJxW;

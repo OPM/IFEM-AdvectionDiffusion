@@ -16,6 +16,7 @@
 
 #include "AdvectionDiffusion.h"
 #include "BDF.h"
+#include "TimeIntUtils.h"
 
 
 /*!
@@ -33,7 +34,8 @@ public:
   //! \param[in] order Temporal order (1,2)
   //! \param[in] itg_type The integrand type to use
   //! \param[in] useALE If \e true, use ALE formulation
-  AdvectionDiffusionBDF(unsigned short int n = 3, int order = 1,
+  AdvectionDiffusionBDF(unsigned short int n = 3,
+                        TimeIntegration::Method method = TimeIntegration::BE,
                         int itg_type = STANDARD, bool useALE = false);
 
   //! \brief Empty destructor.
@@ -80,6 +82,7 @@ public:
 protected:
   bool      ALEformulation; //!< Formulation switch (STANDARD or ALE)
   TimeIntegration::BDF bdf; //!< BDF helper class
+  TimeIntegration::Method timeMethod; //!< Time integration method
 
   Vectors velocity; //!< The advecting velocity field
   Vector  ux;       //!< Grid velocity (ALE)

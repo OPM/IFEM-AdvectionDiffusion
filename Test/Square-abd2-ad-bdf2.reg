@@ -1,0 +1,43 @@
+Square-abd2-ad.xinp -2D -bdf2
+
+Number of elements    16
+Number of nodes       64
+Number of dofs        64
+Number of unknowns    36
+  step = 1  time = 0.1
+L2-norm            : 3.23481e-05
+Max temperature    : 0.000114014
+  step = 2  time = 0.2
+L2-norm            : 0.000177836
+Max temperature    : 0.000643898
+  step = 3  time = 0.3
+L2-norm            : 0.000560393
+Max temperature    : 0.00204134
+  step = 4  time = 0.4
+L2-norm            : 0.00130308
+Max temperature    : 0.00475521
+  step = 5  time = 0.5
+L2-norm            : 0.00252739
+Max temperature    : 0.00922901
+  step = 6  time = 0.6
+L2-norm            : 0.004354
+Max temperature    : 0.0159036
+  step = 7  time = 0.7
+L2-norm            : 0.00690333
+Max temperature    : 0.025219
+  step = 8  time = 0.8
+L2-norm            : 0.0102958
+Max temperature    : 0.0376153
+  step = 9  time = 0.9
+L2-norm            : 0.0146518
+Max temperature    : 0.0535324
+  step = 10  time = 1
+L2-norm            : 0.0200918
+Max temperature    : 0.0734104
+L2 norm |t^h| = a(t^h,t^h)^0.5      : 0.0254216
+H1 norm |t^h| = a(t^h,t^h)^0.5      : 0.0148193
+L2 norm |t|   = (t,t)^0.5           : 0.0253968
+H1 norm |t|   = a(t,t)^0.5          : 0.0879772
+L2 norm |e|   = (e,e)^0,5, e=t-t^h  : 2.51626e-05
+H1 norm |e|   = a(e,e)^0.5, e=t-t^h : 7.93378e-05
+Exact relative error (%)            : 0.09018

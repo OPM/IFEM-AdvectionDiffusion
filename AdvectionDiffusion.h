@@ -28,6 +28,7 @@ class AdvectionDiffusion : public IntegrandBase
 {
 public:
   using WeakOps = EqualOrderOperators::Weak; //!< Convenience renaming
+  using ResidualOps = EqualOrderOperators::Residual; //!< Convenience renaming
 
   //! \brief Enum defining the available stabilization methods.
   enum Stabilization { NONE, SUPG, GLS, MS };
