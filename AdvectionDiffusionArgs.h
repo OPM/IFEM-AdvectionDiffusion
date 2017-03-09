@@ -22,7 +22,7 @@ class AdvectionDiffusionArgs : public SIM::AppXMLInputBase
 {
 public:
   bool adap = false; //!< True to run an adaptive simulator
-  double errTol = 0.0; //!< Error tolerance for embedded time stepping
+  double errTol = 1e-6; //!< Error tolerance for embedded time stepping
   TimeIntegration::Method timeMethod = TimeIntegration::NONE; //!< Time integration method
   int integrandType = Integrand::STANDARD; //!< Integrand formulation
 

@@ -1,0 +1,17 @@
+Square-abd1-ad-embedded.xinp -fehlberg
+
+Number of elements    16
+Number of nodes       64
+Number of dofs        64
+Number of unknowns    36
+  step = 1  time = 0.01
+L2-norm            : 0.000200738
+Max theta   : 0.000733507
+  step = 2  time = 0.08
+L2-norm            : 0.0016059
+Max theta   : 0.0058680
+L2 norm |t^h| = a(t^h,t^h)^0.5      : 0.00203175
+H1 norm |t^h| = a(t^h,t^h)^0.5      : 0.00118461
+L2 norm |t|   = (t,t)^0.5           : 0.00203175
+H1 norm |t|   = a(t,t)^0.5          : 0.00703817
+Exact relative error (%)            : 0.000127748

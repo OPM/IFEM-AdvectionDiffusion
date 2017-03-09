@@ -127,7 +127,7 @@ int runSimulator(char* infile, const AdvectionDiffusionArgs& args)
     typedef SIMAD<Dim,AdvectionDiffusionExplicit> ADSIM;
     ADSIM model(integrand, true);
     if (args.timeMethod >= TimeIntegration::HEUNEULER) {
-      TimeIntegration::SIMExplicitRKE<ADSIM> sim(model, args.timeMethod);
+      TimeIntegration::SIMExplicitRKE<ADSIM> sim(model, args.timeMethod, args.errTol);
       return runSimulatorTransientImpl(infile, args.timeMethod, sim, model);
     }
     else {
