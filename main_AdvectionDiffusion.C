@@ -20,6 +20,7 @@
 #include "SIMSolverAdap.h"
 #include "SIMAD.h"
 #include "AppCommon.h"
+#include "AdvectionDiffusionArgs.h"
 #include "AdvectionDiffusionBDF.h"
 #include "AdvectionDiffusionExplicit.h"
 #include "AdaptiveSIM.h"
@@ -112,35 +113,35 @@ int runSimulatorTransientImpl(char* infile, TimeIntegration::Method tIt,
 
 
 template<class Dim>
-int runSimulator(char* infile, bool adap,
-                 TimeIntegration::Method tIt, int integrandType)
+int runSimulator(char* infile, const AdvectionDiffusionArgs& args)
 {
-  if (tIt == TimeIntegration::NONE)  {
+  if (args.timeMethod == TimeIntegration::NONE)  {
     AdvectionDiffusion integrand(Dim::dimension);
     SIMAD<Dim> model(integrand,true);
-    if (adap)
+    if (args.adap)
       return runSimulatorStationary<SIMSolverAdap>(infile, model);
     else
       return runSimulatorStationary(infile, model);
   }
-  else if (tIt == TimeIntegration::BE || tIt == TimeIntegration::BDF2) {
+  else if (args.timeMethod == TimeIntegration::BE ||
+           args.timeMethod == TimeIntegration::BDF2) {
     AdvectionDiffusionBDF integrand(Dim::dimension,
-                                    tIt==TimeIntegration::BE?1:2,
-                                    integrandType);
+                                    args.timeMethod==TimeIntegration::BE?1:2,
+                                    args.integrandType);
     SIMAD<Dim,AdvectionDiffusionBDF> model(integrand, true);
-    return runSimulatorTransientImpl(infile, tIt, model, model);
+    return runSimulatorTransientImpl(infile, args.timeMethod, model, model);
   }
   else {
-    AdvectionDiffusionExplicit integrand(Dim::dimension, integrandType);
+    AdvectionDiffusionExplicit integrand(Dim::dimension, args.integrandType);
     typedef SIMAD<Dim,AdvectionDiffusionExplicit> ADSIM;
     ADSIM model(integrand, true);
-    if (tIt >= TimeIntegration::HEUNEULER) {
-      TimeIntegration::SIMExplicitRKE<ADSIM> sim(model, tIt);
-      return runSimulatorTransientImpl(infile, tIt, sim, model);
+    if (args.timeMethod >= TimeIntegration::HEUNEULER) {
+      TimeIntegration::SIMExplicitRKE<ADSIM> sim(model, args.timeMethod);
+      return runSimulatorTransientImpl(infile, args.timeMethod, sim, model);
     }
     else {
-      TimeIntegration::SIMExplicitRK<ADSIM> sim(model, tIt);
-      return runSimulatorTransientImpl(infile, tIt, sim, model);
+      TimeIntegration::SIMExplicitRK<ADSIM> sim(model, args.timeMethod);
+      return runSimulatorTransientImpl(infile, args.timeMethod, sim, model);
     }
   }
 }
@@ -179,44 +180,46 @@ int main (int argc, char** argv)
   Profiler prof(argv[0]);
   utl::profiler->start("Initialization");
 
-  int integrandType = Integrand::STANDARD;
-  TimeIntegration::Method tInt = TimeIntegration::NONE;
-  bool twoD = false;
-  bool adap = false;
   char* infile = nullptr;
+  AdvectionDiffusionArgs args;
 
   IFEM::Init(argc,argv,"Advection-Diffusion solver");
 
+  int ignoreArg = -1;
   for (int i = 1; i < argc; i++)
-    if (SIMoptions::ignoreOldOptions(argc,argv,i))
+    if (i == ignoreArg || SIMoptions::ignoreOldOptions(argc,argv,i))
       ; // ignore the obsolete option
     else if (!strcmp(argv[i],"-adap"))
-      adap = true;
+      args.adap = true;
     else if (!strcmp(argv[i],"-2D"))
-      twoD = true;
+      args.dim = 2;
     else if (!strcmp(argv[i],"-be"))
-      tInt = TimeIntegration::BE;
+      args.timeMethod = TimeIntegration::BE;
     else if (!strcmp(argv[i],"-bdf2"))
-      tInt = TimeIntegration::BDF2;
+      args.timeMethod = TimeIntegration::BDF2;
     else if (!strcmp(argv[i],"-euler"))
-      tInt = TimeIntegration::EULER;
+      args.timeMethod = TimeIntegration::EULER;
     else if (!strcmp(argv[i],"-heun"))
-      tInt = TimeIntegration::HEUN;
+      args.timeMethod = TimeIntegration::HEUN;
     else if (!strcmp(argv[i],"-heuneuler"))
-      tInt = TimeIntegration::HEUNEULER;
+      args.timeMethod = TimeIntegration::HEUNEULER;
     else if (!strcmp(argv[i],"-bs"))
-      tInt = TimeIntegration::BOGACKISHAMPINE;
+      args.timeMethod = TimeIntegration::BOGACKISHAMPINE;
     else if (!strcmp(argv[i],"-fehlberg"))
-      tInt = TimeIntegration::FEHLBERG;
+      args.timeMethod = TimeIntegration::FEHLBERG;
     else if (!strcmp(argv[i],"-rk3"))
-      tInt = TimeIntegration::RK3;
+      args.timeMethod = TimeIntegration::RK3;
     else if (!strcmp(argv[i],"-rk4"))
-      tInt = TimeIntegration::RK4;
+      args.timeMethod = TimeIntegration::RK4;
     else if (!strcmp(argv[i],"-supg"))
-      integrandType = Integrand::SECOND_DERIVATIVES | Integrand::G_MATRIX;
-    else if (!infile)
+      args.integrandType = Integrand::SECOND_DERIVATIVES | Integrand::G_MATRIX;
+    else if (!infile) {
       infile = argv[i];
-    else
+      ignoreArg = i;
+      if (!args.readXML(infile,false))
+        return 1;
+      i = 0;
+    } else
       std::cerr <<"  ** Unknown option ignored: "<< argv[i] << std::endl;
 
   if (!infile)
@@ -229,15 +232,15 @@ int main (int argc, char** argv)
     return 0;
   }
 
-  if (adap)
+  if (args.adap)
     IFEM::getOptions().discretization = ASM::LRSpline;
 
   IFEM::cout <<"\nInput file: "<< infile;
   IFEM::getOptions().print(IFEM::cout) << std::endl;
   utl::profiler->stop("Initialization");
 
-  if (twoD)
-    return runSimulator<SIM2D>(infile,adap,tInt,integrandType);
+  if (args.dim == 2)
+    return runSimulator<SIM2D>(infile,args);
   else
-    return runSimulator<SIM3D>(infile,adap,tInt,integrandType);
+    return runSimulator<SIM3D>(infile,args);
 }
