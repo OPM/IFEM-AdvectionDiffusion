@@ -28,6 +28,7 @@ if(NOT WIN32)
 endif()
 
 add_library(CommonAD STATIC AdvectionDiffusion.C
+                            AdvectionDiffusionArgs.C
                             AdvectionDiffusionBDF.C
                             AdvectionDiffusionExplicit.C
                             FluidProperties.C)
