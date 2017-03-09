@@ -34,5 +34,7 @@ Max theta   : 0.000660156
   step = 10  time = 0.01
 L2-norm            : 0.000200738
 Max theta   : 0.000733507
-L2 norm |t^h| = a(t^h,t^h)^0.5      : 1.548e-06
-H1 norm |t^h| = a(t^h,t^h)^0.5      : 6.44998e-08
+L2 norm |t^h| = a(t^h,t^h)^0.5      : 0.000253968
+H1 norm |t^h| = a(t^h,t^h)^0.5      : 0.000148076
+L2 norm |t|   = (t,t)^0.5           : 0.000253968
+H1 norm |t|   = a(t,t)^0.5          : 0.000879772

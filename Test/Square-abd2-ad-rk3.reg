@@ -1,0 +1,310 @@
+Square-abd2-ad-explicit.xinp -rk3
+
+Number of elements    16
+Number of nodes       64
+Number of dofs        64
+Number of unknowns    36
+  step = 1  time = 0.501
+L2-norm            : 0.00252431
+Max theta   : 0.00922396
+  step = 2  time = 0.502
+L2-norm            : 0.00253945
+Max theta   : 0.0092793
+  step = 3  time = 0.503
+L2-norm            : 0.00255466
+Max theta   : 0.00933487
+  step = 4  time = 0.504
+L2-norm            : 0.00256993
+Max theta   : 0.00939065
+  step = 5  time = 0.505
+L2-norm            : 0.00258526
+Max theta   : 0.00944666
+  step = 6  time = 0.506
+L2-norm            : 0.00260064
+Max theta   : 0.00950289
+  step = 7  time = 0.507
+L2-norm            : 0.00261609
+Max theta   : 0.00955934
+  step = 8  time = 0.508
+L2-norm            : 0.0026316
+Max theta   : 0.00961602
+  step = 9  time = 0.509
+L2-norm            : 0.00264717
+Max theta   : 0.00967292
+  step = 10  time = 0.51
+L2-norm            : 0.00266281
+Max theta   : 0.00973004
+  step = 11  time = 0.511
+L2-norm            : 0.0026785
+Max theta   : 0.00978739
+  step = 12  time = 0.512
+L2-norm            : 0.00269426
+Max theta   : 0.00984496
+  step = 13  time = 0.513
+L2-norm            : 0.00271008
+Max theta   : 0.00990276
+  step = 14  time = 0.514
+L2-norm            : 0.00272595
+Max theta   : 0.00996079
+  step = 15  time = 0.515
+L2-norm            : 0.0027419
+Max theta   : 0.010019
+  step = 16  time = 0.516
+L2-norm            : 0.0027579
+Max theta   : 0.0100775
+  step = 17  time = 0.517
+L2-norm            : 0.00277396
+Max theta   : 0.0101362
+  step = 18  time = 0.518
+L2-norm            : 0.00279009
+Max theta   : 0.0101951
+  step = 19  time = 0.519
+L2-norm            : 0.00280628
+Max theta   : 0.0102543
+  step = 20  time = 0.52
+L2-norm            : 0.00282253
+Max theta   : 0.0103137
+  step = 21  time = 0.521
+L2-norm            : 0.00283885
+Max theta   : 0.0103733
+  step = 22  time = 0.522
+L2-norm            : 0.00285523
+Max theta   : 0.0104332
+  step = 23  time = 0.523
+L2-norm            : 0.00287167
+Max theta   : 0.0104932
+  step = 24  time = 0.524
+L2-norm            : 0.00288817
+Max theta   : 0.0105535
+  step = 25  time = 0.525
+L2-norm            : 0.00290474
+Max theta   : 0.0106141
+  step = 26  time = 0.526
+L2-norm            : 0.00292137
+Max theta   : 0.0106748
+  step = 27  time = 0.527
+L2-norm            : 0.00293806
+Max theta   : 0.0107358
+  step = 28  time = 0.528
+L2-norm            : 0.00295482
+Max theta   : 0.0107971
+  step = 29  time = 0.529
+L2-norm            : 0.00297164
+Max theta   : 0.0108585
+  step = 30  time = 0.53
+L2-norm            : 0.00298852
+Max theta   : 0.0109202
+  step = 31  time = 0.531
+L2-norm            : 0.00300547
+Max theta   : 0.0109822
+  step = 32  time = 0.532
+L2-norm            : 0.00302248
+Max theta   : 0.0110443
+  step = 33  time = 0.533
+L2-norm            : 0.00303956
+Max theta   : 0.0111067
+  step = 34  time = 0.534
+L2-norm            : 0.0030567
+Max theta   : 0.0111694
+  step = 35  time = 0.535
+L2-norm            : 0.00307391
+Max theta   : 0.0112322
+  step = 36  time = 0.536
+L2-norm            : 0.00309118
+Max theta   : 0.0112953
+  step = 37  time = 0.537
+L2-norm            : 0.00310851
+Max theta   : 0.0113587
+  step = 38  time = 0.538
+L2-norm            : 0.00312591
+Max theta   : 0.0114222
+  step = 39  time = 0.539
+L2-norm            : 0.00314337
+Max theta   : 0.011486
+  step = 40  time = 0.54
+L2-norm            : 0.0031609
+Max theta   : 0.0115501
+  step = 41  time = 0.541
+L2-norm            : 0.00317849
+Max theta   : 0.0116144
+  step = 42  time = 0.542
+L2-norm            : 0.00319615
+Max theta   : 0.0116789
+  step = 43  time = 0.543
+L2-norm            : 0.00321387
+Max theta   : 0.0117437
+  step = 44  time = 0.544
+L2-norm            : 0.00323166
+Max theta   : 0.0118087
+  step = 45  time = 0.545
+L2-norm            : 0.00324952
+Max theta   : 0.0118739
+  step = 46  time = 0.546
+L2-norm            : 0.00326744
+Max theta   : 0.0119394
+  step = 47  time = 0.547
+L2-norm            : 0.00328542
+Max theta   : 0.0120051
+  step = 48  time = 0.548
+L2-norm            : 0.00330347
+Max theta   : 0.0120711
+  step = 49  time = 0.549
+L2-norm            : 0.00332159
+Max theta   : 0.0121373
+  step = 50  time = 0.55
+L2-norm            : 0.00333978
+Max theta   : 0.0122037
+  step = 51  time = 0.551
+L2-norm            : 0.00335803
+Max theta   : 0.0122704
+  step = 52  time = 0.552
+L2-norm            : 0.00337634
+Max theta   : 0.0123373
+  step = 53  time = 0.553
+L2-norm            : 0.00339473
+Max theta   : 0.0124045
+  step = 54  time = 0.554
+L2-norm            : 0.00341317
+Max theta   : 0.0124719
+  step = 55  time = 0.555
+L2-norm            : 0.00343169
+Max theta   : 0.0125396
+  step = 56  time = 0.556
+L2-norm            : 0.00345027
+Max theta   : 0.0126075
+  step = 57  time = 0.557
+L2-norm            : 0.00346892
+Max theta   : 0.0126756
+  step = 58  time = 0.558
+L2-norm            : 0.00348764
+Max theta   : 0.012744
+  step = 59  time = 0.559
+L2-norm            : 0.00350643
+Max theta   : 0.0128127
+  step = 60  time = 0.56
+L2-norm            : 0.00352528
+Max theta   : 0.0128816
+  step = 61  time = 0.561
+L2-norm            : 0.0035442
+Max theta   : 0.0129507
+  step = 62  time = 0.562
+L2-norm            : 0.00356318
+Max theta   : 0.0130201
+  step = 63  time = 0.563
+L2-norm            : 0.00358224
+Max theta   : 0.0130897
+  step = 64  time = 0.564
+L2-norm            : 0.00360136
+Max theta   : 0.0131596
+  step = 65  time = 0.565
+L2-norm            : 0.00362055
+Max theta   : 0.0132297
+  step = 66  time = 0.566
+L2-norm            : 0.00363981
+Max theta   : 0.0133001
+  step = 67  time = 0.567
+L2-norm            : 0.00365913
+Max theta   : 0.0133707
+  step = 68  time = 0.568
+L2-norm            : 0.00367853
+Max theta   : 0.0134415
+  step = 69  time = 0.569
+L2-norm            : 0.00369799
+Max theta   : 0.0135127
+  step = 70  time = 0.57
+L2-norm            : 0.00371752
+Max theta   : 0.013584
+  step = 71  time = 0.571
+L2-norm            : 0.00373712
+Max theta   : 0.0136557
+  step = 72  time = 0.572
+L2-norm            : 0.00375679
+Max theta   : 0.0137275
+  step = 73  time = 0.573
+L2-norm            : 0.00377653
+Max theta   : 0.0137997
+  step = 74  time = 0.574
+L2-norm            : 0.00379634
+Max theta   : 0.013872
+  step = 75  time = 0.575
+L2-norm            : 0.00381621
+Max theta   : 0.0139447
+  step = 76  time = 0.576
+L2-norm            : 0.00383616
+Max theta   : 0.0140175
+  step = 77  time = 0.577
+L2-norm            : 0.00385617
+Max theta   : 0.0140907
+  step = 78  time = 0.578
+L2-norm            : 0.00387626
+Max theta   : 0.0141641
+  step = 79  time = 0.579
+L2-norm            : 0.00389641
+Max theta   : 0.0142377
+  step = 80  time = 0.58
+L2-norm            : 0.00391664
+Max theta   : 0.0143116
+  step = 81  time = 0.581
+L2-norm            : 0.00393693
+Max theta   : 0.0143858
+  step = 82  time = 0.582
+L2-norm            : 0.00395729
+Max theta   : 0.0144602
+  step = 83  time = 0.583
+L2-norm            : 0.00397773
+Max theta   : 0.0145348
+  step = 84  time = 0.584
+L2-norm            : 0.00399823
+Max theta   : 0.0146097
+  step = 85  time = 0.585
+L2-norm            : 0.0040188
+Max theta   : 0.0146849
+  step = 86  time = 0.586
+L2-norm            : 0.00403945
+Max theta   : 0.0147604
+  step = 87  time = 0.587
+L2-norm            : 0.00406016
+Max theta   : 0.0148361
+  step = 88  time = 0.588
+L2-norm            : 0.00408095
+Max theta   : 0.014912
+  step = 89  time = 0.589
+L2-norm            : 0.00410181
+Max theta   : 0.0149882
+  step = 90  time = 0.59
+L2-norm            : 0.00412273
+Max theta   : 0.0150647
+  step = 91  time = 0.591
+L2-norm            : 0.00414373
+Max theta   : 0.0151414
+  step = 92  time = 0.592
+L2-norm            : 0.0041648
+Max theta   : 0.0152184
+  step = 93  time = 0.593
+L2-norm            : 0.00418594
+Max theta   : 0.0152957
+  step = 94  time = 0.594
+L2-norm            : 0.00420716
+Max theta   : 0.0153732
+  step = 95  time = 0.595
+L2-norm            : 0.00422844
+Max theta   : 0.0154509
+  step = 96  time = 0.596
+L2-norm            : 0.0042498
+Max theta   : 0.015529
+  step = 97  time = 0.597
+L2-norm            : 0.00427122
+Max theta   : 0.0156073
+  step = 98  time = 0.598
+L2-norm            : 0.00429272
+Max theta   : 0.0156858
+  step = 99  time = 0.599
+L2-norm            : 0.00431429
+Max theta   : 0.0157647
+  step = 100  time = 0.6
+L2-norm            : 0.00433594
+Max theta   : 0.0158437
+L2 norm |t^h| = a(t^h,t^h)^0.5      : 0.00548571
+H1 norm |t^h| = a(t^h,t^h)^0.5      : 0.00319845
+L2 norm |t|   = (t,t)^0.5           : 0.00548571
+H1 norm |t|   = a(t,t)^0.5          : 0.0190031

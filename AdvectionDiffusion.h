@@ -234,7 +234,7 @@ protected:
 
 
 /*!
-  \brief Class representing the integrand of Advection-Diffusion energy norms.
+  \brief Class representing the integrand of Advection-Diffusion energy norms for stationary simulations.
 */
 
 class AdvectionDiffusionNorm : public NormBase
@@ -274,6 +274,45 @@ public:
 protected:
   RealFunc* phi;     //!< Analytical solution field
   VecFunc*  gradPhi; //!< Analytical gradient field
+};
+
+
+/*!
+  \brief Class representing the integrand of Advection-Diffusion energy norms.
+*/
+
+class ADNorm : public NormBase
+{
+public:
+  //! \brief The only constructor initializes its data members.
+  //! \param[in] p The heat equation problem to evaluate norms for
+  //! \param[in] a The analytical aolution (optional)
+  ADNorm(AdvectionDiffusion& p, AnaSol* a = nullptr);
+  //! \brief Empty destructor.
+  virtual ~ADNorm() {}
+
+  //! \brief Evaluates the integrand at an interior point.
+  //! \param elmInt The local integral object to receive the contributions
+  //! \param[in] fe Finite element data of current integration point
+  //! \param[in] X Cartesian coordinates of current integration point
+  virtual bool evalInt(LocalIntegral& elmInt, const FiniteElement& fe,
+                       const Vec3& X) const;
+
+  //! \brief Returns the number of norm groups or size of a specified group.
+  //! \param[in] group The norm group to return the size of
+  //! (if zero, return the number of groups)
+  virtual size_t getNoFields(int group = 0) const;
+
+  //! \brief Returns the name of a norm quantity.
+  //! \param[in] i The norm group (one-based index)
+  //! \param[in] prefix Common prefix for all norm names
+  virtual std::string getName(size_t i, size_t j, const char* prefix) const;
+
+  //! \brief Returns whether a norm quantity stores element contributions.
+  virtual bool hasElementContributions(size_t i, size_t j) const;
+
+private:
+  AnaSol* anasol; //!< Analytical solution
 };
 
 #endif
