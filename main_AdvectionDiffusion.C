@@ -39,20 +39,17 @@ int runSimulatorStationary(char* infile, AD& model)
   utl::profiler->start("Model input");
   Solver<AD> solver(model);
 
+  int res;
+  if ((res = ConfigureSIM(model, infile, typename AD::SetupProps())))
+    return res;
+
   // Read in model definitions
-  if (!model.read(infile) || !solver.read(infile))
+  if (!solver.read(infile))
     return 1;
 
   model.opt.print(IFEM::cout,true) << std::endl;
 
   utl::profiler->stop("Model input");
-
-  // Establish the FE data structures
-  if (!model.preprocess())
-    return 1;
-
-  model.setQuadratureRule(model.opt.nGauss[0],true);
-  model.setMode(SIM::STATIC);
 
   std::unique_ptr<DataExporter> exporter;
   if (model.opt.dumpHDF5(infile))
@@ -61,9 +58,6 @@ int runSimulatorStationary(char* infile, AD& model)
         <<". Deactivating...\n"<< std::endl;
     else
       exporter.reset(SIM::handleDataOutput(model, solver, model.opt.hdf5, false, 1, 1));
-
-  model.initSystem(model.opt.solver);
-  model.init();
 
   return solver.solveProblem(infile, exporter.get(), "Solving Advection-Diffusion problem", false);
 }
@@ -77,21 +71,17 @@ int runSimulatorTransientImpl(char* infile, TimeIntegration::Method tIt,
 
   SIMSolver<Solver> solver(sim);
 
+  int res;
+  if ((res = ConfigureSIM(model, infile, typename AD::SetupProps())))
+    return res;
+
   // Read in model definitions
-  if (!model.read(infile) || !solver.read(infile))
+  if (!solver.read(infile))
     return 1;
 
   model.opt.print(IFEM::cout,true) << std::endl;
 
   utl::profiler->stop("Model input");
-
-  // Establish the FE data structures
-  if (!model.preprocess())
-    return 1;
-
-  model.setMode(SIM::DYNAMIC);
-  model.initSystem(model.opt.solver,1,1);
-  model.setQuadratureRule(model.opt.nGauss[0],true);
 
   std::unique_ptr<DataExporter> exporter;
   if (model.opt.dumpHDF5(infile))
@@ -101,10 +91,8 @@ int runSimulatorTransientImpl(char* infile, TimeIntegration::Method tIt,
     else
       exporter.reset(SIM::handleDataOutput(model, solver, model.opt.hdf5, false, 1, 1));
 
-  model.init(solver.getTimePrm());
-
-  if (solver.solveProblem(infile, exporter.get()))
-    return 5;
+  if ((res=solver.solveProblem(infile, exporter.get())))
+    return res;
 
   model.printFinalNorms(solver.getTimePrm());
 
