@@ -17,6 +17,10 @@
 #include "AdvectionDiffusion.h"
 #include "BDF.h"
 #include "TimeIntUtils.h"
+#include "Fields.h"
+#include "TimeIntUtils.h"
+#include <array>
+#include <memory>
 
 
 /*!
@@ -79,6 +83,9 @@ public:
   //! \param[in] asol Pointer to analytical solution (optional)
   virtual NormBase* getNormIntegrand(AnaSol* asol = 0) const;
 
+  //! \brief Registers where we can inject a mixed-basis vector field.
+  virtual void setNamedFields(const std::string&, Fields*);
+
 protected:
   bool      ALEformulation; //!< Formulation switch (STANDARD or ALE)
   TimeIntegration::BDF bdf; //!< BDF helper class
@@ -86,6 +93,7 @@ protected:
 
   Vectors velocity; //!< The advecting velocity field
   Vector  ux;       //!< Grid velocity (ALE)
+  std::array<std::unique_ptr<Fields>,2> uFields; //!< Externally provided velocity fields
 };
 
 #endif
