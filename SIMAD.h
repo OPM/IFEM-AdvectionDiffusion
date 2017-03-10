@@ -262,14 +262,15 @@ public:
     else if (gNorm.empty())
       return;
 
-    IFEM::cout <<"L2 norm |t^h| = a(t^h,t^h)^0.5      : "<< gNorm[0](1);
-    IFEM::cout <<"\nH1 norm |t^h| = a(t^h,t^h)^0.5      : "<< gNorm[0](2);
+    IFEM::cout << ">>> Norm summary for AdvectionDiffusion <<<" << std::endl;
+    IFEM::cout <<"  L2 norm |t^h| = (t^h,t^h)^0.5       : "<< gNorm[0](1);
+    IFEM::cout <<"\n  H1 norm |t^h| = a(t^h,t^h)^0.5      : "<< gNorm[0](2);
     if (this->haveAnaSol() && gNorm[0].size() >= 6)
-      IFEM::cout <<"\nL2 norm |t|   = (t,t)^0.5           : "<< gNorm[0](3)
-                 <<"\nH1 norm |t|   = a(t,t)^0.5          : "<< gNorm[0](5)
-                 <<"\nL2 norm |e|   = (e,e)^0,5, e=t-t^h  : "<< gNorm[0](4)
-                 <<"\nH1 norm |e|   = a(e,e)^0.5, e=t-t^h : "<< gNorm[0](6)
-                 <<"\nExact relative error (%)            : "
+      IFEM::cout <<"\n  L2 norm |t|   = (t,t)^0.5           : "<< gNorm[0](3)
+                 <<"\n  H1 norm |t|   = a(t,t)^0.5          : "<< gNorm[0](5)
+                 <<"\n  L2 norm |e|   = (e,e)^0,5, e=t-t^h  : "<< gNorm[0](4)
+                 <<"\n  H1 norm |e|   = a(e,e)^0.5, e=t-t^h : "<< gNorm[0](6)
+                 <<"\n  Exact relative error (%)            : "
                  << gNorm[0](6)/gNorm[0](5)*100.0;
     IFEM::cout << std::endl;
   }
