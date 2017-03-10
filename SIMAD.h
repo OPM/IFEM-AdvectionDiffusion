@@ -147,6 +147,10 @@ public:
           }
         }
       }
+      else if (strcasecmp(child->Value(),"subiterations") == 0) {
+       utl::getAttribute(child,"max",maxSubIt);
+       utl::getAttribute(child,"tol",subItTol);
+      }
       else
         this->Dim::parse(child);
 
@@ -168,11 +172,12 @@ public:
     // Initialize temperature solution vectors
     size_t n, nSols = this->getNoSolutions();
     temperature.resize(3);
-    temperature[0].resize(this->getNoDOFs(),true);
     std::string str = "temperature1";
     for (n = 0; n < nSols; n++, str[11]++) {
       temperature[n].resize(this->getNoDOFs(),true);
       this->registerField(str,temperature[n]);
+      if (n == 1)
+       ++n;
     }
     return true;
   }
@@ -219,7 +224,7 @@ public:
   }
 
   //! \brief Computes the solution for the current time step.
-  virtual bool solveStep(TimeStep& tp)
+  virtual bool solveStep(TimeStep& tp,bool=false)
   {
     PROFILE1("SIMAD::solveStep");
 
@@ -249,7 +254,7 @@ public:
   }
 
   //! \brief No solution postprocessing.
-  bool postSolve(const TimeStep& tp,bool) { return true; }
+  bool postSolve(const TimeStep& tp,bool=false) { return true; }
 
   //! \brief Evaluates and prints out solution norms.
   void printFinalNorms(const TimeStep& tp)
@@ -327,6 +332,21 @@ public:
     inputContext = str.str();
   }
 
+  //! \brief Returns the maximum number of iterations (unlimited).
+  int getMaxit() const { return maxSubIt; }
+  double getSubItTol() const { return subItTol; }
+
+  //! \brief Solves the linearized system of current iteration.
+  //! \param[in] tp Time stepping parameters
+  //!
+  //! \details Since this solver is linear, this is just a normal solve.
+  SIM::ConvStatus solveIteration(TimeStep& tp)
+  {
+    if (Dim::msgLevel == 1)
+      IFEM::cout <<"\n  step="<< tp.step <<"  time="<< tp.time.t << std::endl;
+    return this->solveStep(tp,false) ? SIM::CONVERGED : SIM::FAILURE;
+  }
+
 #ifdef HAS_PETSC
   //! \brief Set MPI communicator for the linear equation solvers
   //! \param comm The communicator to use
@@ -360,6 +380,8 @@ private:
   Vectors temperature; //!< Temperature solutioni vectors
   bool    standalone; //!< True if simulator runs standalone (i.e. we own the VTF object).
   std::string inputContext; //!< Input context
+  double subItTol = 1e-4;
+  int maxSubIt = 50;
 };
 
 

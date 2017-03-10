@@ -81,9 +81,9 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
     U[0] = (*Uad)(X);
     U[1] = (*Uad)(Xt);
    } else if (uFields[0]) {
-     for (int i = 0; i < bdf.getOrder(); ++i) {
+     for (int i = 0; i < 2; ++i) {
        Vector u;
-       uFields[0]->valueFE(fe, u);
+       uFields[i]->valueFE(fe, u);
        U[i] = u;
      }
    } else {
