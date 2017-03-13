@@ -62,6 +62,13 @@ public:
   {
     return stab == NONE ? STANDARD : SECOND_DERIVATIVES | G_MATRIX;
   }
+
+  //! \brief Returns a pointer to an Integrand for solution norm evaluation.
+  //! \note The Integrand object is allocated dynamically and has to be deleted
+  //! manually when leaving the scope of the pointer variable receiving the
+  //! returned pointer value.
+  //! \param[in] asol Pointer to analytical solution (optional)
+  virtual NormBase* getNormIntegrand(AnaSol* asol = 0) const;
 };
 
 #endif

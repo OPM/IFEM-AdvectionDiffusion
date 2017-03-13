@@ -1,4 +1,4 @@
-Square-abd1-ad-explicit.xinp -rk4
+Square-abd1-ad-explicit.xinp -heun
 
 Number of elements    16
 Number of nodes       64

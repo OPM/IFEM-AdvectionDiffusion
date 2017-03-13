@@ -573,3 +573,91 @@ bool AdvectionDiffusion::WeakDirichlet::evalBou (LocalIntegral& elmInt,
 
   return true;
 }
+
+
+ADNorm::ADNorm(AdvectionDiffusion& p, AnaSol* a) : NormBase(p)
+{
+  nrcmp = myProblem.getNoFields(2);
+  anasol = a;
+}
+
+
+bool ADNorm::evalInt (LocalIntegral& elmInt, const FiniteElement& fe,
+                      const Vec3& X) const
+{
+  ElmNorm& pnorm = static_cast<ElmNorm&>(elmInt);
+  AdvectionDiffusion& hep = static_cast<AdvectionDiffusion&>(myProblem);
+
+  // Evaluate the FE temperature and thermal conductivity at current point
+  double Uh = fe.N.dot(elmInt.vec.front());
+  double kappa = hep.getFluidProperties().getDiffusionConstant();
+
+  // Evaluate the FE heat flux vector, gradU = dNdX^T * eV
+  Vector gradUh;
+  if (!fe.dNdX.multiply(elmInt.vec.front(),gradUh,true))
+    return false;
+
+  size_t ip = 0;
+  // Integrate the L2 norm, (U^h, U^h)
+  pnorm[ip++] += Uh*Uh*fe.detJxW;
+
+  // Integrate the energy norm, a(U^h,U^h)
+  pnorm[ip++] = 0.5*kappa*gradUh.dot(gradUh)*fe.detJxW;
+
+  if (anasol && anasol->getScalarSol()) {
+    double T = (*anasol->getScalarSol())(X);
+    pnorm[ip++] += T*T*fe.detJxW; // L2 norm of analytical solution
+    pnorm[ip++] += (T-Uh)*(T-Uh)*fe.detJxW; // L2 norm of error
+  }
+
+  if (anasol && anasol->getScalarSecSol()) {
+    Vec3 dT = (*anasol->getScalarSecSol())(X);
+    pnorm[ip++] += 0.5*kappa*dT*dT*fe.detJxW;
+    pnorm[ip++] += 0.5*kappa*(dT-gradUh)*(dT-gradUh)*fe.detJxW;
+  }
+
+  return true;
+}
+
+
+size_t ADNorm::getNoFields (int group) const
+{
+  if (group < 1)
+    return this->NormBase::getNoFields();
+  else
+    return anasol ? 6 : 2;
+}
+
+
+std::string ADNorm::getName (size_t i, size_t j,
+                             const char* prefix) const
+{
+  if (i == 0 || j == 0 || j > 4)
+    return this->NormBase::getName(i,j,prefix);
+
+  static const char* s[] = {
+    "(theta^h,theta^h)^0.5",
+    "a(theta^h,theta^h)^0.5",
+    "(q,theta^h)^0.5",
+    "(theta, theta)^0.5",
+    "a(theta,theta)^0.5",
+    "a(e,e)^0.5, e=theta-theta^h",
+    "a(theta^r,theta^r)^0.5",
+    "a(e,e)^0.5, e=theta^r-theta^h",
+    "a(e,e)^0.5, e=theta-theta^r",
+    "effectivity index"
+  };
+
+  size_t k = i > 1 ? j+3 : j-1;
+
+  if (!prefix)
+    return s[k];
+
+  return prefix + std::string(" ") + s[k];
+}
+
+
+bool ADNorm::hasElementContributions (size_t i, size_t j) const
+{
+  return i > 1 || j != 2;
+}

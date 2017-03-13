@@ -39,31 +39,26 @@ int runSimulatorStationary(char* infile, AD& model)
   utl::profiler->start("Model input");
   Solver<AD> solver(model);
 
+  int res;
+  if ((res = ConfigureSIM(model, infile, typename AD::SetupProps())))
+    return res;
+
   // Read in model definitions
-  if (!model.read(infile) || !solver.read(infile))
+  if (!solver.read(infile))
     return 1;
 
   model.opt.print(IFEM::cout,true) << std::endl;
 
   utl::profiler->stop("Model input");
 
-  // Establish the FE data structures
-  if (!model.preprocess())
-    return 1;
-
-  model.setQuadratureRule(model.opt.nGauss[0],true);
-  model.setMode(SIM::STATIC);
-
   std::unique_ptr<DataExporter> exporter;
-  if (model.opt.dumpHDF5(infile))
+  if (model.opt.dumpHDF5(infile)) {
     if (model.opt.discretization < ASM::Spline && !model.opt.hdf5.empty())
       IFEM::cout <<"\n ** HDF5 output is available for spline discretization only"
         <<". Deactivating...\n"<< std::endl;
     else
       exporter.reset(SIM::handleDataOutput(model, solver, model.opt.hdf5, false, 1, 1));
-
-  model.initSystem(model.opt.solver);
-  model.init();
+  }
 
   return solver.solveProblem(infile, exporter.get(), "Solving Advection-Diffusion problem", false);
 }
@@ -77,34 +72,29 @@ int runSimulatorTransientImpl(char* infile, TimeIntegration::Method tIt,
 
   SIMSolver<Solver> solver(sim);
 
+  int res;
+  if ((res = ConfigureSIM(model, infile, typename AD::SetupProps())))
+    return res;
+
   // Read in model definitions
-  if (!model.read(infile) || !solver.read(infile))
+  if (!solver.read(infile))
     return 1;
 
   model.opt.print(IFEM::cout,true) << std::endl;
 
   utl::profiler->stop("Model input");
 
-  // Establish the FE data structures
-  if (!model.preprocess())
-    return 1;
-
-  model.setMode(SIM::DYNAMIC);
-  model.initSystem(model.opt.solver,1,1);
-  model.setQuadratureRule(model.opt.nGauss[0],true);
-
   std::unique_ptr<DataExporter> exporter;
-  if (model.opt.dumpHDF5(infile))
+  if (model.opt.dumpHDF5(infile)) {
     if (model.opt.discretization < ASM::Spline && !model.opt.hdf5.empty())
       IFEM::cout <<"\n ** HDF5 output is available for spline discretization only"
         <<". Deactivating...\n"<< std::endl;
     else
       exporter.reset(SIM::handleDataOutput(model, solver, model.opt.hdf5, false, 1, 1));
+  }
 
-  model.init(solver.getTimePrm());
-
-  if (solver.solveProblem(infile, exporter.get()))
-    return 5;
+  if ((res=solver.solveProblem(infile, exporter.get())))
+    return res;
 
   model.printFinalNorms(solver.getTimePrm());
 
@@ -124,9 +114,10 @@ int runSimulator(char* infile, const AdvectionDiffusionArgs& args)
       return runSimulatorStationary(infile, model);
   }
   else if (args.timeMethod == TimeIntegration::BE ||
-           args.timeMethod == TimeIntegration::BDF2) {
+           args.timeMethod == TimeIntegration::BDF2 ||
+           args.timeMethod == TimeIntegration::THETA) {
     AdvectionDiffusionBDF integrand(Dim::dimension,
-                                    args.timeMethod==TimeIntegration::BE?1:2,
+                                    args.timeMethod,
                                     args.integrandType);
     SIMAD<Dim,AdvectionDiffusionBDF> model(integrand, true);
     return runSimulatorTransientImpl(infile, args.timeMethod, model, model);
@@ -136,7 +127,7 @@ int runSimulator(char* infile, const AdvectionDiffusionArgs& args)
     typedef SIMAD<Dim,AdvectionDiffusionExplicit> ADSIM;
     ADSIM model(integrand, true);
     if (args.timeMethod >= TimeIntegration::HEUNEULER) {
-      TimeIntegration::SIMExplicitRKE<ADSIM> sim(model, args.timeMethod);
+      TimeIntegration::SIMExplicitRKE<ADSIM> sim(model, args.timeMethod, args.errTol);
       return runSimulatorTransientImpl(infile, args.timeMethod, sim, model);
     }
     else {
@@ -197,6 +188,8 @@ int main (int argc, char** argv)
       args.timeMethod = TimeIntegration::BE;
     else if (!strcmp(argv[i],"-bdf2"))
       args.timeMethod = TimeIntegration::BDF2;
+    else if (!strcmp(argv[i],"-cn"))
+      args.timeMethod = TimeIntegration::THETA;
     else if (!strcmp(argv[i],"-euler"))
       args.timeMethod = TimeIntegration::EULER;
     else if (!strcmp(argv[i],"-heun"))

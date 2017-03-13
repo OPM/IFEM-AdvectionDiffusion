@@ -65,3 +65,12 @@ bool AdvectionDiffusionExplicit::finalizeElement (LocalIntegral& A)
   ElmMats& elMat = static_cast<ElmMats&>(A);
   return elMat.A[1].multiply(elMat.vec[0], elMat.b[0], false, true);
 }
+
+
+NormBase* AdvectionDiffusionExplicit::getNormIntegrand (AnaSol* asol) const
+{
+  if (asol)
+    return new ADNorm(*const_cast<AdvectionDiffusionExplicit*>(this),asol);
+  else
+    return new ADNorm(*const_cast<AdvectionDiffusionExplicit*>(this));
+}

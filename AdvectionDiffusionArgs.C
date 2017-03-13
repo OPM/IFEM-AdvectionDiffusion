@@ -34,6 +34,8 @@ bool AdvectionDiffusionArgs::parse(const TiXmlElement* elem)
       timeMethod = TimeIntegration::THETA;
     else if (type == "euler")
       timeMethod = TimeIntegration::EULER;
+    else if (type == "heun")
+      timeMethod = TimeIntegration::HEUN;
     else if (type == "heuneuler")
       timeMethod = TimeIntegration::HEUNEULER;
     else if (type == "bs")

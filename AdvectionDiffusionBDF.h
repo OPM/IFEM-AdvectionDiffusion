@@ -16,6 +16,7 @@
 
 #include "AdvectionDiffusion.h"
 #include "BDF.h"
+#include "TimeIntUtils.h"
 
 
 /*!
@@ -33,7 +34,8 @@ public:
   //! \param[in] order Temporal order (1,2)
   //! \param[in] itg_type The integrand type to use
   //! \param[in] useALE If \e true, use ALE formulation
-  AdvectionDiffusionBDF(unsigned short int n = 3, int order = 1,
+  AdvectionDiffusionBDF(unsigned short int n = 3,
+                        TimeIntegration::Method method = TimeIntegration::BE,
                         int itg_type = STANDARD, bool useALE = false);
 
   //! \brief Empty destructor.
@@ -80,48 +82,10 @@ public:
 protected:
   bool      ALEformulation; //!< Formulation switch (STANDARD or ALE)
   TimeIntegration::BDF bdf; //!< BDF helper class
+  TimeIntegration::Method timeMethod; //!< Time integration method
 
   Vectors velocity; //!< The advecting velocity field
   Vector  ux;       //!< Grid velocity (ALE)
-};
-
-
-/*!
-  \brief Class representing the integrand of Advection-Diffusion energy norms.
-*/
-
-class ADNorm : public NormBase
-{
-public:
-  //! \brief The only constructor initializes its data members.
-  //! \param[in] p The heat equation problem to evaluate norms for
-  //! \param[in] a The analytical aolution (optional)
-  ADNorm(AdvectionDiffusion& p, AnaSol* a = nullptr);
-  //! \brief Empty destructor.
-  virtual ~ADNorm() {}
-
-  //! \brief Evaluates the integrand at an interior point.
-  //! \param elmInt The local integral object to receive the contributions
-  //! \param[in] fe Finite element data of current integration point
-  //! \param[in] X Cartesian coordinates of current integration point
-  virtual bool evalInt(LocalIntegral& elmInt, const FiniteElement& fe,
-                       const Vec3& X) const;
-
-  //! \brief Returns the number of norm groups or size of a specified group.
-  //! \param[in] group The norm group to return the size of
-  //! (if zero, return the number of groups)
-  virtual size_t getNoFields(int group = 0) const;
-
-  //! \brief Returns the name of a norm quantity.
-  //! \param[in] i The norm group (one-based index)
-  //! \param[in] prefix Common prefix for all norm names
-  virtual std::string getName(size_t i, size_t j, const char* prefix) const;
-
-  //! \brief Returns whether a norm quantity stores element contributions.
-  virtual bool hasElementContributions(size_t i, size_t j) const;
-
-private:
-  AnaSol* anasol; //!< Analytical solution
 };
 
 #endif

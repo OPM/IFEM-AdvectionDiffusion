@@ -167,7 +167,8 @@ public:
 
     // Initialize temperature solution vectors
     size_t n, nSols = this->getNoSolutions();
-    temperature.resize(nSols);
+    temperature.resize(3);
+    temperature[0].resize(this->getNoDOFs(),true);
     std::string str = "temperature1";
     for (n = 0; n < nSols; n++, str[11]++) {
       temperature[n].resize(this->getNoDOFs(),true);
