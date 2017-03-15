@@ -1,5 +1,8 @@
 Square-abd1-ad-embedded.xinp -heuneuler
 
+Input file: Square-abd1-ad-embedded.xinp
+Equation solver: 2
+Number of Gauss points: 4
 Number of elements    16
 Number of nodes       64
 Number of dofs        64
@@ -7,28 +10,7 @@ Number of unknowns    36
   step = 1  time = 0.01
 L2-norm            : 0.000200738
 Max theta   : 0.000733507
-  step = 2  time = 0.0227243
-L2-norm            : 0.00032845
-Max theta   : 0.00120018
-  step = 3  time = 0.0290865
-L2-norm            : 0.000583876
-Max theta   : 0.00213351
-  step = 4  time = 0.0354486
-L2-norm            : 0.000583876
-Max theta   : 0.00213351
-  step = 5  time = 0.0418108
-L2-norm            : 0.000839301
-Max theta   : 0.00306685
-  step = 6  time = 0.0608973
-L2-norm            : 0.00103087
-Max theta   : 0.00376685
-  step = 7  time = 0.0640783
-L2-norm            : 0.00128629
-Max theta   : 0.00470019
-  step = 8  time = 0.08
-L2-norm            : 0.0014461
-Max theta   : 0.00528412
-  step = 9  time = 0.08
+  step = 2  time = 0.08
 L2-norm            : 0.0016059
 Max theta   : 0.00586806
 L2 norm |t^h| = a(t^h,t^h)^0.5      : 0.00203175

@@ -1,152 +1,97 @@
 Square-abd2-ad-embedded.xinp -heuneuler
 
+Input file: Square-abd2-ad-embedded.xinp
+Equation solver: 2
+Number of Gauss points: 4
 Number of elements    16
 Number of nodes       64
 Number of dofs        64
 Number of unknowns    36
   step = 1  time = 0.505
-L2-norm            : 0.00254686
-Max theta   : 0.00930637
-  step = 2  time = 0.507146
-L2-norm            : 0.0025822
-Max theta   : 0.00943549
-  step = 3  time = 0.509437
-L2-norm            : 0.00261763
-Max theta   : 0.00956497
-  step = 4  time = 0.511723
-L2-norm            : 0.00265323
-Max theta   : 0.00969507
-  step = 5  time = 0.513999
-L2-norm            : 0.002689
-Max theta   : 0.00982578
-  step = 6  time = 0.516264
-L2-norm            : 0.00272493
-Max theta   : 0.0099571
-  step = 7  time = 0.518519
-L2-norm            : 0.00276102
-Max theta   : 0.010089
-  step = 8  time = 0.520765
-L2-norm            : 0.00279728
-Max theta   : 0.0102215
-  step = 9  time = 0.523
-L2-norm            : 0.0028337
-Max theta   : 0.0103546
-  step = 10  time = 0.525226
-L2-norm            : 0.00287028
-Max theta   : 0.0104883
-  step = 11  time = 0.527443
-L2-norm            : 0.00290701
-Max theta   : 0.0106226
-  step = 12  time = 0.52965
-L2-norm            : 0.00294391
-Max theta   : 0.0107575
-  step = 13  time = 0.531848
-L2-norm            : 0.00298097
-Max theta   : 0.0108929
-  step = 14  time = 0.534036
-L2-norm            : 0.00301818
-Max theta   : 0.0110289
-  step = 15  time = 0.536216
-L2-norm            : 0.00305555
-Max theta   : 0.0111655
-  step = 16  time = 0.538387
-L2-norm            : 0.00309307
-Max theta   : 0.0113026
-  step = 17  time = 0.540549
-L2-norm            : 0.00313075
-Max theta   : 0.0114403
-  step = 18  time = 0.542702
-L2-norm            : 0.00316858
-Max theta   : 0.0115786
-  step = 19  time = 0.544847
-L2-norm            : 0.00320656
-Max theta   : 0.0117174
-  step = 20  time = 0.546983
-L2-norm            : 0.0032447
-Max theta   : 0.0118568
-  step = 21  time = 0.549111
-L2-norm            : 0.00328299
-Max theta   : 0.0119967
-  step = 22  time = 0.55123
-L2-norm            : 0.00332143
-Max theta   : 0.0121372
-  step = 23  time = 0.553342
-L2-norm            : 0.00336002
-Max theta   : 0.0122782
-  step = 24  time = 0.555445
-L2-norm            : 0.00339876
-Max theta   : 0.0124198
-  step = 25  time = 0.55754
-L2-norm            : 0.00343764
-Max theta   : 0.0125619
-  step = 26  time = 0.559628
-L2-norm            : 0.00347668
-Max theta   : 0.0127046
-  step = 27  time = 0.561707
-L2-norm            : 0.00351586
-Max theta   : 0.0128478
-  step = 28  time = 0.563779
-L2-norm            : 0.00355519
-Max theta   : 0.0129915
-  step = 29  time = 0.565843
-L2-norm            : 0.00359467
-Max theta   : 0.0131358
-  step = 30  time = 0.5679
-L2-norm            : 0.00363429
-Max theta   : 0.0132806
-  step = 31  time = 0.569949
-L2-norm            : 0.00367406
-Max theta   : 0.0134259
-  step = 32  time = 0.571991
-L2-norm            : 0.00371397
-Max theta   : 0.0135718
-  step = 33  time = 0.574025
-L2-norm            : 0.00375402
-Max theta   : 0.0137181
-  step = 34  time = 0.576052
-L2-norm            : 0.00379422
-Max theta   : 0.013865
-  step = 35  time = 0.578072
-L2-norm            : 0.00383456
-Max theta   : 0.0140125
-  step = 36  time = 0.580085
-L2-norm            : 0.00387504
-Max theta   : 0.0141604
-  step = 37  time = 0.582091
-L2-norm            : 0.00391567
-Max theta   : 0.0143089
-  step = 38  time = 0.58409
-L2-norm            : 0.00395643
-Max theta   : 0.0144578
-  step = 39  time = 0.586082
-L2-norm            : 0.00399734
-Max theta   : 0.0146073
-  step = 40  time = 0.588067
-L2-norm            : 0.00403839
-Max theta   : 0.0147573
-  step = 41  time = 0.590046
-L2-norm            : 0.00407957
-Max theta   : 0.0149078
-  step = 42  time = 0.592018
-L2-norm            : 0.0041209
-Max theta   : 0.0150588
-  step = 43  time = 0.593983
-L2-norm            : 0.00416236
-Max theta   : 0.0152103
-  step = 44  time = 0.595942
-L2-norm            : 0.00420396
-Max theta   : 0.0153624
-  step = 45  time = 0.597894
-L2-norm            : 0.0042457
-Max theta   : 0.0155149
-  step = 46  time = 0.59984
-L2-norm            : 0.00428758
-Max theta   : 0.0156679
-  step = 47  time = 0.6
-L2-norm            : 0.00433318
-Max theta   : 0.0158346
-L2 norm |t^h| = a(t^h,t^h)^0.5      : 0.00548193
-H1 norm |t^h| = a(t^h,t^h)^0.5      : 0.00319666
+L2-norm            : 0.0025845
+Max theta   : 0.0094439
+  step = 2  time = 0.522456
+L2-norm            : 0.00271874
+Max theta   : 0.00993433
+  step = 3  time = 0.530775
+L2-norm            : 0.00285493
+Max theta   : 0.0104327
+  step = 4  time = 0.53946
+L2-norm            : 0.00299726
+Max theta   : 0.0109532
+  step = 5  time = 0.544891
+L2-norm            : 0.00305732
+Max theta   : 0.0111728
+  step = 6  time = 0.54124
+L2-norm            : 0.0031169
+Max theta   : 0.0113912
+  step = 7  time = 0.543264
+L2-norm            : 0.00316483
+Max theta   : 0.0115658
+  step = 8  time = 0.544991
+L2-norm            : 0.00324383
+Max theta   : 0.0118556
+  step = 9  time = 0.549494
+L2-norm            : 0.00328438
+Max theta   : 0.0120026
+  step = 10  time = 0.550264
+L2-norm            : 0.00333925
+Max theta   : 0.0122041
+  step = 11  time = 0.554079
+L2-norm            : 0.00337425
+Max theta   : 0.0123313
+  step = 12  time = 0.555678
+L2-norm            : 0.00343904
+Max theta   : 0.0125686
+  step = 13  time = 0.561363
+L2-norm            : 0.00349223
+Max theta   : 0.0127622
+  step = 14  time = 0.56312
+L2-norm            : 0.00353569
+Max theta   : 0.0129216
+  step = 15  time = 0.5653
+L2-norm            : 0.00362105
+Max theta   : 0.0132328
+  step = 16  time = 0.570798
+L2-norm            : 0.00367428
+Max theta   : 0.0134283
+  step = 17  time = 0.571731
+L2-norm            : 0.00374625
+Max theta   : 0.0136899
+  step = 18  time = 0.575436
+L2-norm            : 0.00378293
+Max theta   : 0.0138251
+  step = 19  time = 0.576458
+L2-norm            : 0.00384022
+Max theta   : 0.0140338
+  step = 20  time = 0.581387
+L2-norm            : 0.00388982
+Max theta   : 0.0142156
+  step = 21  time = 0.583671
+L2-norm            : 0.00398618
+Max theta   : 0.0145669
+  step = 22  time = 0.589036
+L2-norm            : 0.00404154
+Max theta   : 0.0147703
+  step = 23  time = 0.589801
+L2-norm            : 0.00411331
+Max theta   : 0.0150312
+  step = 24  time = 0.593357
+L2-norm            : 0.00415077
+Max theta   : 0.0151691
+  step = 25  time = 0.59449
+L2-norm            : 0.00421246
+Max theta   : 0.0153941
+  step = 26  time = 0.599929
+L2-norm            : 0.00427065
+Max theta   : 0.0156072
+  step = 27  time = 0.6
+L2-norm            : 0.00433089
+Max theta   : 0.0158268
+L2 norm |t^h| = a(t^h,t^h)^0.5      : 0.00547876
+H1 norm |t^h| = a(t^h,t^h)^0.5      : 0.00319521
 L2 norm |t|   = (t,t)^0.5           : 0.00548571
 H1 norm |t|   = a(t,t)^0.5          : 0.0190031
-Exact relative error (%)            : 0.0636661
+L2 norm |e|   = (e,e)^0,5, e=t-t^h  : 7.05963e-06
+H1 norm |e|   = a(e,e)^0.5, e=t-t^h : 2.23768e-05
+Exact relative error (%)            : 0.117754
