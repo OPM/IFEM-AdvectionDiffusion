@@ -173,6 +173,7 @@ public:
     size_t n, nSols = this->getNoSolutions();
     temperature.resize(3);
     std::string str = "temperature1";
+    temperature[1].resize(this->getNoDOFs(),true);
     for (n = 0; n < nSols; n++, str[11]++) {
       temperature[n].resize(this->getNoDOFs(),true);
       this->registerField(str,temperature[n]);

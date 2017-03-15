@@ -135,7 +135,7 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
     fe.dNdX.multiply(elMat.vec[1], g, true);
     grad = g;
     ResidualOps::Laplacian(elMat.b[0], fe, grad, -mu);
-    theta -= 0.5*U[1]*g;
+    theta -= 0.5*props.getMassAdvectionConstant()*U[1]*g;
     if (reaction)
       theta -= 0.5*props.getReactionConstant()*(*reaction)(Xt);
   }
