@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<simulation>
+
+  <geometry dim="2" sets="true">
+    <raiseorder patch="1" u="3" v="3"/>
+    <refine type="uniform" patch="1" u="3" v="3"/>
+  </geometry>
+
+  <advectiondiffusion>
+    <boundaryconditions>
+      <dirichlet set="Boundary" basis="1" comp="1"/>
+    </boundaryconditions>
+    <advectionfield> 4*pow(x-x*x,2)*8*(y-1)*y*(2*y-1)*pow(t,3) |
+                    -8*(x-1)*x*(2*x-1)*4*pow(y-y*y,2)*pow(t,3)
+    </advectionfield>
+    <source type="expression">
+     f   = 4*pow(x-x*x,2);
+     fp  = 8*(x-1)*x*(2*x-1);
+     f2p = 8*(6*x*x-6*x+1);
+     g  = 4*pow(y-y*y,2);
+     gp  = 8*(y-1)*y*(2*y-1);
+     g2p = 8*(6*y*y-6*y+1);
+     h  = pow(t,3);
+     hp = 3*t*t;
+     u   = f*gp*h;
+     v   = -fp*g*h;
+     Tt = f*g*hp;
+     Tx = fp*g*h;
+     Ty = f*gp*h;
+     Txx = f2p*g*h;
+     Tyy = f*g2p*h;
+     Tt - Txx - Tyy + u*Tx + v*Ty
+   </source>
+   <anasol type="expression">
+     <variables>
+       f   = 4*pow(x-x*x,2);
+       fp  = 8*(x-1)*x*(2*x-1);
+       g   = 4*pow(y-y*y,2);
+       gp  = 8*(y-1)*y*(2*y-1);
+       h   = pow(t,3);
+     </variables>
+     <primary>f*g*h</primary>
+     <secondary>fp*g*h | f*gp*h</secondary>
+   </anasol>
+  </advectiondiffusion>
+
+  <discretization>
+    <nGauss>4</nGauss>
+  </discretization>
+
+  <timestepping start="0" end="1" dt="0.1"/>
+
+  <postprocessing>
+    <restartstride>1</restartstride>
+  </postprocessing>
+
+</simulation>

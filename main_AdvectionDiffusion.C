@@ -16,7 +16,6 @@
 #include "SIM3D.h"
 #include "SIMExplicitRK.h"
 #include "SIMExplicitRKE.h"
-#include "SIMSolver.h"
 #include "SIMSolverAdap.h"
 #include "SIMAD.h"
 #include "AppCommon.h"
@@ -26,21 +25,24 @@
 #include "AdaptiveSIM.h"
 #include "HDF5Writer.h"
 #include "XMLWriter.h"
-#include "Utilities.h"
 #include "Profiler.h"
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 
 
+/*!
+  \brief Runs a stationary advection-diffusion problem.
+*/
+
 template<template<class T> class Solver=SIMSolver, class AD>
-int runSimulatorStationary(char* infile, AD& model)
+int runSimulatorStationary (char* infile, AD& model)
 {
   utl::profiler->start("Model input");
   Solver<AD> solver(model);
 
-  int res;
-  if ((res = ConfigureSIM(model, infile, typename AD::SetupProps())))
+  int res = ConfigureSIM(model, infile, typename AD::SetupProps());
+  if (res)
     return res;
 
   // Read in model definitions
@@ -57,23 +59,26 @@ int runSimulatorStationary(char* infile, AD& model)
       IFEM::cout <<"\n ** HDF5 output is available for spline discretization only"
         <<". Deactivating...\n"<< std::endl;
     else
-      exporter.reset(SIM::handleDataOutput(model, solver, model.opt.hdf5, false, 1, 1));
+      exporter.reset(SIM::handleDataOutput(model, solver, model.opt.hdf5));
   }
 
   return solver.solveProblem(infile, exporter.get(), "Solving Advection-Diffusion problem", false);
 }
 
 
+/*!
+  \brief Runs a transient advection-diffusion problem.
+*/
+
 template<class Solver, class AD>
-int runSimulatorTransientImpl(char* infile, TimeIntegration::Method tIt,
-                              Solver& sim, AD& model)
+int runSimulatorTransientImpl (char* infile, Solver& sim, AD& model)
 {
   utl::profiler->start("Model input");
 
   SIMSolver<Solver> solver(sim);
 
-  int res;
-  if ((res = ConfigureSIM(model, infile, typename AD::SetupProps())))
+  int res = ConfigureSIM(model, infile, typename AD::SetupProps());
+  if (res)
     return res;
 
   // Read in model definitions
@@ -84,13 +89,17 @@ int runSimulatorTransientImpl(char* infile, TimeIntegration::Method tIt,
 
   utl::profiler->stop("Model input");
 
+  if (solver.restart(model.opt.restartFile,model.opt.restartStep) < 0)
+    return 2;
+
   std::unique_ptr<DataExporter> exporter;
   if (model.opt.dumpHDF5(infile)) {
     if (model.opt.discretization < ASM::Spline && !model.opt.hdf5.empty())
       IFEM::cout <<"\n ** HDF5 output is available for spline discretization only"
         <<". Deactivating...\n"<< std::endl;
     else
-      exporter.reset(SIM::handleDataOutput(model, solver, model.opt.hdf5, false, 1, 1));
+      exporter.reset(SIM::handleDataOutput(model, solver, model.opt.hdf5, false,
+                                           model.opt.saveInc, model.opt.restartInc));
   }
 
   if ((res=solver.solveProblem(infile, exporter.get())))
@@ -101,6 +110,10 @@ int runSimulatorTransientImpl(char* infile, TimeIntegration::Method tIt,
   return 0;
 }
 
+
+/*!
+  \brief Creates and runs the advection-diffusion problem.
+*/
 
 template<class Dim>
 int runSimulator(char* infile, const AdvectionDiffusionArgs& args)
@@ -120,7 +133,7 @@ int runSimulator(char* infile, const AdvectionDiffusionArgs& args)
                                     args.timeMethod,
                                     args.integrandType);
     SIMAD<Dim,AdvectionDiffusionBDF> model(integrand, true);
-    return runSimulatorTransientImpl(infile, args.timeMethod, model, model);
+    return runSimulatorTransientImpl(infile, model, model);
   }
   else {
     AdvectionDiffusionExplicit integrand(Dim::dimension, args.integrandType);
@@ -128,11 +141,11 @@ int runSimulator(char* infile, const AdvectionDiffusionArgs& args)
     ADSIM model(integrand, true);
     if (args.timeMethod >= TimeIntegration::HEUNEULER) {
       TimeIntegration::SIMExplicitRKE<ADSIM> sim(model, args.timeMethod, args.errTol);
-      return runSimulatorTransientImpl(infile, args.timeMethod, sim, model);
+      return runSimulatorTransientImpl(infile, sim, model);
     }
     else {
       TimeIntegration::SIMExplicitRK<ADSIM> sim(model, args.timeMethod);
-      return runSimulatorTransientImpl(infile, args.timeMethod, sim, model);
+      return runSimulatorTransientImpl(infile, sim, model);
     }
   }
 }
@@ -162,8 +175,6 @@ int runSimulator(char* infile, const AdvectionDiffusionArgs& args)
   \arg -hdf5 : Write primary and projected secondary solution to HDF5 file
   \arg -2D : Use two-parametric simulation driver
   \arg -adap : Use adaptive simulation driver with LR-splines discretization
-  \arg -BE : Time dependent (BE) simulation
-  \arg -BDF2 : Time dependent (BDF2) simulation
 */
 
 int main (int argc, char** argv)
@@ -212,7 +223,8 @@ int main (int argc, char** argv)
       if (!args.readXML(infile,false))
         return 1;
       i = 0;
-    } else
+    }
+    else
       std::cerr <<"  ** Unknown option ignored: "<< argv[i] << std::endl;
 
   if (!infile)
@@ -220,8 +232,8 @@ int main (int argc, char** argv)
     std::cout <<"usage: "<< argv[0]
               <<" <inputfile> [-dense|-spr|-superlu[<nt>]|-samg|-petsc]\n"
               <<"       [-lag|-spec|-LR] [-2D] [-nGauss <n>] [-adap]\n"
-	      <<"       [-hdf5] [-vtf <format> [-nviz <nviz>]"
-	      <<" [-nu <nu>] [-nv <nv>] [-nw <nw>]]\n";
+              <<"       [-hdf5] [-vtf <format> [-nviz <nviz>]"
+              <<" [-nu <nu>] [-nv <nv>] [-nw <nw>]]\n";
     return 0;
   }
 

@@ -52,13 +52,39 @@ include(IFEMTesting)
 configure_file(${IFEM_REGTEST_SCRIPT} regtest.sh)
 
 if(MPI_FOUND)
-  # Add parallel tests here
-else()
-  file(GLOB AD_TESTFILES RELATIVE ${PROJECT_SOURCE_DIR}/Test
-                         ${PROJECT_SOURCE_DIR}/Test/*.reg)
-  foreach(TESTFILE ${AD_TESTFILES})
+  if(HDF5_FOUND AND CEREAL_FOUND)
+    ifem_add_restart_test(MPI/Square-ad-restart.reg AdvectionDiffusion 5 4)
+  endif()
+endif()
+if(NOT MPI_FOUND OR IFEM_SERIAL_TESTS_IN_PARALLEL)
+  foreach(TESTFILE Lshape.reg
+                   Square-abd1-ad-bdf2.reg
+                   Square-abd1-ad-be.reg
+                   Square-abd1-ad-bs.reg
+                   Square-abd1-ad-cn.reg
+                   Square-abd1-ad-euler.reg
+                   Square-abd1-ad-fehlberg.reg
+                   Square-abd1-ad-heuneuler.reg
+                   Square-abd1-ad-heun.reg
+                   Square-abd1-ad-rk3.reg
+                   Square-abd1-ad-rk4.reg
+                   Square-abd2-ad-bdf2.reg
+                   Square-abd2-ad-be.reg
+                   Square-abd2-ad-bs.reg
+                   Square-abd2-ad-cn.reg
+                   Square-abd2-ad-euler.reg
+                   Square-abd2-ad-fehlberg.reg
+                   Square-abd2-ad-heuneuler.reg
+                   Square-abd2-ad-heun.reg
+                   Square-abd2-ad-rk3.reg
+                   Square-abd2-ad-rk4.reg
+                   Square-ad-RaPr.reg
+                   Square-ad.reg)
     ifem_add_test(${TESTFILE} AdvectionDiffusion)
   endforeach()
+  if(HDF5_FOUND AND CEREAL_FOUND)
+    ifem_add_restart_test(Square-abd2-ad-restart.reg AdvectionDiffusion 5)
+  endif()
 endif()
 list(APPEND TEST_APPS AdvectionDiffusion)
 
