@@ -26,6 +26,7 @@
 #include "Profiler.h"
 #include "Utilities.h"
 #include "DataExporter.h"
+#include "SIMMultiPatchModelGen.h"
 #include "tinyxml.h"
 
 
@@ -35,7 +36,8 @@
   Advection-Diffusion problem using NURBS-based finite elements.
 */
 
-template<class Dim, class Integrand=AdvectionDiffusion> class SIMAD : public Dim
+template<class Dim, class Integrand=AdvectionDiffusion> class SIMAD :
+  public SIMMultiPatchModelGen<Dim>
 {
 public:
   //! \brief Setup properties.
@@ -50,7 +52,8 @@ public:
   //! \param[in] ad Integrand for advection-diffusion problem
   //! \param[in] alone Integrand is used stand-alone (controls time stepping)
   SIMAD(Integrand& ad, bool alone = false) :
-    Dim(1), AD(ad), weakDirBC(Dim::dimension, 4.0, 1.0), inputContext("advectiondiffusion")
+    SIMMultiPatchModelGen<Dim>(1), AD(ad),
+    weakDirBC(Dim::dimension, 4.0, 1.0), inputContext("advectiondiffusion")
   {
     standalone = alone;
     Dim::myProblem = &AD;
