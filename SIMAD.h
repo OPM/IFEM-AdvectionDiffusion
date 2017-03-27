@@ -147,6 +147,10 @@ public:
           }
         }
       }
+      else if (strcasecmp(child->Value(),"subiterations") == 0) {
+       utl::getAttribute(child,"max",maxSubIt);
+       utl::getAttribute(child,"tol",subItTol);
+      }
       else
         this->Dim::parse(child);
 
@@ -168,11 +172,13 @@ public:
     // Initialize temperature solution vectors
     size_t n, nSols = this->getNoSolutions();
     temperature.resize(3);
-    temperature[0].resize(this->getNoDOFs(),true);
     std::string str = "temperature1";
+    temperature[1].resize(this->getNoDOFs(),true);
     for (n = 0; n < nSols; n++, str[11]++) {
       temperature[n].resize(this->getNoDOFs(),true);
       this->registerField(str,temperature[n]);
+      if (n == 1)
+       ++n;
     }
     return true;
   }
@@ -219,7 +225,7 @@ public:
   }
 
   //! \brief Computes the solution for the current time step.
-  virtual bool solveStep(TimeStep& tp)
+  virtual bool solveStep(TimeStep& tp,bool=false)
   {
     PROFILE1("SIMAD::solveStep");
 
@@ -249,7 +255,7 @@ public:
   }
 
   //! \brief No solution postprocessing.
-  bool postSolve(const TimeStep& tp,bool) { return true; }
+  bool postSolve(const TimeStep& tp,bool=false) { return true; }
 
   //! \brief Evaluates and prints out solution norms.
   void printFinalNorms(const TimeStep& tp)
@@ -262,14 +268,15 @@ public:
     else if (gNorm.empty())
       return;
 
-    IFEM::cout <<"L2 norm |t^h| = a(t^h,t^h)^0.5      : "<< gNorm[0](1);
-    IFEM::cout <<"\nH1 norm |t^h| = a(t^h,t^h)^0.5      : "<< gNorm[0](2);
+    IFEM::cout << ">>> Norm summary for AdvectionDiffusion <<<" << std::endl;
+    IFEM::cout <<"  L2 norm |t^h| = (t^h,t^h)^0.5       : "<< gNorm[0](1);
+    IFEM::cout <<"\n  H1 norm |t^h| = a(t^h,t^h)^0.5      : "<< gNorm[0](2);
     if (this->haveAnaSol() && gNorm[0].size() >= 6)
-      IFEM::cout <<"\nL2 norm |t|   = (t,t)^0.5           : "<< gNorm[0](3)
-                 <<"\nH1 norm |t|   = a(t,t)^0.5          : "<< gNorm[0](5)
-                 <<"\nL2 norm |e|   = (e,e)^0,5, e=t-t^h  : "<< gNorm[0](4)
-                 <<"\nH1 norm |e|   = a(e,e)^0.5, e=t-t^h : "<< gNorm[0](6)
-                 <<"\nExact relative error (%)            : "
+      IFEM::cout <<"\n  L2 norm |t|   = (t,t)^0.5           : "<< gNorm[0](3)
+                 <<"\n  H1 norm |t|   = a(t,t)^0.5          : "<< gNorm[0](5)
+                 <<"\n  L2 norm |e|   = (e,e)^0,5, e=t-t^h  : "<< gNorm[0](4)
+                 <<"\n  H1 norm |e|   = a(e,e)^0.5, e=t-t^h : "<< gNorm[0](6)
+                 <<"\n  Exact relative error (%)            : "
                  << gNorm[0](6)/gNorm[0](5)*100.0;
     IFEM::cout << std::endl;
   }
@@ -326,6 +333,21 @@ public:
     inputContext = str.str();
   }
 
+  //! \brief Returns the maximum number of iterations (unlimited).
+  int getMaxit() const { return maxSubIt; }
+  double getSubItTol() const { return subItTol; }
+
+  //! \brief Solves the linearized system of current iteration.
+  //! \param[in] tp Time stepping parameters
+  //!
+  //! \details Since this solver is linear, this is just a normal solve.
+  SIM::ConvStatus solveIteration(TimeStep& tp)
+  {
+    if (Dim::msgLevel == 1)
+      IFEM::cout <<"\n  step="<< tp.step <<"  time="<< tp.time.t << std::endl;
+    return this->solveStep(tp,false) ? SIM::CONVERGED : SIM::FAILURE;
+  }
+
 #ifdef HAS_PETSC
   //! \brief Set MPI communicator for the linear equation solvers
   //! \param comm The communicator to use
@@ -359,6 +381,8 @@ private:
   Vectors temperature; //!< Temperature solutioni vectors
   bool    standalone; //!< True if simulator runs standalone (i.e. we own the VTF object).
   std::string inputContext; //!< Input context
+  double subItTol = 1e-4;
+  int maxSubIt = 50;
 };
 
 

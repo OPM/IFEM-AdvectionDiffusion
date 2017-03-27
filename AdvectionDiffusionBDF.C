@@ -50,7 +50,7 @@ bool AdvectionDiffusionBDF::initElement (const std::vector<int>& MNPC,
   int ierr = 0;
   for (size_t i = 0; i < primsol.size() && ierr == 0; i++) {
     ierr = utl::gather(MNPC,1,primsol[i],A.vec[i]);
-    if (!Uad && i < velocity.size())
+    if (!Uad && i < velocity.size() && !uFields[0])
       ierr = utl::gather(MNPC,nsd,velocity[i],A.vec[i+primsol.size()]);
   }
 
@@ -80,6 +80,12 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
   if (Uad) {
     U[0] = (*Uad)(X);
     U[1] = (*Uad)(Xt);
+   } else if (uFields[0]) {
+     for (int i = 0; i < 2; ++i) {
+       Vector u;
+       uFields[i]->valueFE(fe, u);
+       U[i] = u;
+     }
    } else {
     std::vector<Vec3> tmp(bdf.getOrder());
     for (int j=0; j<bdf.getOrder();++j)
@@ -129,7 +135,7 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
     fe.dNdX.multiply(elMat.vec[1], g, true);
     grad = g;
     ResidualOps::Laplacian(elMat.b[0], fe, grad, -mu);
-    theta -= 0.5*U[1]*g;
+    theta -= 0.5*props.getMassAdvectionConstant()*U[1]*g;
     if (reaction)
       theta -= 0.5*props.getReactionConstant()*(*reaction)(Xt);
   }
@@ -173,8 +179,6 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
       elMat.eSs(i) += theta*convI;
   }
 
-  WeakOps::Source(elMat.b.front(), fe, theta);
-
   return true;
 }
 
@@ -190,6 +194,15 @@ bool AdvectionDiffusionBDF::finalizeElement (LocalIntegral& A)
   }
 
   return true;
+}
+
+
+void AdvectionDiffusionBDF::setNamedFields(const std::string& name, Fields* field)
+{
+  if (name == "velocity1")
+    uFields[0].reset(field);
+  else
+    uFields[1].reset(field);
 }
 
 
