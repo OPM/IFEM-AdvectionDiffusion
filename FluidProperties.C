@@ -22,7 +22,7 @@
 namespace AD {
 
 FluidProperties::FluidProperties() :
-  rho(1.0), kappa(1.0), C(1.0), Ra(1.0), Pr(1.0), scaling(PHYSICAL)
+  rho(1.0), kappa(1.0), alpha(1.0), C(1.0), Ra(1.0), Pr(1.0), scaling(PHYSICAL)
 {
 }
 
@@ -39,6 +39,7 @@ void FluidProperties::parse(const TiXmlElement* elem)
 
   utl::getAttribute(elem,"rho",rho);
   utl::getAttribute(elem,"C",C);
+  utl::getAttribute(elem,"alpha",alpha);
   utl::getAttribute(elem,"kappa",kappa);
   utl::getAttribute(elem,"Ra",Ra);
   utl::getAttribute(elem,"Pr",Pr);
@@ -90,5 +91,14 @@ double FluidProperties::getReactionConstant() const
   return 1.0;
 }
 
+
+double FluidProperties::getThermalExpansion(double T) const
+{
+  if (scaling == PR_RA)
+    return -T;
+
+  assert(scaling == PHYSICAL);
+  return rho*alpha*T;
+}
 
 }

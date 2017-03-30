@@ -59,6 +59,9 @@ public:
   //! \brief Return Rayleigh number.
   double getRayleighNumber() const { return Ra; }
 
+  //! \brief Returns the thermal expansion coefficient.
+  double getExpansion() const { return alpha; }
+
   //! \brief Return mass and advection constant according to scaling.
   double getMassAdvectionConstant() const;
 
@@ -67,14 +70,19 @@ public:
 
   //! \brief Returns the reaction constant acccording to scaling.
   double getReactionConstant() const;
+
+  //! \brief Get thermal expansion term
+  //! \param[in] T Temperature
+  double getThermalExpansion(double T) const;
 protected:
   // Physical properties (constant)
-  double rho;   //!< Mass density.
-  double kappa; //!< Thermal diffusivity.
-  double C;     //!< Heat capacity.
+  double rho;   //!< Mass density
+  double kappa; //!< Thermal diffusivity
+  double alpha; //!< Thermal expansion coefficient
+  double C;     //!< Heat capacity
 
-  double Ra; //!< Rayleigh number.
-  double Pr; //!< Prandtl number.
+  double Ra; //!< Rayleigh number
+  double Pr; //!< Prandtl number
 
   Scaling scaling; //!< Scaling to use.
 };
