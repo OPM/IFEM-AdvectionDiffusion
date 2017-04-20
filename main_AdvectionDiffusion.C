@@ -18,13 +18,9 @@
 #include "SIMExplicitRKE.h"
 #include "SIMSolverAdap.h"
 #include "SIMAD.h"
-#include "AppCommon.h"
 #include "AdvectionDiffusionArgs.h"
 #include "AdvectionDiffusionBDF.h"
 #include "AdvectionDiffusionExplicit.h"
-#include "AdaptiveSIM.h"
-#include "HDF5Writer.h"
-#include "XMLWriter.h"
 #include "Profiler.h"
 #include <stdlib.h>
 #include <string.h>
@@ -53,16 +49,10 @@ int runSimulatorStationary (char* infile, AD& model)
 
   utl::profiler->stop("Model input");
 
-  std::unique_ptr<DataExporter> exporter;
-  if (model.opt.dumpHDF5(infile)) {
-    if (model.opt.discretization < ASM::Spline && !model.opt.hdf5.empty())
-      IFEM::cout <<"\n ** HDF5 output is available for spline discretization only"
-        <<". Deactivating...\n"<< std::endl;
-    else
-      exporter.reset(SIM::handleDataOutput(model, solver, model.opt.hdf5));
-  }
+  if (model.opt.dumpHDF5(infile))
+    solver.handleDataOutput(model.opt.hdf5);
 
-  return solver.solveProblem(infile, exporter.get(), "Solving Advection-Diffusion problem", false);
+  return solver.solveProblem(infile,"Solving Advection-Diffusion problem",false);
 }
 
 
@@ -92,22 +82,14 @@ int runSimulatorTransientImpl (char* infile, Solver& sim, AD& model)
   if (solver.restart(model.opt.restartFile,model.opt.restartStep) < 0)
     return 2;
 
-  std::unique_ptr<DataExporter> exporter;
-  if (model.opt.dumpHDF5(infile)) {
-    if (model.opt.discretization < ASM::Spline && !model.opt.hdf5.empty())
-      IFEM::cout <<"\n ** HDF5 output is available for spline discretization only"
-        <<". Deactivating...\n"<< std::endl;
-    else
-      exporter.reset(SIM::handleDataOutput(model, solver, model.opt.hdf5, false,
-                                           model.opt.saveInc, model.opt.restartInc));
-  }
+  if (model.opt.dumpHDF5(infile))
+    solver.handleDataOutput(model.opt.hdf5, model.opt.saveInc,
+                            model.opt.restartInc);
 
-  if ((res=solver.solveProblem(infile, exporter.get())))
-    return res;
+  res = solver.solveProblem(infile,"Solving Advection-Diffusion problem");
+  if (!res) model.printFinalNorms(solver.getTimePrm());
 
-  model.printFinalNorms(solver.getTimePrm());
-
-  return 0;
+  return res;
 }
 
 
