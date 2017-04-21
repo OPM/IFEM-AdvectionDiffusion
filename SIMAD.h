@@ -26,7 +26,14 @@
 #include "Profiler.h"
 #include "Utilities.h"
 #include "DataExporter.h"
+#include "SIMMultiPatchModelGen.h"
 #include "tinyxml.h"
+
+#ifdef HAS_CEREAL
+#include <cereal/cereal.hpp>
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/vector.hpp>
+#endif
 
 
 /*!
@@ -35,7 +42,8 @@
   Advection-Diffusion problem using NURBS-based finite elements.
 */
 
-template<class Dim, class Integrand=AdvectionDiffusion> class SIMAD : public Dim
+template<class Dim, class Integrand=AdvectionDiffusion> class SIMAD :
+  public SIMMultiPatchModelGen<Dim>
 {
 public:
   //! \brief Setup properties.
@@ -50,7 +58,8 @@ public:
   //! \param[in] ad Integrand for advection-diffusion problem
   //! \param[in] alone Integrand is used stand-alone (controls time stepping)
   SIMAD(Integrand& ad, bool alone = false) :
-    Dim(1), AD(ad), weakDirBC(Dim::dimension, 4.0, 1.0), inputContext("advectiondiffusion")
+    SIMMultiPatchModelGen<Dim>(1), AD(ad),
+    weakDirBC(Dim::dimension, 4.0, 1.0), inputContext("advectiondiffusion")
   {
     standalone = alone;
     Dim::myProblem = &AD;
@@ -60,7 +69,7 @@ public:
   //! \brief Construct from properties
   //! \param props The properties
   SIMAD(SetupProps& props) :
-    Dim(1), AD(*props.integrand),
+    SIMMultiPatchModelGen<Dim>(1), AD(*props.integrand),
     weakDirBC(Dim::dimension, 4.0, 1.0), inputContext("advectiondiffusion")
   {
     standalone = false;
@@ -301,6 +310,46 @@ public:
     return this->writeGlvStep(iDump,tp.time.t);
   }
 
+  //! \brief Serialize internal state for restarting purposes.
+  //! \param data Container for serialized data
+  bool serialize(DataExporter::SerializeData& data)
+  {
+#ifdef HAS_CEREAL
+    std::ostringstream str;
+    cereal::BinaryOutputArchive ar(str);
+    doSerializeOps(ar);
+    data.insert(std::make_pair(this->getName(), str.str()));
+    return true;
+#endif
+    return false;
+  }
+
+  //! \brief Set internal state from a serialized state.
+  //! \param[in] data Container for serialized data
+  bool deSerialize(const DataExporter::SerializeData& data)
+  {
+#ifdef HAS_CEREAL
+    std::stringstream str;
+    auto it = data.find(this->getName());
+    if (it != data.end()) {
+      str << it->second;
+      cereal::BinaryInputArchive ar(str);
+      doSerializeOps(ar);
+      AD.advanceStep();
+    }
+    return true;
+#endif
+    return false;
+  }
+
+   //! \brief Serialize to/from state.
+   //! \param ar An input or ouput archive
+   template <class T> void doSerializeOps(T& ar)
+   {
+     for (size_t i = 0; i < temperature.size(); ++i)
+       ar(temperature[i]);
+   }
+
   //! \brief Obtain a reference to a solution vector.
   Vector& getSolution(int n=0) { return temperature[n]; }
 
@@ -318,7 +367,7 @@ public:
   void registerFields(DataExporter& exporter, const std::string& prefix="")
   {
     exporter.registerField("theta","temperature",DataExporter::SIM,
-                           DataExporter::PRIMARY|DataExporter::RESTART,
+                           DataExporter::PRIMARY,
                            prefix);
     exporter.setFieldValue("theta", this, &this->getSolution(0));
   }
