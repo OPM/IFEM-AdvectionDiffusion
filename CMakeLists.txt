@@ -31,7 +31,7 @@ add_library(CommonAD STATIC AdvectionDiffusion.C
                             AdvectionDiffusionArgs.C
                             AdvectionDiffusionBDF.C
                             AdvectionDiffusionExplicit.C
-                            FluidProperties.C)
+                            ADFluidProperties.C)
 
 add_executable(AdvectionDiffusion main_AdvectionDiffusion.C)
 

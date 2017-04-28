@@ -10,7 +10,7 @@
 //!
 //==============================================================================
 
-#include "FluidProperties.h"
+#include "ADFluidProperties.h"
 #include <tinyxml.h>
 
 #include "gtest/gtest.h"

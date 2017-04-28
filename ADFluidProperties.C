@@ -1,7 +1,7 @@
 // $Id$
 //==============================================================================
 //!
-//! \file FluidProperties.C
+//! \file ADFluidProperties.C
 //!
 //! \date Aug 11 2015
 //!
@@ -12,7 +12,7 @@
 //==============================================================================
 
 
-#include "FluidProperties.h"
+#include "ADFluidProperties.h"
 
 #include "IFEM.h"
 #include "tinyxml.h"
