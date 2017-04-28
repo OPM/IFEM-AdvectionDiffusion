@@ -17,7 +17,7 @@
 #include "IntegrandBase.h"
 #include "ElmMats.h"
 #include "EqualOrderOperators.h"
-#include "FluidProperties.h"
+#include "ADFluidProperties.h"
 
 
 /*!
