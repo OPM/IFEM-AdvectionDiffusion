@@ -31,7 +31,7 @@
   \brief Runs a stationary advection-diffusion problem.
 */
 
-template<template<class T> class Solver=SIMSolver, class AD>
+template<template<class T> class Solver=SIMSolverStat, class AD>
 int runSimulatorStationary (char* infile, AD& model)
 {
   utl::profiler->start("Model input");

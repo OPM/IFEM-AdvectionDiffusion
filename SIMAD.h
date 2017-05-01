@@ -21,7 +21,7 @@
 #include "ExprFunctions.h"
 #include "Property.h"
 #include "SIMoutput.h"
-#include "SIMSolver.h"
+#include "SIMconfigure.h"
 #include "IFEM.h"
 #include "TimeStep.h"
 #include "Profiler.h"
@@ -64,7 +64,7 @@ public:
   {
     standalone = alone;
     Dim::myProblem = &AD;
-    this->myHeading = "Advection-Diffusion solver";
+    Dim::myHeading = "Advection-Diffusion solver";
   }
 
   //! \brief Construct from properties
@@ -75,7 +75,7 @@ public:
   {
     standalone = false;
     Dim::myProblem = &AD;
-    this->myHeading = "Advection-Diffusion solver";
+    Dim::myHeading = "Advection-Diffusion solver";
   }
 
   //! \brief The destructor clears the VTF-file pointer, unless stand-alone.
@@ -171,7 +171,7 @@ public:
   virtual std::string getName() const { return "AdvectionDiffusion"; }
 
   //! \brief Initialize simulator.
-  bool init(const TimeStep& tp=TimeStep())
+  bool init(const TimeStep&)
   {
     int p1, p2, p3;
     Dim::myModel.front()->getOrder(p1,p2,p3);
@@ -187,8 +187,7 @@ public:
     for (n = 0; n < nSols; n++, str[11]++) {
       temperature[n].resize(this->getNoDOFs(),true);
       this->registerField(str,temperature[n]);
-      if (n == 1)
-       ++n;
+      if (n == 1) ++n;
     }
     return true;
   }
@@ -199,11 +198,10 @@ public:
     Dim::myInts.insert(std::make_pair(0,Dim::myProblem));
 
     // Couple the weak Dirichlet integrand to the generic Neumann property codes
-    PropertyVec::iterator p;
-    for (p = Dim::myProps.begin(); p != Dim::myProps.end(); p++)
-      if (p->pcode == Property::NEUMANN_GENERIC)
-        if (Dim::myInts.find(p->pindx) == Dim::myInts.end())
-          Dim::myInts.insert(std::make_pair(p->pindx,&weakDirBC));
+    for (const Property& p : Dim::myProps)
+      if (p.pcode == Property::NEUMANN_GENERIC)
+        if (Dim::myInts.find(p.pindx) == Dim::myInts.end())
+          Dim::myInts.insert(std::make_pair(p.pindx,&weakDirBC));
   }
 
   //! \brief Defines the global number of elements.
@@ -213,7 +211,7 @@ public:
   //! \param[in] fileName File name used to construct the VTF-file name from
   //! \param[out] geoBlk Running geometry block counter
   //! \param[out] nBlock Running result block counter
-  virtual bool saveModel(char* fileName, int& geoBlk, int& nBlock)
+  bool saveModel(char* fileName, int& geoBlk, int& nBlock)
   {
     if (Dim::opt.format < 0) return true;
 
@@ -222,7 +220,7 @@ public:
   }
 
   //! \brief Advances the time step one step forward.
-  virtual bool advanceStep(TimeStep& tp)
+  bool advanceStep(TimeStep&)
   {
     // Update temperature vectors between time steps
     const int nNusols = temperature.size();
@@ -235,7 +233,7 @@ public:
   }
 
   //! \brief Computes the solution for the current time step.
-  virtual bool solveStep(TimeStep& tp,bool=false)
+  bool solveStep(TimeStep& tp, bool = false)
   {
     PROFILE1("SIMAD::solveStep");
 
@@ -265,7 +263,7 @@ public:
   }
 
   //! \brief No solution postprocessing.
-  bool postSolve(const TimeStep& tp,bool=false) { return true; }
+  bool postSolve(const TimeStep&) { return true; }
 
   //! \brief Evaluates and prints out solution norms.
   void printFinalNorms(const TimeStep& tp)
@@ -348,8 +346,7 @@ public:
    //! \param ar An input or ouput archive
    template <class T> void doSerializeOps(T& ar)
    {
-     for (size_t i = 0; i < temperature.size(); ++i)
-       ar(temperature[i]);
+     for (Vector& t : temperature) ar(t);
    }
 
   //! \brief Obtain a reference to a solution vector.
@@ -374,8 +371,6 @@ public:
     exporter.setFieldValue("theta", this, &this->getSolution(0));
   }
 
-  double externalEnergy(const Vectors&) const { return 0.0; }
-
   //! \brief Set context to read from input file
   void setContext(int ctx)
   {
@@ -384,8 +379,9 @@ public:
     inputContext = str.str();
   }
 
-  //! \brief Returns the maximum number of iterations (unlimited).
+  //! \brief Returns the maximum number of iterations.
   int getMaxit() const { return maxSubIt; }
+  //! \brief Returns the sub-iteration tolerance.
   double getSubItTol() const { return subItTol; }
 
   //! \brief Solves the linearized system of current iteration.
@@ -402,10 +398,7 @@ public:
 #ifdef HAS_PETSC
   //! \brief Set MPI communicator for the linear equation solvers
   //! \param comm The communicator to use
-  void setCommunicator(const MPI_Comm* comm)
-  {
-    this->adm.setCommunicator(comm);
-  }
+  void setCommunicator(const MPI_Comm* comm) { Dim::adm.setCommunicator(comm); }
 #endif
 
   //! \brief Set externally provided solution vector (adaptive).
@@ -462,7 +455,7 @@ struct SolverConfigurator< SIMAD<Dim,Integrand> > {
 
     // Initialize the linear solvers
     ad.setMode(SIM::DYNAMIC);
-    ad.initSystem(ad.opt.solver,1,1,false);
+    ad.initSystem(ad.opt.solver);
     ad.setQuadratureRule(ad.opt.nGauss[0]);
 
     // Time-step loop
