@@ -91,8 +91,8 @@ public:
 
   //! \brief The default constructor initializes all pointers to zero.
   //! \param[in] n Number of spatial dimensions
-  //! \param[in] stab Stabilization option
-  AdvectionDiffusion(unsigned short int n = 3, Stabilization stab = NONE);
+  //! \param[in] s Stabilization option
+  AdvectionDiffusion(unsigned short int n = 3, Stabilization s = NONE);
 
   //! \brief Class representing the Advection-Diffusion element matrices.
   class ElementInfo : public ElmMats
@@ -306,6 +306,7 @@ public:
 
   //! \brief Returns the name of a norm quantity.
   //! \param[in] i The norm group (one-based index)
+  //! \param[in] j The norm number (one-based index)
   //! \param[in] prefix Common prefix for all norm names
   virtual std::string getName(size_t i, size_t j, const char* prefix) const;
 

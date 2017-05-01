@@ -35,7 +35,7 @@ class AdvectionDiffusionBDF : public AdvectionDiffusion
 public:
   //! \brief The default constructor initializes all pointers to zero.
   //! \param[in] n Number of spatial dimensions
-  //! \param[in] order Temporal order (1,2)
+  //! \param[in] method The time integration method to use
   //! \param[in] itg_type The integrand type to use
   //! \param[in] useALE If \e true, use ALE formulation
   AdvectionDiffusionBDF(unsigned short int n = 3,
@@ -63,9 +63,10 @@ public:
   //! \brief Evaluates the integrand at an interior point.
   //! \param elmInt The local integral object to receive the contributions
   //! \param[in] fe Finite element data of current integration point
+  //! \param[in] time Parameters for time-dependent simulations
   //! \param[in] X Cartesian coordinates of current integration point
   virtual bool evalInt(LocalIntegral& elmInt, const FiniteElement& fe,
-		       const TimeDomain& time, const Vec3& X) const;
+                       const TimeDomain& time, const Vec3& X) const;
 
   //! \brief Returns the integrand type.
   virtual int getIntegrandType() const

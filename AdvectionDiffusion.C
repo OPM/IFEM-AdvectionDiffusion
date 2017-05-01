@@ -40,10 +40,7 @@ AdvectionDiffusion::~AdvectionDiffusion()
 
 int AdvectionDiffusion::getIntegrandType () const
 {
-  if (stab == NONE)
-    return STANDARD;
-
-  return SECOND_DERIVATIVES | ELEMENT_CORNERS;
+  return stab == NONE ? STANDARD : SECOND_DERIVATIVES | ELEMENT_CORNERS;
 }
 
 
@@ -64,49 +61,13 @@ LocalIntegral* AdvectionDiffusion::getLocalIntegral (size_t nen, size_t,
 }
 
 
-/*!
-  \brief Returns the characteristic element size.
-  \param[in] XC The element corner coordinates
-  \param[in] nsd Number of space dimensions
-
-  \details The size is taken as the longest diagonal.
-*/
-
-static double getElementSize (const Vec3Vec& XC, int nsd)
-{
-  Vec3Vec D(nsd*2-2);
-
-  // Compute the element diagonals
-  if (nsd == 2 && XC.size() >= 4) {
-    D[0] = XC[3] - XC[0];
-    D[1] = XC[1] - XC[2];
-  }
-  else if (nsd == 3 && XC.size() >= 8) {
-    D[0] = XC[7] - XC[0];
-    D[1] = XC[6] - XC[1];
-    D[2] = XC[4] - XC[3];
-    D[3] = XC[2] - XC[6];
-  }
-  else
-    return 0.0;
-
-  // Take our element size as the longest diagonal
-  double h = D.front().length();
-  for (size_t i = 1; i < D.size(); i++)
-    h = std::max(h,D[i].length());
-
-  return h;
-}
-
-
 bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
                                   const FiniteElement& fe,
                                   const Vec3& X) const
 {
   ElementInfo& elMat = static_cast<ElementInfo&>(elmInt);
-  if (stab != NONE)
-    elMat.hk = getElementSize(fe.XC,nsd);
   elMat.iEl = fe.iel;
+  elMat.hk = fe.h;
 
   double f = source ? (*source)(X) : 0.0;
 
@@ -331,9 +292,8 @@ static inline double H1Norm (const Vec3& grad)
   return grad*grad;
 }
 
-/*!
-  \brief Returns the residual in an integration point.
-*/
+/* Unused function, consider remove
+// \brief Returns the residual in an integration point.
 
 static inline double residualNorm (double val, const Vec3& U,
                                    const Vec3& grad, const Vec3& hess,
@@ -342,7 +302,7 @@ static inline double residualNorm (double val, const Vec3& U,
   double res = -kappa*hess.sum() + U*grad + react*val - f;
   return res*res;
 }
-
+*/
 
 bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
                                       const FiniteElement& fe,
@@ -358,7 +318,6 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
 
   //double react = problem.reaction ? (*problem.reaction)(X) : 0.0;
   //double f = problem.source ? (*problem.source)(X) : 0.0;
-  //double h = getElementSize(fe.XC,problem.nsd);
   double val = pnorm.vec.front().dot(fe.N);
 
   Vec3 grad;
@@ -371,7 +330,7 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
     }
 
   // Intrinsic parameter to get L^2 norm error (upper bound)
-  //double kk = std::min((h/(sqrt(2)*sqrt(13))),(h*h/(3*sqrt(10)*problem.props.getDiffusivity())));
+  //double kk = fe.h*std::min(1/(sqrt(2)*sqrt(13)),fe.h/(3*sqrt(10)*problem.props.getDiffusivity()));
 
   int norm = 0;
 
@@ -524,15 +483,9 @@ bool AdvectionDiffusion::WeakDirichlet::evalBou (LocalIntegral& elmInt,
   if (Uad)
     U = (*Uad)(X);
 
-  double g=0.0;
-  if (flux)
-    g = (*flux)(X);
-
+  double g = flux ? (*flux)(X) : 0.0;
   double An = U*normal;
-
-  // element size
-  double h = getElementSize(fe.XC,nsd);
-  double C = CBI*fabs(props.getDiffusivity())/h;
+  double C = CBI*fabs(props.getDiffusivity())/fe.h;
   double kap = props.getDiffusivity();
 
   // loop over test functions (i) and basis functions (j)

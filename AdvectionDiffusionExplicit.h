@@ -49,7 +49,7 @@ public:
   //! \param[in] fe Finite element data of current integration point
   //! \param[in] X Cartesian coordinates of current integration point
   virtual bool evalInt(LocalIntegral& elmInt, const FiniteElement& fe,
-		       const TimeDomain& time, const Vec3& X) const;
+                       const Vec3& X) const;
 
   //! \brief Returns a local integral container for the given element.
   //! \param[in] nen Number of nodes on element

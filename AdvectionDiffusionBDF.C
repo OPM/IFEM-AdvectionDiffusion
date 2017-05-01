@@ -16,10 +16,10 @@
 #include "FiniteElement.h"
 #include "TimeDomain.h"
 #include "Utilities.h"
-#include "StabilizationUtils.h"
 #include "ElmNorm.h"
 #include "AnaSol.h"
 #include "Vec3Oper.h"
+#include "StabilizationUtils.h"
 
 
 AdvectionDiffusionBDF::AdvectionDiffusionBDF (unsigned short int n,
