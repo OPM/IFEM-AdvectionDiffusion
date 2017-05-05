@@ -283,6 +283,7 @@ static inline double L2Norm (double val)
   return val*val;
 }
 
+
 /*!
   \brief Returns the H1 semi-norm contribution in an integration point.
 */
@@ -292,9 +293,11 @@ static inline double H1Norm (const Vec3& grad)
   return grad*grad;
 }
 
-/* Unused function, consider remove
-// \brief Returns the residual in an integration point.
 
+/*!
+  \brief Returns the residual in an integration point.
+*/
+/*
 static inline double residualNorm (double val, const Vec3& U,
                                    const Vec3& grad, const Vec3& hess,
                                    double kappa, double f, double react)
@@ -303,6 +306,7 @@ static inline double residualNorm (double val, const Vec3& U,
   return res*res;
 }
 */
+
 
 bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
                                       const FiniteElement& fe,
