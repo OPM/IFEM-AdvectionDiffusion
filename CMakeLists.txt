@@ -50,13 +50,12 @@ if(MPI_FOUND)
   endif()
 endif()
 if(NOT MPI_FOUND OR IFEM_SERIAL_TESTS_IN_PARALLEL)
-  foreach(TESTFILE Lshape.reg
+  set(TESTFILES    Lshape.reg
                    Square-abd1-ad-bdf2.reg
                    Square-abd1-ad-be.reg
                    Square-abd1-ad-bs.reg
                    Square-abd1-ad-cn.reg
                    Square-abd1-ad-euler.reg
-                   Square-abd1-ad-fehlberg.reg
                    Square-abd1-ad-heuneuler.reg
                    Square-abd1-ad-heun.reg
                    Square-abd1-ad-rk3.reg
@@ -66,13 +65,17 @@ if(NOT MPI_FOUND OR IFEM_SERIAL_TESTS_IN_PARALLEL)
                    Square-abd2-ad-bs.reg
                    Square-abd2-ad-cn.reg
                    Square-abd2-ad-euler.reg
-                   Square-abd2-ad-fehlberg.reg
                    Square-abd2-ad-heuneuler.reg
                    Square-abd2-ad-heun.reg
                    Square-abd2-ad-rk3.reg
                    Square-abd2-ad-rk4.reg
                    Square-ad-RaPr.reg
                    Square-ad.reg)
+  if(NOT __LINUX_COMPILER_PGI) # These tests are extremely compiler sensitive, disable.
+    list(APPEND TESTFILES Square-abd1-ad-fehlberg.reg
+                          Square-abd2-ad-fehlberg.reg)
+  endif()
+  foreach(TESTFILE ${TESTFILES})
     ifem_add_test(${TESTFILE} AdvectionDiffusion)
   endforeach()
   if(HDF5_FOUND AND CEREAL_FOUND)
