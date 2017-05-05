@@ -51,16 +51,19 @@ public:
     //! \brief Defines which FE quantities are needed by the integrand.
     virtual int getIntegrandType() const { return ELEMENT_CORNERS; }
 
+    using IntegrandBase::getLocalIntegral;
     //! \brief Returns a local integral contribution object for given element.
     //! \param[in] nen Number of nodes on element
     virtual LocalIntegral* getLocalIntegral(size_t nen, size_t, bool) const;
 
+    using IntegrandBase::initElementBou;
     //! \brief Initializes current element for boundary integration.
     //! \param[in] MNPC Matrix of nodal point correspondance for current element
     //! \param elmInt Local integral for element
     virtual bool initElementBou(const std::vector<int>& MNPC,
                                 LocalIntegral& elmInt);
 
+    using IntegrandBase::evalBou;
     //! \brief Evaluates the integrand at a boundary point.
     //! \param elmInt The local integral object to receive the contributions
     //! \param[in] fe Finite element data of current integration point
@@ -154,6 +157,7 @@ public:
   //! \brief Defines which FE quantities are needed by the integrand.
   virtual int getIntegrandType() const;
 
+  using IntegrandBase::getLocalIntegral;
   //! \brief Returns a local integral container for the given element.
   //! \param[in] nen Number of nodes on element
   //! \param[in] neumann Whether or not we are assembling Neumann BC's
@@ -167,6 +171,7 @@ public:
   //! element quantities are assembled into their system level equivalents.
   virtual bool finalizeElement(LocalIntegral& elmInt);
 
+  using IntegrandBase::evalInt;
   //! \brief Evaluates the integrand at an interior point.
   //! \param elmInt The local integral object to receive the contributions
   //! \param[in] fe Finite element data of current integration point
@@ -174,6 +179,7 @@ public:
   virtual bool evalInt(LocalIntegral& elmInt, const FiniteElement& fe,
                        const Vec3& X) const;
 
+  using IntegrandBase::evalBou;
   //! \brief Evaluates the integrand at a boundary point.
   //! \param elmInt The local integral object to receive the contributions
   //! \param[in] fe Finite element data of current integration point
@@ -182,6 +188,7 @@ public:
   virtual bool evalBou(LocalIntegral& elmInt, const FiniteElement& fe,
                        const Vec3& X, const Vec3& normal) const;
 
+  using IntegrandBase::evalSol;
   //! \brief Evaluates the secondary solution at a result point.
   //! \param[out] s Array of solution field values at current point
   //! \param[in] fe Finite element data at current point
@@ -249,6 +256,7 @@ public:
   //! \brief Empty destructor.
   virtual ~AdvectionDiffusionNorm() {}
 
+  using NormBase::evalInt;
   //! \brief Evaluates the integrand at an interior point.
   //! \param elmInt The local integral object to receive the contributions
   //! \param[in] fe Finite element data of current integration point
@@ -292,6 +300,7 @@ public:
   //! \brief Empty destructor.
   virtual ~ADNorm() {}
 
+  using NormBase::evalInt;
   //! \brief Evaluates the integrand at an interior point.
   //! \param elmInt The local integral object to receive the contributions
   //! \param[in] fe Finite element data of current integration point
