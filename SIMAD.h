@@ -18,6 +18,7 @@
 #include "AnaSol.h"
 #include "ASMstruct.h"
 #include "Functions.h"
+#include "ExprFunctions.h"
 #include "Property.h"
 #include "SIMoutput.h"
 #include "SIMSolver.h"
