@@ -20,13 +20,16 @@ include_directories(${IFEM_INCLUDES} ../Common ${PROJECT_SOURCE_DIR})
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
-add_library(CommonAD STATIC AdvectionDiffusion.C
-                            AdvectionDiffusionArgs.C
-                            AdvectionDiffusionBDF.C
-                            AdvectionDiffusionExplicit.C
-                            ADFluidProperties.C)
+set(AD_SOURCES AdvectionDiffusion.C
+               AdvectionDiffusionArgs.C
+               AdvectionDiffusionBDF.C
+               AdvectionDiffusionExplicit.C
+               ADFluidProperties.C)
+
+add_library(CommonAD STATIC ${AD_SOURCES})
 
 add_executable(AdvectionDiffusion main_AdvectionDiffusion.C)
+list(APPEND CHECK_SOURCES ${AD_SOURCES} main_AdvectionDiffusion.C)
 
 target_link_libraries(AdvectionDiffusion CommonAD IFEMAppCommon ${IFEM_LIBRARIES})
 
@@ -40,9 +43,6 @@ add_doc_target(AdvectionDiffusion AdvectionDiffusion)
 # Testing
 enable_testing()
 include(IFEMTesting)
-
-# Generate regtest script with correct paths
-configure_file(${IFEM_REGTEST_SCRIPT} regtest.sh)
 
 if(MPI_FOUND)
   if(HDF5_FOUND AND CEREAL_FOUND)
