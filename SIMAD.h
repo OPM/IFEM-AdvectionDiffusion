@@ -200,7 +200,7 @@ public:
 
     // Couple the weak Dirichlet integrand to the generic Neumann property codes
     PropertyVec::iterator p;
-    for (p = Dim::myProps.begin(); p != Dim::myProps.end(); p++)
+    for (p = Dim::myProps.begin(); p != Dim::myProps.end(); ++p)
       if (p->pcode == Property::NEUMANN_GENERIC)
         if (Dim::myInts.find(p->pindx) == Dim::myInts.end())
           Dim::myInts.insert(std::make_pair(p->pindx,&weakDirBC));
