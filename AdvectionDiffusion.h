@@ -102,7 +102,7 @@ public:
   {
   public:
     //! \brief Default constructor.
-    ElementInfo(bool lhs = true) : ElmMats(lhs) {}
+    explicit ElementInfo(bool lhs = true) : ElmMats(lhs) {}
     //! \brief Empty destructor.
     virtual ~ElementInfo() {}
 
