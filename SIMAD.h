@@ -58,7 +58,7 @@ public:
   //! \brief Default constructor.
   //! \param[in] ad Integrand for advection-diffusion problem
   //! \param[in] alone Integrand is used stand-alone (controls time stepping)
-  SIMAD(Integrand& ad, bool alone = false) :
+  explicit SIMAD(Integrand& ad, bool alone = false) :
     SIMMultiPatchModelGen<Dim>(1), AD(ad),
     weakDirBC(Dim::dimension, 4.0, 1.0), inputContext("advectiondiffusion")
   {
@@ -67,9 +67,8 @@ public:
     Dim::myHeading = "Advection-Diffusion solver";
   }
 
-  //! \brief Construct from properties
-  //! \param props The properties
-  SIMAD(SetupProps& props) :
+  //! \brief Constructs from given properties.
+  explicit SIMAD(SetupProps& props) :
     SIMMultiPatchModelGen<Dim>(1), AD(*props.integrand),
     weakDirBC(Dim::dimension, 4.0, 1.0), inputContext("advectiondiffusion")
   {
