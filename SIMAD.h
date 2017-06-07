@@ -69,7 +69,7 @@ public:
 
   //! \brief Construct from properties
   //! \param props The properties
-  SIMAD(SetupProps& props) :
+  explicit SIMAD(SetupProps& props) :
     SIMMultiPatchModelGen<Dim>(1), AD(*props.integrand),
     weakDirBC(Dim::dimension, 4.0, 1.0), inputContext("advectiondiffusion")
   {
