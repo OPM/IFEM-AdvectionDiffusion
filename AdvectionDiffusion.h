@@ -88,7 +88,7 @@ public:
     const double CBI;   //!< Model constant
     const double gamma; //!< Adjoint factor
     VecFunc*     Uad;   //!< Pointer to advection field
-    RealFunc*    flux;  //!< Pointer to the flux field
+    RealFunc*    flux = nullptr;  //!< Pointer to the flux field
     AD::FluidProperties props; //!< Fluid properties
   };
 
@@ -113,8 +113,8 @@ public:
     Vector eSs; //!< Stabilized vector
     Vector Cv;  //!< velocity + area
 
-    double hk;  //!< element size
-    size_t iEl; //!< element index
+    double hk = 1.0;  //!< element size
+    size_t iEl = 0; //!< element index
   };
 
   //! \brief The destructor deletes the advection field.
