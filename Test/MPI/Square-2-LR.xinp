@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<simulation>
+
+  <!-- General - geometry definitions !-->
+  <geometry dim="2">
+    <partitioning procs="2" nperproc="1"/>
+    <patchfile type="lrspline">../square-2.lr</patchfile>
+    <topology>
+      <connection master="1" midx="2" slave="2" sidx="1"/>
+    </topology>
+    <topologysets>
+      <set name="all" type="edge">
+        <item patch="1">1 3 4</item>
+        <item patch="2">2 3 4</item>
+      </set>
+    </topologysets>
+  </geometry>
+
+  <advectiondiffusion>
+    <boundaryconditions>
+      <dirichlet set="all" comp="1" type="expression">1/3*pow(x,3)*pow(y,2)*sin(t)</dirichlet>
+    </boundaryconditions>
+    <source type="expression">
+            u=1/3*pow(x,3)*pow(y,2)*sin(t);
+            ux=pow(x,2)*pow(y,2)*sin(t);
+            uy=1/3*pow(x,3)*2*y*sin(t);
+            ut=1/3*pow(x,3)*pow(y,2)*cos(t);
+            v=-1/3*pow(x,2)*pow(y,3)*sin(t);
+            uxx=2*x*pow(y,2)*sin(t);
+            uyy=2/3*pow(x,3)*sin(t);
+            ut-uxx-uyy+u*ux+v*uy
+    </source>
+    <advectionfield>
+      1/3*pow(x,3)*pow(y,2)*sin(t) | -1/3*pow(x,2)*pow(y,3)*sin(t)
+    </advectionfield>
+
+    <anasol type="expression">
+      <variables>u=1/3*pow(x,3)*pow(y,2)*sin(t);
+                 ux=pow(x,2)*pow(y,2)*sin(t);
+                 uy=2/3*pow(x,3)*y*sin(t);
+      </variables>
+      <primary>u</primary>
+      <secondary>ux|uy</secondary>
+    </anasol>
+  </advectiondiffusion>
+
+  <timestepping start="0.0" end="1.0" dt="0.1" type="bdf2"/>
+
+  <linearsolver class="petsc">
+    <type>gmres</type>
+    <pc>asm</pc>
+  </linearsolver>
+
+</simulation>
