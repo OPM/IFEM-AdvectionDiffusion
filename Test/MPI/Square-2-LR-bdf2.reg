@@ -1,0 +1,47 @@
+Square-2-LR.xinp
+
+Number of elements    34
+Number of nodes       48
+Number of dofs        48
+Number of constraints 14
+Number of unknowns    34
+Number of domains     2
+Number of equations   56 (34 on process)
+LR-spline basis functions are used
+  step = 1  time = 0.1
+L2-norm            : 0.0425685
+Max temperature    : 0.266222
+  step = 2  time = 0.2
+L2-norm            : 0.0847172
+Max temperature    : 0.529785
+  step = 3  time = 0.3
+L2-norm            : 0.126022
+Max temperature    : 0.788054
+  step = 4  time = 0.4
+L2-norm            : 0.166068
+Max temperature    : 1.03845
+  step = 5  time = 0.5
+L2-norm            : 0.204455
+Max temperature    : 1.27847
+  step = 6  time = 0.6
+L2-norm            : 0.240799
+Max temperature    : 1.50571
+  step = 7  time = 0.7
+L2-norm            : 0.274737
+Max temperature    : 1.71791
+  step = 8  time = 0.8
+L2-norm            : 0.30593
+Max temperature    : 1.91295
+  step = 9  time = 0.9
+L2-norm            : 0.334066
+Max temperature    : 2.08887
+  step = 10  time = 1
+L2-norm            : 0.358864
+Max temperature    : 2.24392
+  L2 norm |t^h| = (t^h,t^h)^0.5       : 0.536627
+  H1 norm |t^h| = a(t^h,t^h)^0.5      : 0.35813
+  L2 norm |t|   = (t,t)^0.5           : 0.5364
+  H1 norm |t|   = a(t,t)^0.5          : 1.18838
+  L2 norm |e|   = (e,e)^0,5, e=t-t^h  : 0.000686354
+  H1 norm |e|   = a(e,e)^0.5, e=t-t^h : 0.00583794
+  Exact relative error (%)            : 0.491251
