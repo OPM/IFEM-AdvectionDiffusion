@@ -16,37 +16,30 @@
 #include "tinyxml.h"
 
 
-bool AdvectionDiffusionArgs::parse(const TiXmlElement* elem)
+bool AdvectionDiffusionArgs::parseArg (const char* argv)
 {
-  if (!strcasecmp(elem->Value(),"advectiondiffusion"))
-    utl::getAttribute(elem,"adaptive",adap);
+  TimeIntegration::Method tmp;
+  if (argv[0] != '-')
+    return false;
+  else if ((tmp = TimeIntegration::get(argv+1)) > TimeIntegration::NONE)
+    timeMethod = tmp;
+  else if (!strcmp(argv,"-supg"))
+    integrandType = Integrand::SECOND_DERIVATIVES | Integrand::G_MATRIX;
+  else
+    return this->SIMargsBase::parseArg(argv);
 
+  return true;
+}
+
+
+bool AdvectionDiffusionArgs::parse (const TiXmlElement* elem)
+{
   if (!strcasecmp(elem->Value(),"timestepping")) {
-    utl::getAttribute(elem, "tol", errTol);
-
     std::string type;
-    utl::getAttribute(elem,"type",type);
-    if (type == "be")
-      timeMethod = TimeIntegration::BE;
-    else if (type == "bdf2")
-      timeMethod = TimeIntegration::BDF2;
-    else if (type == "cn")
-      timeMethod = TimeIntegration::THETA;
-    else if (type == "euler")
-      timeMethod = TimeIntegration::EULER;
-    else if (type == "heun")
-      timeMethod = TimeIntegration::HEUN;
-    else if (type == "heuneuler")
-      timeMethod = TimeIntegration::HEUNEULER;
-    else if (type == "bs")
-      timeMethod = TimeIntegration::BOGACKISHAMPINE;
-    else if (type == "fehlberg")
-      timeMethod = TimeIntegration::FEHLBERG;
-    else if (type == "rk3")
-      timeMethod = TimeIntegration::RK3;
-    else if (type == "rk4")
-      timeMethod = TimeIntegration::RK4;
+    utl::getAttribute(elem,"tol",errTol);
+    if (utl::getAttribute(elem,"type",type))
+      timeMethod = TimeIntegration::get(type);
   }
 
-  return SIM::AppXMLInputBase::parse(elem);
+  return this->SIMargsBase::parse(elem);
 }

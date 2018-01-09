@@ -168,40 +168,13 @@ int main (int argc, char** argv)
   AdvectionDiffusionArgs args;
 
   IFEM::Init(argc,argv,"Advection-Diffusion solver");
-
-  int ignoreArg = -1;
   for (int i = 1; i < argc; i++)
-    if (i == ignoreArg || SIMoptions::ignoreOldOptions(argc,argv,i))
+    if (argv[i] == infile || args.parseArg(argv[i]))
+      ; // ignore the input file on the second pass
+    else if (SIMoptions::ignoreOldOptions(argc,argv,i))
       ; // ignore the obsolete option
-    else if (!strcmp(argv[i],"-adap"))
-      args.adap = true;
-    else if (!strcmp(argv[i],"-2D"))
-      args.dim = 2;
-    else if (!strcmp(argv[i],"-be"))
-      args.timeMethod = TimeIntegration::BE;
-    else if (!strcmp(argv[i],"-bdf2"))
-      args.timeMethod = TimeIntegration::BDF2;
-    else if (!strcmp(argv[i],"-cn"))
-      args.timeMethod = TimeIntegration::THETA;
-    else if (!strcmp(argv[i],"-euler"))
-      args.timeMethod = TimeIntegration::EULER;
-    else if (!strcmp(argv[i],"-heun"))
-      args.timeMethod = TimeIntegration::HEUN;
-    else if (!strcmp(argv[i],"-heuneuler"))
-      args.timeMethod = TimeIntegration::HEUNEULER;
-    else if (!strcmp(argv[i],"-bs"))
-      args.timeMethod = TimeIntegration::BOGACKISHAMPINE;
-    else if (!strcmp(argv[i],"-fehlberg"))
-      args.timeMethod = TimeIntegration::FEHLBERG;
-    else if (!strcmp(argv[i],"-rk3"))
-      args.timeMethod = TimeIntegration::RK3;
-    else if (!strcmp(argv[i],"-rk4"))
-      args.timeMethod = TimeIntegration::RK4;
-    else if (!strcmp(argv[i],"-supg"))
-      args.integrandType = Integrand::SECOND_DERIVATIVES | Integrand::G_MATRIX;
     else if (!infile) {
       infile = argv[i];
-      ignoreArg = i;
       if (!args.readXML(infile,false))
         return 1;
       i = 0;
