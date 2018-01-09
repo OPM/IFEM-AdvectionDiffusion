@@ -14,6 +14,7 @@
 
 #include "AdvectionDiffusionExplicit.h"
 #include "FiniteElement.h"
+#include "Function.h"
 
 
 AdvectionDiffusionExplicit::AdvectionDiffusionExplicit (unsigned short int n,

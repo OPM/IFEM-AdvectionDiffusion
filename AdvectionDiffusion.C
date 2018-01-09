@@ -14,9 +14,10 @@
 #include "AdvectionDiffusion.h"
 #include "FiniteElement.h"
 #include "ElmNorm.h"
-#include "Utilities.h"
-#include "Vec3Oper.h"
 #include "AnaSol.h"
+#include "Function.h"
+#include "Vec3Oper.h"
+#include "Utilities.h"
 
 
 AdvectionDiffusion::AdvectionDiffusion (unsigned short int n,

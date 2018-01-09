@@ -19,6 +19,9 @@
 #include "EqualOrderOperators.h"
 #include "ADFluidProperties.h"
 
+class RealFunc;
+class VecFunc;
+
 
 /*!
   \brief Class representing the integrand of the Advection-Diffusion problem.
@@ -27,7 +30,7 @@
 class AdvectionDiffusion : public IntegrandBase
 {
 public:
-  using WeakOps = EqualOrderOperators::Weak; //!< Convenience renaming
+  using WeakOps     = EqualOrderOperators::Weak;     //!< Convenience renaming
   using ResidualOps = EqualOrderOperators::Residual; //!< Convenience renaming
 
   //! \brief Enum defining the available stabilization methods.
@@ -74,14 +77,12 @@ public:
 
     //! \brief Defines the advection field.
     void setAdvectionField(VecFunc* U) { Uad = U; }
-
     //! \brief Defines the flux function.
     void setFlux(RealFunc* f) { flux = f; }
 
-    //! \brief Obtain a reference to fluid properties.
+    //! \brief Returns a reference to the fluid properties.
     AD::FluidProperties& getFluidProperties() { return props; }
-
-    //! \brief Obtain a const reference to material data.
+    //! \brief Returns a const reference to the fluid properties.
     const AD::FluidProperties& getFluidProperties() const { return props; }
 
   protected:
@@ -140,7 +141,7 @@ public:
   //! \brief Defines the flux function.
   void setFlux(RealFunc* f) { flux = f; }
 
-  //! \brief Defines the reaction field
+  //! \brief Defines the reaction field.
   void setReactionField(RealFunc* f) { reaction = f; }
 
   //! \brief Defines the global number of elements.
@@ -160,7 +161,7 @@ public:
   using IntegrandBase::getLocalIntegral;
   //! \brief Returns a local integral container for the given element.
   //! \param[in] nen Number of nodes on element
-  //! \param[in] neumann Whether or not we are assembling Neumann BC's
+  //! \param[in] neumann Whether or not we are assembling Neumann BCs
   virtual LocalIntegral* getLocalIntegral(size_t nen, size_t,
                                           bool neumann) const;
 
@@ -218,10 +219,9 @@ public:
   //! \brief Advances the integrand one time step forward.
   virtual void advanceStep() {}
 
-  //! \brief Obtain a reference to fluid properties.
+  //! \brief Returns a reference to the fluid properties.
   AD::FluidProperties& getFluidProperties() { return props; }
-
-  //! \brief Obtain a const reference to material data.
+  //! \brief Returns a const reference to the fluid properties.
   const AD::FluidProperties& getFluidProperties() const { return props; }
 
 protected:
@@ -229,10 +229,11 @@ protected:
   RealFunc* reaction; //!< Pointer to the reaction field
   RealFunc* source;   //!< Pointer to source field
   RealFunc* flux;     //!< Pointer to the flux field
-  Vector tauE;  //!< Stored tau values - need for norm integration
-  int order;    //!< Basis order
 
-  AD::FluidProperties props; //!< Fluid properties.
+  Vector tauE;  //!< Stored tau values - need for norm integration
+  int    order; //!< Basis order
+
+  AD::FluidProperties props; //!< Fluid properties
 
   Stabilization stab; //!< The type of stabilization used
   double        Cinv; //!< Stabilization parameter
@@ -242,7 +243,8 @@ protected:
 
 
 /*!
-  \brief Class representing the integrand of Advection-Diffusion energy norms for stationary simulations.
+  \brief Class representing the integrand of Advection-Diffusion energy norms
+  for stationary simulations.
 */
 
 class AdvectionDiffusionNorm : public NormBase
@@ -252,7 +254,8 @@ public:
   //! \param[in] p The Advection-Diffusion problem to evaluate norms for
   //! \param[in] u Analytical solution field
   //! \param[in] du Analytical gradient field
-  AdvectionDiffusionNorm(AdvectionDiffusion& p, RealFunc* u=0, VecFunc* du=0);
+  AdvectionDiffusionNorm(AdvectionDiffusion& p,
+                         RealFunc* u = nullptr, VecFunc* du = nullptr);
   //! \brief Empty destructor.
   virtual ~AdvectionDiffusionNorm() {}
 
