@@ -34,7 +34,7 @@ public:
   AdvectionDiffusionArgs() : SIMargsBase("advectiondiffusion") {}
 
   //! \brief Parses a command-line argument.
-  virtual bool parseArg(const char* argv);
+  bool parseArg(const char* argv) override;
 
 protected:
   //! \brief Parse an element from the input file
