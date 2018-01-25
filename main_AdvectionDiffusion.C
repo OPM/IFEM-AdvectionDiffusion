@@ -35,6 +35,7 @@ template<template<class T> class Solver=SIMSolverStat, class AD>
 int runSimulatorStationary (char* infile, AD& model)
 {
   utl::profiler->start("Model input");
+
   Solver<AD> solver(model);
 
   int res = ConfigureSIM(model, infile, typename AD::SetupProps());
@@ -52,7 +53,7 @@ int runSimulatorStationary (char* infile, AD& model)
   if (model.opt.dumpHDF5(infile))
     solver.handleDataOutput(model.opt.hdf5);
 
-  return solver.solveProblem(infile,"Solving Advection-Diffusion problem",false);
+  return solver.solveProblem(infile,"Solving Advection-Diffusion problem");
 }
 
 
