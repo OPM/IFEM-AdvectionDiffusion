@@ -425,14 +425,18 @@ private:
   Vectors temperature; //!< Temperature solutioni vectors
   bool    standalone; //!< True if simulator runs standalone (i.e. we own the VTF object).
   std::string inputContext; //!< Input context
-  double subItTol = 1e-4;
-  int maxSubIt = 50;
+  double subItTol = 1e-4; //!< Sub-iteration tolerance
+  int maxSubIt = 50; //!< Maximum number of sub-iterations
 };
 
 
 //! \brief Partial specialization for configurator
 template<class Dim, class Integrand>
 struct SolverConfigurator< SIMAD<Dim,Integrand> > {
+  //! \brief Configure a SIMAD instance.
+  //! \param ad The SIMAD instance to configure
+  //! \param[in] props Configuration properties
+  //! \param[in] infile The input file to read
   int setup(SIMAD<Dim,Integrand>& ad,
             const typename SIMAD<Dim,Integrand>::SetupProps& props, char* infile)
   {

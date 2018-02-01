@@ -17,11 +17,11 @@
 class TiXmlElement;
 
 
+namespace AD {
+
 /*!
   \brief Class representing fluid properties for advection-diffusion problems.
 */
-
-namespace AD {
 
 class FluidProperties
 {
