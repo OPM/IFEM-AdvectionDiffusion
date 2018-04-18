@@ -14,27 +14,22 @@
 #ifndef _SIM_AD_H
 #define _SIM_AD_H
 
-#include "AdvectionDiffusion.h"
-#include "AnaSol.h"
-#include "ASMstruct.h"
-#include "Functions.h"
-#include "ExprFunctions.h"
-#include "Property.h"
+#include "SIMMultiPatchModelGen.h"
+#include "SIMsolution.h"
 #include "SIMoutput.h"
 #include "SIMconfigure.h"
+#include "Property.h"
+#include "ASMstruct.h"
+#include "AdvectionDiffusion.h"
+#include "AnaSol.h"
+#include "Functions.h"
+#include "ExprFunctions.h"
 #include "IFEM.h"
 #include "TimeStep.h"
 #include "Profiler.h"
 #include "Utilities.h"
 #include "DataExporter.h"
-#include "SIMMultiPatchModelGen.h"
 #include "tinyxml.h"
-
-#ifdef HAS_CEREAL
-#include <cereal/cereal.hpp>
-#include <cereal/archives/binary.hpp>
-#include <cereal/types/vector.hpp>
-#endif
 
 
 /*!
@@ -43,8 +38,8 @@
   Advection-Diffusion problem using NURBS-based finite elements.
 */
 
-template<class Dim, class Integrand=AdvectionDiffusion> class SIMAD :
-  public SIMMultiPatchModelGen<Dim>
+template<class Dim, class Integrand=AdvectionDiffusion>
+class SIMAD : public SIMMultiPatchModelGen<Dim>, public SIMsolution
 {
 public:
   //! \brief Setup properties.
@@ -72,7 +67,6 @@ public:
     SIMMultiPatchModelGen<Dim>(1), AD(*props.integrand),
     weakDirBC(Dim::dimension, 4.0, 1.0), inputContext("advectiondiffusion")
   {
-    standalone = false;
     Dim::myProblem = &AD;
     Dim::myHeading = "Advection-Diffusion solver";
   }
@@ -179,15 +173,11 @@ public:
     AD.setElements(this->getNoElms());
 
     // Initialize temperature solution vectors
+    this->initSolution(this->getNoDOFs(),3);
     size_t n, nSols = this->getNoSolutions();
-    temperature.resize(3);
     std::string str = "temperature1";
-    temperature[1].resize(this->getNoDOFs(),true);
-    for (n = 0; n < nSols; n++, str[11]++) {
-      temperature[n].resize(this->getNoDOFs(),true);
-      this->registerField(str,temperature[n]);
-      if (n == 1) ++n;
-    }
+    for (n = 0; n < nSols && n < 2; n++, str[11]++)
+      this->registerField(str,solution[n]);
     return true;
   }
 
@@ -221,13 +211,8 @@ public:
   //! \brief Advances the time step one step forward.
   bool advanceStep(TimeStep&)
   {
-    // Update temperature vectors between time steps
-    const int nNusols = temperature.size();
-    for (int n = nNusols-1; n > 0; n--)
-      temperature[n] = temperature[n-1];
-
+    this->pushSolution(); // Update solution vectors between time steps
     AD.advanceStep();
-
     return true;
   }
 
@@ -237,22 +222,23 @@ public:
     PROFILE1("SIMAD::solveStep");
 
     if (Dim::msgLevel >= 0 && standalone)
-      IFEM::cout <<"\n  step = "<< tp.step <<"  time = "<< tp.time.t << std::endl;
+      IFEM::cout <<"\n  step = "<< tp.step
+                 <<"  time = "<< tp.time.t << std::endl;
 
     Vector dummy;
-    this->updateDirichlet(tp.time.t, &dummy);
+    this->updateDirichlet(tp.time.t,&dummy);
 
-    if (!this->assembleSystem(tp.time, temperature))
+    if (!this->assembleSystem(tp.time,solution))
       return false;
 
-    if (!this->solveSystem(temperature.front(), Dim::msgLevel-1,"temperature "))
+    if (!this->solveSystem(solution.front(),Dim::msgLevel-1,"temperature "))
       return false;
 
     if (Dim::msgLevel == 1)
     {
       size_t iMax[1];
       double dMax[1];
-      double normL2 = this->solutionNorms(temperature.front(),dMax,iMax,1);
+      double normL2 = this->solutionNorms(solution.front(),dMax,iMax,1);
       IFEM::cout <<"\n  Temperature summary:  L2-norm        : "<< normL2
                  <<"\n                       Max temperature : "<< dMax[0]
                  << std::endl;
@@ -270,7 +256,7 @@ public:
     Vectors gNorm;
     this->setMode(SIM::RECOVERY);
     this->setQuadratureRule(Dim::opt.nGauss[1]);
-    if (!this->solutionNorms(tp.time,temperature,gNorm))
+    if (!this->solutionNorms(tp.time,solution,gNorm))
       return;
     else if (gNorm.empty())
       return;
@@ -310,63 +296,39 @@ public:
 
   //! \brief Serialize internal state for restarting purposes.
   //! \param data Container for serialized data
-  bool serialize(DataExporter::SerializeData& data)
+  bool serialize(SerializeMap& data) const
   {
-#ifdef HAS_CEREAL
-    std::ostringstream str;
-    cereal::BinaryOutputArchive ar(str);
-    doSerializeOps(ar);
-    data.insert(std::make_pair(this->getName(), str.str()));
-    return true;
-#else
-    return false;
-#endif
+    return this->saveSolution(data,this->getName());
   }
 
   //! \brief Set internal state from a serialized state.
   //! \param[in] data Container for serialized data
-  bool deSerialize(const DataExporter::SerializeData& data)
+  bool deSerialize(const SerializeMap& data)
   {
-#ifdef HAS_CEREAL
-    std::stringstream str;
-    auto it = data.find(this->getName());
-    if (it != data.end()) {
-      str << it->second;
-      cereal::BinaryInputArchive ar(str);
-      doSerializeOps(ar);
-      AD.advanceStep();
-      return true;
-    }
-#endif
-    return false;
+    if (!this->restoreSolution(data,this->getName()))
+      return false;
+
+    AD.advanceStep();
+    return true;
   }
 
-   //! \brief Serialize to/from state.
-   //! \param ar An input or ouput archive
-   template <class T> void doSerializeOps(T& ar)
-   {
-     for (Vector& t : temperature) ar(t);
-   }
-
-  //! \brief Obtain a reference to a solution vector.
-  Vector& getSolution(int n=0) { return temperature[n]; }
-
-  //! \brief Obtain a reference to a solution vector.
-  //! \details If set, returns external vector for index 0.
-  const Vector& getSolution(int n=0) const
+  //! \brief Returns a reference to current solution vector.
+  Vector& getSolution() { return solution.front(); }
+  //! \brief Returns a const reference to current solution vector.
+  //! \details If set, returns external vector for \a idx=0.
+  virtual const Vector& getSolution(int idx) const
   {
-    if (n == 0 && solution)
-      return *solution;
+    if (idx == 0 && extsol)
+      return *extsol;
 
-    return temperature[n];
+    return solution[idx];
   }
 
   //! \brief Register fields for simulation result export.
   void registerFields(DataExporter& exporter, const std::string& prefix="")
   {
     exporter.registerField("theta","temperature",DataExporter::SIM,
-                           DataExporter::PRIMARY,
-                           prefix);
+                           DataExporter::PRIMARY, prefix);
     exporter.setFieldValue("theta", this, &this->getSolution(0));
   }
 
@@ -395,13 +357,12 @@ public:
   }
 
 #ifdef HAS_PETSC
-  //! \brief Set MPI communicator for the linear equation solvers
-  //! \param comm The communicator to use
+  //! \brief Sets MPI communicator for the linear equation solvers.
   void setCommunicator(const MPI_Comm* comm) { Dim::adm.setCommunicator(comm); }
 #endif
 
-  //! \brief Set externally provided solution vector (adaptive).
-  void setSol(const Vector* sol) { solution = sol; }
+  //! \brief Sets the externally provided solution vector (adaptive simulation).
+  void setSol(const Vector* sol) { extsol = sol; }
 
 protected:
   //! \brief Initializes for integration of Neumann terms for a given property.
@@ -420,9 +381,8 @@ private:
   Integrand& AD; //!< Problem integrand definition
   AdvectionDiffusion::WeakDirichlet weakDirBC; //!< Weak Dirichlet integrand
 
-  const Vector* solution = nullptr; //!< Externally provided solution vector (adaptive simulators).
-  Vectors temperature; //!< Temperature solutioni vectors
-  bool    standalone; //!< True if simulator runs standalone (i.e. we own the VTF object).
+  const Vector* extsol = nullptr; //!< Solution vector for adaptive simulators
+  bool standalone = false; //!< If \e true, this simulator owns the VTF object
   std::string inputContext; //!< Input context
   double subItTol = 1e-4; //!< Sub-iteration tolerance
   int maxSubIt = 50; //!< Maximum number of sub-iterations
