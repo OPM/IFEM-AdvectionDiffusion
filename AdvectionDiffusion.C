@@ -21,21 +21,21 @@
 
 
 AdvectionDiffusion::AdvectionDiffusion (unsigned short int n,
-                                        AdvectionDiffusion::Stabilization s) :
-  order(1), stab(s), Cinv(5)
+                                        AdvectionDiffusion::Stabilization s)
+  : IntegrandBase(n), order(1), stab(s), Cinv(5.0)
 {
-  nsd = n;
   primsol.resize(1);
 
-  source = 0, Uad = 0, flux = 0, reaction = 0;
+  Uad = nullptr;
+  reaction = source = flux = nullptr;
 }
 
 
 AdvectionDiffusion::~AdvectionDiffusion()
 {
-  delete source;
   delete Uad;
   delete reaction;
+  delete source;
 }
 
 
@@ -86,8 +86,8 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
     WeakOps::Advection(elMat.A[0], fe, U, 1.0);
 
     // loop over test functions (i) and basis functions (j)
-    for (size_t i = 1; i <= fe.N.size(); ++i) {
-      for (size_t j = 1; j <= fe.N.size(); ++j) {
+    for (size_t i = 1; i <= fe.N.size(); i++)
+      for (size_t j = 1; j <= fe.N.size(); j++)
         if (stab == SUPG) {
           double convV=0, Lu=0;
           for (size_t k = 1;k <= nsd;k++) {
@@ -102,7 +102,7 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
             elMat.eSs(i) += convV*f*fe.detJxW;
         }
 
-        if (stab == GLS) {
+        else if (stab == GLS) {
           double Lv=0, Lu=0;
           for (size_t k = 1;k <= nsd;k++) {
             Lv += U[k-1]*fe.dNdX(i,k)-props.getDiffusivity()*fe.d2NdX2(i,k,k);
@@ -118,7 +118,7 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
             elMat.eSs(i) += Lv*f*fe.detJxW;
         }
 
-        if (stab == MS) {
+        else if (stab == MS) {
           double Lav=0, Lu=0;
           for (size_t k = 1;k <= nsd;k++) {
             Lav += -U[k-1]*fe.dNdX(i,k)-props.getDiffusivity()*fe.d2NdX2(i,k,k);
@@ -132,8 +132,6 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
           if (source && j == 1)
             elMat.eSs(i) += -Lav*f*fe.detJxW;
         }
-      }
-    }
   }
 
   // Integrate source, if defined
@@ -433,10 +431,9 @@ std::string AdvectionDiffusionNorm::getName (size_t i, size_t j,
 
 
 AdvectionDiffusion::WeakDirichlet::WeakDirichlet (unsigned short int n,
-                                                  double CBI_, double gamma_) :
-  CBI(CBI_), gamma(gamma_), Uad(nullptr)
+                                                  double CBI_, double gamma_)
+  : IntegrandBase(n), CBI(CBI_), gamma(gamma_), Uad(nullptr), flux(nullptr)
 {
-  nsd = n;
   // Need current solution only
   primsol.resize(1);
 }
