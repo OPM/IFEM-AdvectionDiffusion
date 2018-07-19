@@ -1,0 +1,79 @@
+Square-ad.xinp -2D -bdf2
+
+Step 1
+  Element block 1
+    81 nodes
+    64 elements
+    Scalar: 'temperature'
+    Scalar: 'Exact temperature'
+    Vector: 'Exact temperature'
+Step 2
+  Element block 1
+    81 nodes
+    64 elements
+    Scalar: 'temperature'
+    Scalar: 'Exact temperature'
+    Vector: 'Exact temperature'
+Step 3
+  Element block 1
+    81 nodes
+    64 elements
+    Scalar: 'temperature'
+    Scalar: 'Exact temperature'
+    Vector: 'Exact temperature'
+Step 4
+  Element block 1
+    81 nodes
+    64 elements
+    Scalar: 'temperature'
+    Scalar: 'Exact temperature'
+    Vector: 'Exact temperature'
+Step 5
+  Element block 1
+    81 nodes
+    64 elements
+    Scalar: 'temperature'
+    Scalar: 'Exact temperature'
+    Vector: 'Exact temperature'
+Step 6
+  Element block 1
+    81 nodes
+    64 elements
+    Scalar: 'temperature'
+    Scalar: 'Exact temperature'
+    Vector: 'Exact temperature'
+Step 7
+  Element block 1
+    81 nodes
+    64 elements
+    Scalar: 'temperature'
+    Scalar: 'Exact temperature'
+    Vector: 'Exact temperature'
+Step 8
+  Element block 1
+    81 nodes
+    64 elements
+    Scalar: 'temperature'
+    Scalar: 'Exact temperature'
+    Vector: 'Exact temperature'
+Step 9
+  Element block 1
+    81 nodes
+    64 elements
+    Scalar: 'temperature'
+    Scalar: 'Exact temperature'
+    Vector: 'Exact temperature'
+Step 10
+  Element block 1
+    81 nodes
+    64 elements
+    Scalar: 'temperature'
+    Scalar: 'Exact temperature'
+    Vector: 'Exact temperature'
+Step 11
+  Element block 1
+    81 nodes
+    64 elements
+    Scalar: 'temperature'
+    Scalar: 'Exact temperature'
+    Vector: 'Exact temperature'

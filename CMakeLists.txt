@@ -87,6 +87,8 @@ if(NOT MPI_FOUND OR IFEM_SERIAL_TESTS_IN_PARALLEL)
   if(HDF5_FOUND AND CEREAL_FOUND)
     ifem_add_restart_test(Square-abd2-ad-restart.reg AdvectionDiffusion 5)
   endif()
+
+  ifem_add_vtf_test(Square-ad.vreg AdvectionDiffusion)
 endif()
 list(APPEND TEST_APPS AdvectionDiffusion)
 
