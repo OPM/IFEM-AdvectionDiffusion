@@ -54,6 +54,6 @@
     <nGauss>4</nGauss>
   </discretization>
 
-  <timestepping start="0.5" end="0.6" dt="0.005" f2="0.5" dtMin="1e-6" dtMax="0.0" tol="1e-5"/>
+  <timestepping start="0.5" end="0.6" dt="0.005" f2="0.5" dtMin="1e-6" dtMax="0.0" tol="1e-4"/>
 
 </simulation>

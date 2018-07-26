@@ -6,35 +6,35 @@ Number of dofs        64
 Number of unknowns    36
   step = 1  time = 0.001
 L2-norm            : 2.00738e-05
-Max theta   : 7.33507e-05
+Max temperature    : 7.33507e-05
   step = 2  time = 0.002
 L2-norm            : 4.01476e-05
-Max theta   : 0.000146701
+Max temperature    : 0.000146701
   step = 3  time = 0.003
 L2-norm            : 6.02214e-05
-Max theta   : 0.000220052
+Max temperature    : 0.000220052
   step = 4  time = 0.004
 L2-norm            : 8.02951e-05
-Max theta   : 0.000293403
+Max temperature    : 0.000293403
   step = 5  time = 0.005
 L2-norm            : 0.000100369
-Max theta   : 0.000366753
+Max temperature    : 0.000366753
   step = 6  time = 0.006
 L2-norm            : 0.000120443
-Max theta   : 0.000440104
+Max temperature    : 0.000440104
   step = 7  time = 0.007
 L2-norm            : 0.000140516
-Max theta   : 0.000513455
+Max temperature    : 0.000513455
   step = 8  time = 0.008
 L2-norm            : 0.00016059
-Max theta   : 0.000586806
+Max temperature    : 0.000586806
   step = 9  time = 0.009
 L2-norm            : 0.000180664
-Max theta   : 0.000660156
+Max temperature    : 0.000660156
   step = 10  time = 0.01
 L2-norm            : 0.000200738
-Max theta   : 0.000733507
-L2 norm |t^h| = (t^h,t^h)^0.5       : 0.000253968
-H1 norm |t^h| = a(t^h,t^h)^0.5      : 0.000148076
-L2 norm |t|   = (t,t)^0.5           : 0.000253968
-H1 norm |t|   = a(t,t)^0.5          : 0.000879772
+Max temperature    : 0.000733507
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.000253968
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.00124419
+  L2 norm |T|   = (T,T)^0.5           : 0.000253968
+  H1 norm |T|   = a(T,T)^0.5          : 0.00124419

@@ -1,0 +1,71 @@
+Square-ad-adap-rec.xinp -adap
+
+LR-spline basis functions are used
+Number of elements    64
+Number of nodes       81
+Number of dofs        81
+Number of constraints 32
+Number of unknowns    49
+Enabled projection(s): Continuous global L2-projection
+ >>> Starting adaptive simulation based on
+     Continuous global L2-projection error estimates (norm group 1) <<<
+Adaptive step 1
+L2-norm            : 0.0703498
+Max temperature    : 0.333333
+Projecting secondary solution ...
+	Continuous global L2-projection
+Energy norm              a(T^h,T^h)^0.5 : 0.247538
+Exact norm                   a(T,T)^0.5 : 0.247314
+Exact error         a(e,e)^0.5, e=T-T^h : 0.0208584
+Exact relative error (%)                : 8.43399
+Error estimate a(e,e)^0.5, e=T^r-T^h : 0.0199447
+Relative error (%) : 33.1478
+Effectivity index  : 0.956193
+Root mean square (RMS) of error      : 0.94744
+Min element error                    : 5.6288e-06
+Max element error                    : 0.00771462
+Average element error                : 0.0018098
+Refining 50 basis functions with errors in range \[0.00271649,0.0242887\] 10% of max error (0.00242887)
+Adaptive step 2
+Number of elements    214
+Number of nodes       238
+Number of dofs        238
+Number of constraints 55
+Number of unknowns    183
+L2-norm            : 0.069821
+Max temperature    : 0.333333
+Projecting secondary solution ...
+	Continuous global L2-projection
+Energy norm              a(T^h,T^h)^0.5 : 0.247319
+Exact norm                   a(T,T)^0.5 : 0.247314
+Exact error         a(e,e)^0.5, e=T-T^h : 0.0104102
+Exact relative error (%)                : 4.20932
+Error estimate a(e,e)^0.5, e=T^r-T^h : 0.0101668
+Relative error (%) : 17.7275
+Effectivity index  : 0.976617
+Root mean square (RMS) of error      : 0.783537
+Min element error                    : 5.71602e-06
+Max element error                    : 0.00224729
+Average element error                : 0.00054706
+Refining 185 basis functions with errors in range \[0.000772819,0.00759008\] 10% of max error (0.000759008)
+Adaptive step 3
+Number of elements    769
+Number of nodes       802
+Number of dofs        802
+Number of constraints 95
+Number of unknowns    707
+L2-norm            : 0.0697497
+Max temperature    : 0.333333
+Projecting secondary solution ...
+	Continuous global L2-projection
+Energy norm              a(T^h,T^h)^0.5 : 0.247307
+Exact norm                   a(T,T)^0.5 : 0.247314
+Exact error         a(e,e)^0.5, e=T-T^h : 0.00522134
+Exact relative error (%)                : 2.11122
+Error estimate a(e,e)^0.5, e=T^r-T^h : 0.00515417
+Relative error (%) : 9.10589
+Effectivity index  : 0.987137
+Root mean square (RMS) of error      : 0.686846
+Min element error                    : 4.91794e-06
+Max element error                    : 0.000605533
+Average element error                : 0.000153207

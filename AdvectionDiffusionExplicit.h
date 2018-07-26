@@ -41,25 +41,25 @@ public:
   //! \details This method is invoked once for each element, after the numerical
   //! integration loop over interior points is finished and before the resulting
   //! element quantities are assembled into their system level equivalents.
-  virtual bool finalizeElement(LocalIntegral&);
+  bool finalizeElement(LocalIntegral&) override;
 
   using AdvectionDiffusion::evalInt;
   //! \brief Evaluates the integrand at an interior point.
   //! \param elmInt The local integral object to receive the contributions
   //! \param[in] fe Finite element data of current integration point
   //! \param[in] X Cartesian coordinates of current integration point
-  virtual bool evalInt(LocalIntegral& elmInt, const FiniteElement& fe,
-                       const Vec3& X) const;
+  bool evalInt(LocalIntegral& elmInt, const FiniteElement& fe,
+               const Vec3& X) const override;
 
   using AdvectionDiffusion::getLocalIntegral;
   //! \brief Returns a local integral container for the given element.
   //! \param[in] nen Number of nodes on element
   //! \param[in] neumann Whether or not we are assembling Neumann BC's
-  virtual LocalIntegral* getLocalIntegral(size_t nen, size_t,
-                                          bool neumann) const;
+  LocalIntegral* getLocalIntegral(size_t nen, size_t,
+                                  bool neumann) const override;
 
   //! \brief Returns the integrand type.
-  virtual int getIntegrandType() const
+  int getIntegrandType() const override
   {
     return stab == NONE ? STANDARD : SECOND_DERIVATIVES | G_MATRIX;
   }
@@ -69,7 +69,11 @@ public:
   //! manually when leaving the scope of the pointer variable receiving the
   //! returned pointer value.
   //! \param[in] asol Pointer to analytical solution (optional)
-  virtual NormBase* getNormIntegrand(AnaSol* asol = 0) const;
+  NormBase* getNormIntegrand(AnaSol* asol = 0) const override;
+
+  //! \brief Defines the solution mode before the element assembly is started.
+  //! \param[in] mode The solution mode to use
+  void setMode(SIM::SolutionMode mode) override;
 };
 
 #endif

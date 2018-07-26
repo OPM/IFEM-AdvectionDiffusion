@@ -74,12 +74,11 @@ if(NOT MPI_FOUND OR IFEM_SERIAL_TESTS_IN_PARALLEL)
                    Square-abd2-ad-rk4.reg
                    Square-ad-RaPr.reg
                    Square-ad.reg)
-  if(NOT __LINUX_COMPILER_PGI) # These tests are extremely compiler sensitive, disable.
-    list(APPEND TESTFILES Square-abd1-ad-fehlberg.reg
-                          Square-abd2-ad-fehlberg.reg)
-  endif()
   if(LRSpline_FOUND)
     list(APPEND TESTFILES Square-2-LR-bdf2.reg)
+    list(APPEND TESTFILES Square-ad-adap.reg)
+    list(APPEND TESTFILES Square-ad-adap-rec.reg)
+    ifem_add_vtf_test(Square-ad-adap-rec.vreg AdvectionDiffusion)
   endif()
   foreach(TESTFILE ${TESTFILES})
     ifem_add_test(${TESTFILE} AdvectionDiffusion)

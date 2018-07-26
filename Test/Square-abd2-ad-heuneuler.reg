@@ -1,97 +1,61 @@
 Square-abd2-ad-embedded.xinp -heuneuler
 
-Input file: Square-abd2-ad-embedded.xinp
-Equation solver: 2
-Number of Gauss points: 4
 Number of elements    16
 Number of nodes       64
 Number of dofs        64
 Number of unknowns    36
   step = 1  time = 0.505
 L2-norm            : 0.0025845
-Max theta   : 0.0094439
-  step = 2  time = 0.522456
-L2-norm            : 0.00271874
-Max theta   : 0.00993433
-  step = 3  time = 0.530775
-L2-norm            : 0.00285493
-Max theta   : 0.0104327
-  step = 4  time = 0.53946
-L2-norm            : 0.00299726
-Max theta   : 0.0109532
-  step = 5  time = 0.544891
-L2-norm            : 0.00305732
-Max theta   : 0.0111728
-  step = 6  time = 0.54124
-L2-norm            : 0.0031169
-Max theta   : 0.0113912
-  step = 7  time = 0.543264
-L2-norm            : 0.00316483
-Max theta   : 0.0115658
-  step = 8  time = 0.544991
-L2-norm            : 0.00324383
-Max theta   : 0.0118556
-  step = 9  time = 0.549494
-L2-norm            : 0.00328438
-Max theta   : 0.0120026
-  step = 10  time = 0.550264
-L2-norm            : 0.00333925
-Max theta   : 0.0122041
-  step = 11  time = 0.554079
-L2-norm            : 0.00337425
-Max theta   : 0.0123313
-  step = 12  time = 0.555678
-L2-norm            : 0.00343904
-Max theta   : 0.0125686
-  step = 13  time = 0.561363
-L2-norm            : 0.00349223
-Max theta   : 0.0127622
-  step = 14  time = 0.56312
-L2-norm            : 0.00353569
-Max theta   : 0.0129216
-  step = 15  time = 0.5653
-L2-norm            : 0.00362105
-Max theta   : 0.0132328
-  step = 16  time = 0.570798
-L2-norm            : 0.00367428
-Max theta   : 0.0134283
-  step = 17  time = 0.571731
-L2-norm            : 0.00374625
-Max theta   : 0.0136899
-  step = 18  time = 0.575436
-L2-norm            : 0.00378293
-Max theta   : 0.0138251
-  step = 19  time = 0.576458
-L2-norm            : 0.00384022
-Max theta   : 0.0140338
-  step = 20  time = 0.581387
-L2-norm            : 0.00388982
-Max theta   : 0.0142156
-  step = 21  time = 0.583671
-L2-norm            : 0.00398618
-Max theta   : 0.0145669
-  step = 22  time = 0.589036
-L2-norm            : 0.00404154
-Max theta   : 0.0147703
-  step = 23  time = 0.589801
-L2-norm            : 0.00411331
-Max theta   : 0.0150312
-  step = 24  time = 0.593357
-L2-norm            : 0.00415077
-Max theta   : 0.0151691
-  step = 25  time = 0.59449
-L2-norm            : 0.00421246
-Max theta   : 0.0153941
-  step = 26  time = 0.599929
-L2-norm            : 0.00427065
-Max theta   : 0.0156072
-  step = 27  time = 0.6
-L2-norm            : 0.00433089
-Max theta   : 0.0158268
-  L2 norm |t^h| = (t^h,t^h)^0.5       : 0.00547876
-  H1 norm |t^h| = a(t^h,t^h)^0.5      : 0.00319521
-  L2 norm |t|   = (t,t)^0.5           : 0.00548571
-  H1 norm |t|   = a(t,t)^0.5          : 0.0190031
-  L2 norm |e|   = (e,e)^0,5, e=t-t^h  : 7.05963e-06
-  H1 norm |e|   = a(e,e)^0.5, e=t-t^h : 2.23768e-05
-  Exact relative error (%)            : 0.117754
+Max temperature    : 0.0094439
+  step = 2  time = 0.5602
+L2-norm            : 0.00300901
+Max temperature    : 0.0109948
+  step = 3  time = 0.579052
+L2-norm            : 0.00342244
+Max temperature    : 0.0125059
+  step = 4  time = 0.580179
+L2-norm            : 0.00353848
+Max temperature    : 0.0129705
+  step = 5  time = 0.570403
+L2-norm            : 0.0036202
+Max temperature    : 0.0132225
+  step = 6  time = 0.572956
+L2-norm            : 0.00368765
+Max temperature    : 0.013488
+  step = 7  time = 0.575121
+L2-norm            : 0.00374306
+Max temperature    : 0.0136895
+  step = 8  time = 0.576813
+L2-norm            : 0.00378806
+Max temperature    : 0.0138485
+  step = 9  time = 0.578913
+L2-norm            : 0.00387608
+Max temperature    : 0.0141763
+  step = 10  time = 0.584387
+L2-norm            : 0.00393232
+Max temperature    : 0.0143717
+  step = 11  time = 0.585396
+L2-norm            : 0.00401018
+Max temperature    : 0.0146681
+  step = 12  time = 0.589183
+L2-norm            : 0.00404968
+Max temperature    : 0.0148018
+  step = 13  time = 0.590188
+L2-norm            : 0.00411088
+Max temperature    : 0.0150314
+  step = 14  time = 0.594962
+L2-norm            : 0.0041617
+Max temperature    : 0.0152112
+  step = 15  time = 0.597136
+L2-norm            : 0.00425967
+Max temperature    : 0.0155763
+  step = 16  time = 0.6
+L2-norm            : 0.00432203
+Max temperature    : 0.0157924
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.00546614
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.0267941
+  L2 norm |T|   = (T,T)^0.5           : 0.00548571
+  H1 norm |T|   = a(T,T)^0.5          : 0.0268744
+  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 2.01958e-05
+  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.00011991
+  Exact relative error (%)            : 0.368153

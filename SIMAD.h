@@ -48,6 +48,7 @@ public:
     bool shareGrid = false; //!< True to share grid with some other simulator
     Integrand* integrand = nullptr; //!< Integrand to use
     SIMoutput* share = nullptr; //!< Simulator to share grid with
+    bool standalone = false; //!< Simulator runs standalone
   };
 
   //! \brief Default constructor.
@@ -63,10 +64,11 @@ public:
   }
 
   //! \brief Constructs from given properties.
-  explicit SIMAD(SetupProps& props) :
+  explicit SIMAD(const SetupProps& props) :
     SIMMultiPatchModelGen<Dim>(1), AD(*props.integrand),
     weakDirBC(Dim::dimension, 4.0, 1.0), inputContext("advectiondiffusion")
   {
+    standalone = props.standalone;
     Dim::myProblem = &AD;
     Dim::myHeading = "Advection-Diffusion solver";
   }
@@ -84,7 +86,7 @@ public:
 
   using Dim::parse;
   //! \brief Parses a data section from an XML element.
-  virtual bool parse(const TiXmlElement* elem)
+  bool parse(const TiXmlElement* elem) override
   {
     if (strcasecmp(elem->Value(),inputContext.c_str()))
       return this->Dim::parse(elem);
@@ -161,7 +163,7 @@ public:
   }
 
   //! \brief Returns the name of this simulator (for use in the HDF5 export).
-  virtual std::string getName() const { return "AdvectionDiffusion"; }
+  std::string getName() const override { return "AdvectionDiffusion"; }
 
   //! \brief Initialize simulator.
   bool init(const TimeStep&)
@@ -182,7 +184,7 @@ public:
   }
 
   //! \brief Preprocessing performed before the FEM model generation.
-  virtual void preprocessA()
+  void preprocessA() override
   {
     Dim::myInts.insert(std::make_pair(0,Dim::myProblem));
 
@@ -194,7 +196,7 @@ public:
   }
 
   //! \brief Defines the global number of elements.
-  virtual bool preprocessB() { AD.setElements(this->getNoElms());return true; }
+  bool preprocessB() override { AD.setElements(this->getNoElms());return true; }
 
   //! \brief Opens a new VTF-file and writes the model geometry to it.
   //! \param[in] fileName File name used to construct the VTF-file name from
@@ -204,7 +206,6 @@ public:
   {
     if (Dim::opt.format < 0) return true;
 
-    nBlock = 0;
     return this->writeGlvG(geoBlk,fileName);
   }
 
@@ -221,9 +222,8 @@ public:
   {
     PROFILE1("SIMAD::solveStep");
 
-    if (Dim::msgLevel >= 0 && standalone)
-      IFEM::cout <<"\n  step = "<< tp.step
-                 <<"  time = "<< tp.time.t << std::endl;
+    if (Dim::msgLevel >= 0 && standalone && tp.multiSteps())
+      IFEM::cout <<"\n  step = "<< tp.step <<"  time = "<< tp.time.t << std::endl;
 
     Vector dummy;
     this->updateDirichlet(tp.time.t,&dummy);
@@ -244,6 +244,9 @@ public:
                  << std::endl;
     }
 
+    if (!tp.multiSteps())
+      printFinalNorms(tp);
+
     return true;
   }
 
@@ -262,13 +265,13 @@ public:
       return;
 
     IFEM::cout << ">>> Norm summary for AdvectionDiffusion <<<" << std::endl;
-    IFEM::cout <<"  L2 norm |t^h| = (t^h,t^h)^0.5       : "<< gNorm[0](1);
-    IFEM::cout <<"\n  H1 norm |t^h| = a(t^h,t^h)^0.5      : "<< gNorm[0](2);
+    IFEM::cout <<"  L2 norm |T^h| = (T^h,T^h)^0.5       : "<< gNorm[0](1);
+    IFEM::cout <<"\n  H1 norm |T^h| = a(T^h,T^h)^0.5      : "<< gNorm[0](2);
     if (this->haveAnaSol() && gNorm[0].size() >= 6)
-      IFEM::cout <<"\n  L2 norm |t|   = (t,t)^0.5           : "<< gNorm[0](3)
-                 <<"\n  H1 norm |t|   = a(t,t)^0.5          : "<< gNorm[0](5)
-                 <<"\n  L2 norm |e|   = (e,e)^0,5, e=t-t^h  : "<< gNorm[0](4)
-                 <<"\n  H1 norm |e|   = a(e,e)^0.5, e=t-t^h : "<< gNorm[0](6)
+      IFEM::cout <<"\n  L2 norm |T|   = (T,T)^0.5           : "<< gNorm[0](5)
+                 <<"\n  H1 norm |T|   = a(T,T)^0.5          : "<< gNorm[0](3)
+                 <<"\n  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : "<< gNorm[0](6)
+                 <<"\n  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : "<< gNorm[0](4)
                  <<"\n  Exact relative error (%)            : "
                  << gNorm[0](6)/gNorm[0](5)*100.0;
     IFEM::cout << std::endl;
@@ -296,14 +299,14 @@ public:
 
   //! \brief Serialize internal state for restarting purposes.
   //! \param data Container for serialized data
-  bool serialize(SerializeMap& data) const
+  bool serialize(SerializeMap& data) const override
   {
     return this->saveSolution(data,this->getName());
   }
 
   //! \brief Set internal state from a serialized state.
   //! \param[in] data Container for serialized data
-  bool deSerialize(const SerializeMap& data)
+  bool deSerialize(const SerializeMap& data) override
   {
     if (!this->restoreSolution(data,this->getName()))
       return false;
@@ -316,7 +319,7 @@ public:
   Vector& getSolution() { return solution.front(); }
   //! \brief Returns a const reference to current solution vector.
   //! \details If set, returns external vector for \a idx=0.
-  virtual const Vector& getSolution(int idx) const
+  const Vector& getSolution(int idx) const override
   {
     if (idx == 0 && extsol)
       return *extsol;
@@ -327,9 +330,16 @@ public:
   //! \brief Register fields for simulation result export.
   void registerFields(DataExporter& exporter, const std::string& prefix="")
   {
-    exporter.registerField("theta","temperature",DataExporter::SIM,
-                           DataExporter::PRIMARY, prefix);
-    exporter.setFieldValue("theta", this, &this->getSolution(0));
+    int results = DataExporter::PRIMARY;
+
+    if (!Dim::opt.pSolOnly)
+      results |= DataExporter::SECONDARY;
+
+    if (Dim::opt.saveNorms)
+      results |= DataExporter::NORMS;
+
+    exporter.registerField("u","temperature",DataExporter::SIM,results, prefix);
+    exporter.setFieldValue("u", this, &this->getSolution(0));
   }
 
   //! \brief Set context to read from input file
@@ -364,10 +374,21 @@ public:
   //! \brief Sets the externally provided solution vector (adaptive simulation).
   void setSol(const Vector* sol) { extsol = sol; }
 
+  //! \brief Prints a summary of the calculated solution to std::cout.
+  //! \param[in] solution The solution vector
+  //! \param[in] printSol Print solution only if size is less than this value
+  //! \param[in] outPrec Number of digits after the decimal point in norm print
+  void printSolutionSummary(const Vector& solution, int printSol, const char*,
+                            std::streamsize outPrec = 0) override
+  {
+    this->SIMbase::printSolutionSummary(solution, printSol,
+                                        "temperature ", outPrec);
+  }
+
 protected:
   //! \brief Initializes for integration of Neumann terms for a given property.
   //! \param[in] propInd Physical property index
-  virtual bool initNeumann(size_t propInd)
+  bool initNeumann(size_t propInd) override
   {
     typename Dim::SclFuncMap::const_iterator tit = Dim::myScalars.find(propInd);
     if (tit == Dim::myScalars.end()) return false;
@@ -375,6 +396,35 @@ protected:
     weakDirBC.setFlux(tit->second);
     AD.setFlux(tit->second);
     return true;
+  }
+
+  //! \brief Prints integrated solution norms to the log stream.
+  //! \param[in] norms The norm values
+  //! \param[in] w Total number of characters in the norm labels
+  void printNorms (const Vectors& norms, size_t w) const override
+  {
+    if (norms.empty()) return;
+
+    NormBase* norm = this->getNormIntegrand();
+    const Vector& n = norms.front();
+
+    IFEM::cout <<"Energy norm"
+      << utl::adjustRight(w-8,norm->getName(1,2)) << n(2);
+
+    if (this->haveAnaSol() && n.size() >= 4)
+      IFEM::cout <<"\nExact norm"
+        << utl::adjustRight(w-7,norm->getName(1,3)) << n(3)
+        <<"\nExact error"
+        << utl::adjustRight(w-8,norm->getName(1,4)) << n(4)
+        <<"\nExact relative error (%)                : "<< 100.0*n(4)/n(3);
+
+    size_t j = 0;
+    for (const auto& prj : Dim::opt.project)
+      if (++j < norms.size())
+        this->printNormGroup(norms[j],n,prj.second);
+
+    IFEM::cout << std::endl;
+    delete norm;
   }
 
 private:

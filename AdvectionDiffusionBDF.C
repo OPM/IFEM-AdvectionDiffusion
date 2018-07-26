@@ -210,7 +210,19 @@ void AdvectionDiffusionBDF::setNamedFields(const std::string& name, Fields* fiel
 NormBase* AdvectionDiffusionBDF::getNormIntegrand (AnaSol* asol) const
 {
   if (asol)
-    return new ADNorm(*const_cast<AdvectionDiffusionBDF*>(this),asol);
+    return new AdvectionDiffusionNorm(*const_cast<AdvectionDiffusionBDF*>(this),asol);
   else
-    return new ADNorm(*const_cast<AdvectionDiffusionBDF*>(this));
+    return new AdvectionDiffusionNorm(*const_cast<AdvectionDiffusionBDF*>(this));
+}
+
+
+void AdvectionDiffusionBDF::setMode (SIM::SolutionMode mode)
+{
+  m_mode = mode;
+  if (mode == SIM::RECOVERY)
+    primsol.resize(1);
+  else if (mode == SIM::STATIC)
+    primsol.clear();
+  else
+    primsol.resize(3);
 }
