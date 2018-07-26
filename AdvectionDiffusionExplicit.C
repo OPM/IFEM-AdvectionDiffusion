@@ -69,7 +69,17 @@ bool AdvectionDiffusionExplicit::finalizeElement (LocalIntegral& A)
 NormBase* AdvectionDiffusionExplicit::getNormIntegrand (AnaSol* asol) const
 {
   if (asol)
-    return new ADNorm(*const_cast<AdvectionDiffusionExplicit*>(this),asol);
+    return new AdvectionDiffusionNorm(*const_cast<AdvectionDiffusionExplicit*>(this),asol);
   else
-    return new ADNorm(*const_cast<AdvectionDiffusionExplicit*>(this));
+    return new AdvectionDiffusionNorm(*const_cast<AdvectionDiffusionExplicit*>(this));
+}
+
+
+void AdvectionDiffusionExplicit::setMode (SIM::SolutionMode mode)
+{
+  m_mode = mode;
+  if (mode == SIM::STATIC)
+    primsol.clear();
+  else
+    primsol.resize(1);
 }

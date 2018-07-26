@@ -1,0 +1,74 @@
+Square-ad-adap-rec.xinp -adap
+
+Step 1
+  Element block 1
+    256 nodes
+    64 elements
+    Displacement: 'Solution'
+    Displacement: 'Exact Solution'
+    Scalar: 'Exact T'
+    Scalar: 'Continuous global L2-projection T,x'
+    Scalar: 'Continuous global L2-projection T,y'
+    Scalar: 'Continuous global L2-projection effectivity index'
+    Scalar: '(T^h,T^h)^0.5'
+    Scalar: 'a(T^h,T^h)^0.5'
+    Scalar: 'a(T,T)^0.5'
+    Scalar: 'FE T,x'
+    Scalar: 'FE T,y'
+    Scalar: 'Exact T,x'
+    Scalar: 'Exact T,y'
+    Scalar: 'Continuous global L2-projection a(e,e)^0.5, e=T^r-T^h'
+    Scalar: 'Continuous global L2-projection a(e,e)^0.5, e=T-T^r'
+    Scalar: '(T,T)^0.5'
+    Scalar: 'a(e,e)^0.5, e=T-T^h'
+    Scalar: '(e,e)^0.5, e=T-T^h'
+    Scalar: 'Continuous global L2-projection a(T^r,T^r)^0.5'
+    Scalar: 'T'
+Step 2
+  Element block 1
+    856 nodes
+    214 elements
+    Displacement: 'Solution'
+    Displacement: 'Exact Solution'
+    Scalar: 'Exact T'
+    Scalar: 'Continuous global L2-projection T,x'
+    Scalar: 'Continuous global L2-projection T,y'
+    Scalar: 'Continuous global L2-projection effectivity index'
+    Scalar: '(T^h,T^h)^0.5'
+    Scalar: 'a(T^h,T^h)^0.5'
+    Scalar: 'a(T,T)^0.5'
+    Scalar: 'FE T,x'
+    Scalar: 'FE T,y'
+    Scalar: 'Exact T,x'
+    Scalar: 'Exact T,y'
+    Scalar: 'Continuous global L2-projection a(e,e)^0.5, e=T^r-T^h'
+    Scalar: 'Continuous global L2-projection a(e,e)^0.5, e=T-T^r'
+    Scalar: '(T,T)^0.5'
+    Scalar: 'a(e,e)^0.5, e=T-T^h'
+    Scalar: '(e,e)^0.5, e=T-T^h'
+    Scalar: 'Continuous global L2-projection a(T^r,T^r)^0.5'
+    Scalar: 'T'
+Step 3
+  Element block 1
+    3076 nodes
+    769 elements
+    Displacement: 'Solution'
+    Displacement: 'Exact Solution'
+    Scalar: 'Exact T'
+    Scalar: 'Continuous global L2-projection T,x'
+    Scalar: 'Continuous global L2-projection T,y'
+    Scalar: 'Continuous global L2-projection effectivity index'
+    Scalar: '(T^h,T^h)^0.5'
+    Scalar: 'a(T^h,T^h)^0.5'
+    Scalar: 'a(T,T)^0.5'
+    Scalar: 'FE T,x'
+    Scalar: 'FE T,y'
+    Scalar: 'Exact T,x'
+    Scalar: 'Exact T,y'
+    Scalar: 'Continuous global L2-projection a(e,e)^0.5, e=T^r-T^h'
+    Scalar: 'Continuous global L2-projection a(e,e)^0.5, e=T-T^r'
+    Scalar: '(T,T)^0.5'
+    Scalar: 'a(e,e)^0.5, e=T-T^h'
+    Scalar: '(e,e)^0.5, e=T-T^h'
+    Scalar: 'Continuous global L2-projection a(T^r,T^r)^0.5'
+    Scalar: 'T'

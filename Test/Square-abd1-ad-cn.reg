@@ -10,7 +10,7 @@ Max temperature    : 0.0366753
   step = 2  time = 1
 L2-norm            : 0.0200738
 Max temperature    : 0.0733507
-L2 norm |t^h| = (t^h,t^h)^0.5       : 0.0253968
-H1 norm |t^h| = a(t^h,t^h)^0.5      : 0.0148076
-L2 norm |t|   = (t,t)^0.5           : 0.0253968
-H1 norm |t|   = a(t,t)^0.5          : 0.0879772
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.0253968
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.124419
+  L2 norm |T|   = (T,T)^0.5           : 0.0253968
+  H1 norm |T|   = a(T,T)^0.5          : 0.124419

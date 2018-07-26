@@ -182,9 +182,9 @@ bool AdvectionDiffusion::evalSol (Vector& s, const FiniteElement& fe,
 std::string AdvectionDiffusion::getField1Name (size_t, const char* prefix) const
 {
   if (!prefix)
-    return "theta";
+    return "T";
 
-  return prefix + std::string(" theta");
+  return prefix + std::string(" T");
 }
 
 
@@ -194,11 +194,22 @@ std::string AdvectionDiffusion::getField2Name (size_t i,
   if (i > 2)
     return "";
 
-  static const char* s[3] = { "theta_x", "theta_y", "theta_z" };
+  static const char* s[3] = { "T,x", "T,y", "T,z" };
   if (!prefix)
     return s[i];
 
   return prefix + std::string(" ") + s[i];
+}
+
+
+void AdvectionDiffusion::setMode (SIM::SolutionMode mode)
+{
+  m_mode = mode;
+
+  if (mode >= SIM::RECOVERY)
+    primsol.resize(1);
+  else
+    primsol.clear();
 }
 
 
@@ -245,188 +256,7 @@ double AdvectionDiffusion::ElementInfo::getTau(double kappa,
 
 NormBase* AdvectionDiffusion::getNormIntegrand (AnaSol* asol) const
 {
-  if (asol)
-    return new AdvectionDiffusionNorm(*const_cast<AdvectionDiffusion*>(this),
-                                      asol->getScalarSol(),
-                                      asol->getScalarSecSol());
-  else
-    return new AdvectionDiffusionNorm(*const_cast<AdvectionDiffusion*>(this));
-}
-
-
-AdvectionDiffusionNorm::AdvectionDiffusionNorm (AdvectionDiffusion& p,
-                                                RealFunc* val, VecFunc* grad) :
-  NormBase(p), phi(val), gradPhi(grad)
-{
-  nrcmp = myProblem.getNoFields(2);
-  finalOp = ASM::ABS;
-}
-
-
-size_t AdvectionDiffusionNorm::getNoFields (int fld) const
-{
-  switch (fld) {
-  case 0 : return 1 + prjsol.size();
-  case 1 : return gradPhi ? 5 : 2;
-  default: return gradPhi ? 4 : 2;
-  }
-}
-
-
-/*!
-  \brief Returns the L2 norm contribution in an integration point.
-*/
-
-static inline double L2Norm (double val)
-{
-  return val*val;
-}
-
-
-/*!
-  \brief Returns the H1 semi-norm contribution in an integration point.
-*/
-
-static inline double H1Norm (const Vec3& grad)
-{
-  return grad*grad;
-}
-
-
-/*!
-  \brief Returns the residual in an integration point.
-*/
-/*
-static inline double residualNorm (double val, const Vec3& U,
-                                   const Vec3& grad, const Vec3& hess,
-                                   double kappa, double f, double react)
-{
-  double res = -kappa*hess.sum() + U*grad + react*val - f;
-  return res*res;
-}
-*/
-
-
-bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
-                                      const FiniteElement& fe,
-                                      const Vec3& X) const
-{
-  AdvectionDiffusion& problem = static_cast<AdvectionDiffusion&>(myProblem);
-  ElmNorm& pnorm = static_cast<ElmNorm&>(elmInt);
-
-  // Evaluate the advection field
-  Vec3 U;
-  if (problem.Uad)
-    U = (*problem.Uad)(X);
-
-  //double react = problem.reaction ? (*problem.reaction)(X) : 0.0;
-  //double f = problem.source ? (*problem.source)(X) : 0.0;
-  double val = pnorm.vec.front().dot(fe.N);
-
-  Vec3 grad;
-  Vec3 hess;
-  for (size_t k = 1; k <= problem.nsd; k++)
-    for (size_t j = 1; j <= fe.N.size(); j++) {
-      grad[k-1] += fe.dNdX(j,k)*pnorm.vec.front()(j);
-      if (this->getIntegrandType() & Integrand::SECOND_DERIVATIVES)
-        hess[k-1] += fe.d2NdX2(j,k,k)*pnorm.vec.front()(j);
-    }
-
-  // Intrinsic parameter to get L^2 norm error (upper bound)
-  //double kk = fe.h*std::min(1/(sqrt(2)*sqrt(13)),fe.h/(3*sqrt(10)*problem.props.getDiffusivity()));
-
-  int norm = 0;
-
-  // Choice to have VMS based error
-//  pnorm[norm++] += kk*kk*residualNorm(val, U, grad, hess,
-//                                      problem.props.getDiffusivity(), f, react)*fe.detJxW;
-
-  // or Gradient based error depends on what to select here
-  pnorm[norm++] += H1Norm(grad)*fe.detJxW;
-
-  pnorm[norm++] += L2Norm(val)*fe.detJxW;
-
-  Vec3 eGrad;
-  if (phi && gradPhi) {
-//    double eVal = (*phi)(X);
-    eGrad = (*gradPhi)(X);
-
-    pnorm[norm++] += H1Norm(eGrad)*fe.detJxW;
-
-    // Recovery based error
-    pnorm[norm++] += H1Norm(grad-eGrad)*fe.detJxW;
-
-    // VMS based error estimation
-    //pnorm[norm++] += L2Norm(val-eVal)*fe.detJxW;
-
-//    pnorm[norm++] += kk*kk*residualNorm(val, U, grad, hess,
-//                                        problem.props.getDiffusivity(), f, react)*fe.detJxW;
-
-    norm++; // effectivity index
-  }
-
-  for (size_t i = 0; i < pnorm.psol.size(); i++) {
-    Vec3 rGrad;
-    for (size_t k = 0; k < problem.nsd; k++)
-      rGrad[k] += pnorm.psol[i].dot(fe.N,k,problem.nsd);
-
-    pnorm[norm++] += H1Norm(rGrad)*fe.detJxW;
-    // Recovery based estimate
-    pnorm[norm++] += H1Norm(rGrad-grad)*fe.detJxW;
-
-    if (phi && gradPhi) {
-      pnorm[norm++] += H1Norm(eGrad-rGrad)*fe.detJxW;
-      norm++; // effectivity index
-    }
-  }
-
-  return true;
-}
-
-
-bool AdvectionDiffusionNorm::finalizeElement (LocalIntegral& elmInt)
-{
-  ElmNorm& norm = static_cast<ElmNorm&>(elmInt);
-
-  // no effectiviy indices without an analytic solution
-  if (!phi)
-    return true;
-
-  norm[4] = norm[3]/norm[2];
-
-  int j = 2;
-  size_t skip = this->getNoFields(1);
-  for (size_t i = skip; i < norm.size(); i += this->getNoFields(j++))
-    norm[i+3] = norm[i+1]/norm[2];
-
-  return true;
-}
-
-
-std::string AdvectionDiffusionNorm::getName (size_t i, size_t j,
-                                             const char* prefix) const
-{
-  static const char* s[5] = {
-    "VMS explicit estimate (residual)",
-    "Gradient u_h",
-    "Exact error in L^2 norm,  e=u-u^h",
-    "VMS explicit residual estimate",
-    "eff index, residual"
-  };
-
-  static const char* p[4] = {
-    "|u^r|_H1",
-    "|e|_H1 e=u^r-u^h",
-    "|e|_H1, e=u-u^r",
-    "eff index, H1"
-  };
-
-  const char** n = i > 2 ? p : s;
-
-  if (!prefix)
-    return n[j-1];
-
-  return prefix + std::string(" ") + n[j-1];
+  return new AdvectionDiffusionNorm(*const_cast<AdvectionDiffusion*>(this), asol);
 }
 
 
@@ -530,15 +360,17 @@ bool AdvectionDiffusion::WeakDirichlet::evalBou (LocalIntegral& elmInt,
 }
 
 
-ADNorm::ADNorm(AdvectionDiffusion& p, AnaSol* a) : NormBase(p)
+AdvectionDiffusionNorm::AdvectionDiffusionNorm(AdvectionDiffusion& p, AnaSol* a) :
+  NormBase(p)
 {
   nrcmp = myProblem.getNoFields(2);
   anasol = a;
 }
 
 
-bool ADNorm::evalInt (LocalIntegral& elmInt, const FiniteElement& fe,
-                      const Vec3& X) const
+bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
+                                      const FiniteElement& fe,
+                                      const Vec3& X) const
 {
   ElmNorm& pnorm = static_cast<ElmNorm&>(elmInt);
   AdvectionDiffusion& hep = static_cast<AdvectionDiffusion&>(myProblem);
@@ -557,7 +389,14 @@ bool ADNorm::evalInt (LocalIntegral& elmInt, const FiniteElement& fe,
   pnorm[ip++] += Uh*Uh*fe.detJxW;
 
   // Integrate the energy norm, a(U^h,U^h)
-  pnorm[ip++] = 0.5*kappa*gradUh.dot(gradUh)*fe.detJxW;
+  pnorm[ip++] += kappa*gradUh.dot(gradUh)*fe.detJxW;
+
+  Vec3 dT;
+  if (anasol && anasol->getScalarSecSol()) {
+    dT = (*anasol->getScalarSecSol())(X);
+    pnorm[ip++] += kappa*dT*dT*fe.detJxW;
+    pnorm[ip++] += kappa*(dT-gradUh)*(dT-gradUh)*fe.detJxW;
+  }
 
   if (anasol && anasol->getScalarSol()) {
     double T = (*anasol->getScalarSol())(X);
@@ -565,54 +404,113 @@ bool ADNorm::evalInt (LocalIntegral& elmInt, const FiniteElement& fe,
     pnorm[ip++] += (T-Uh)*(T-Uh)*fe.detJxW; // L2 norm of error
   }
 
-  if (anasol && anasol->getScalarSecSol()) {
-    Vec3 dT = (*anasol->getScalarSecSol())(X);
-    pnorm[ip++] += 0.5*kappa*dT*dT*fe.detJxW;
-    pnorm[ip++] += 0.5*kappa*(dT-gradUh)*(dT-gradUh)*fe.detJxW;
+  for (const Vector& psol : pnorm.psol)
+    if (psol.empty()) { // residual
+      Vec3 hess;
+      if (this->getIntegrandType() & Integrand::SECOND_DERIVATIVES)
+        for (size_t k = 1; k <= hep.getNoSpaceDim(); k++)
+          for (size_t j = 1; j <= fe.N.size(); j++) {
+            if (this->getIntegrandType() & Integrand::SECOND_DERIVATIVES)
+              hess[k-1] += fe.d2NdX2(j,k,k)*pnorm.vec.front()(j);
+        }
+        double f = hep.source ? (*hep.source)(X) : 0.0;
+        Vec3 U;
+        if (hep.Uad)
+          U = (*hep.Uad)(X);
+        double react = hep.reaction ? (*hep.reaction)(X) : 0.0;
+        double res = -kappa*hess.sum() + U*gradUh + react*Uh - f;
+        double kk = fe.h*std::min(1.0/(sqrt(2.0)*sqrt(13.0)),fe.h/(3.0*sqrt(10.0)*hep.props.getDiffusivity()));
+        ip++; // unused
+        pnorm[ip++] += kk*kk*res*res*fe.detJxW;
+        if (anasol && anasol->getScalarSecSol())
+          ip += 2;
+    } else {
+      Vec3 rGrad;
+      for (size_t k = 0; k < hep.nsd; k++)
+        rGrad[k] += psol.dot(fe.N,k,hep.nsd);
+
+      pnorm[ip++] += rGrad*rGrad*fe.detJxW;
+      // Recovery based estimate
+      pnorm[ip++] += (rGrad-gradUh)*(rGrad-gradUh)*fe.detJxW;
+
+      if (anasol && anasol->getScalarSecSol()) {
+        pnorm[ip++] += (dT-rGrad)*(dT-rGrad)*fe.detJxW;
+        ip++; // effectivity index
+      }
+    }
+
+  return true;
+}
+
+
+bool AdvectionDiffusionNorm::finalizeElement (LocalIntegral& elmInt)
+{
+  if (!anasol) return true;
+
+  ElmNorm& pnorm = static_cast<ElmNorm&>(elmInt);
+
+  // Evaluate local effectivity indices as a(e^r,e^r)/a(e,e)
+  // with e^r = u^r - u^h  and  e = u - u^h
+  size_t g = 2;
+  for (size_t ip = this->getNoFields(1); ip < pnorm.size(); ip += 4)
+  {
+    size_t gsize = this->getNoFields(g++);
+    if (gsize != 4)
+      continue;
+    pnorm[ip+3] = pnorm[ip+1] / pnorm[3];
   }
 
   return true;
 }
 
 
-size_t ADNorm::getNoFields (int group) const
+size_t AdvectionDiffusionNorm::getNoFields (int group) const
 {
   if (group < 1)
     return this->NormBase::getNoFields();
-  else
+  else if (group == 1)
     return anasol ? 6 : 2;
+  else
+    return anasol ? 4 : 2;
 }
 
 
-std::string ADNorm::getName (size_t i, size_t j,
-                             const char* prefix) const
+std::string AdvectionDiffusionNorm::getName (size_t i, size_t j,
+                                             const char* prefix) const
 {
-  if (i == 0 || j == 0 || j > 4)
-    return this->NormBase::getName(i,j,prefix);
-
   static const char* s[] = {
-    "(theta^h,theta^h)^0.5",
-    "a(theta^h,theta^h)^0.5",
-    "(q,theta^h)^0.5",
-    "(theta, theta)^0.5",
-    "a(theta,theta)^0.5",
-    "a(e,e)^0.5, e=theta-theta^h",
-    "a(theta^r,theta^r)^0.5",
-    "a(e,e)^0.5, e=theta^r-theta^h",
-    "a(e,e)^0.5, e=theta-theta^r",
+    "(T^h,T^h)^0.5",
+    "a(T^h,T^h)^0.5",
+    "a(T,T)^0.5",
+    "a(e,e)^0.5, e=T-T^h",
+    "(T,T)^0.5",
+    "(e,e)^0.5, e=T-T^h",
+  };
+
+  static const char* rec[] = {
+    "a(T^r,T^r)^0.5",
+    "a(e,e)^0.5, e=T^r-T^h",
+    "a(e,e)^0.5, e=T-T^r",
     "effectivity index"
   };
 
-  size_t k = i > 1 ? j+3 : j-1;
+  static const char* res[] = {
+    "|T^h|_res",
+    "effectivity index"
+  };
+
+
+  const char** n = s;
+  if (i > 1) {
+    size_t nNrm = this->getNoFields(i);
+    if (nNrm == 1 || (nNrm == 2 && anasol))
+      n = res;
+    else
+      n = rec;
+  }
 
   if (!prefix)
-    return s[k];
+    return n[j-1];
 
-  return prefix + std::string(" ") + s[k];
-}
-
-
-bool ADNorm::hasElementContributions (size_t i, size_t j) const
-{
-  return i > 1 || j != 2;
+  return prefix + std::string(" ") + n[j-1];
 }

@@ -156,29 +156,29 @@ public:
   double getElementTau(size_t e) const { return e > tauE.size() ? 0 : tauE(e); }
 
   //! \brief Defines which FE quantities are needed by the integrand.
-  virtual int getIntegrandType() const;
+  int getIntegrandType() const override;
 
   using IntegrandBase::getLocalIntegral;
   //! \brief Returns a local integral container for the given element.
   //! \param[in] nen Number of nodes on element
   //! \param[in] neumann Whether or not we are assembling Neumann BCs
-  virtual LocalIntegral* getLocalIntegral(size_t nen, size_t,
-                                          bool neumann) const;
+  LocalIntegral* getLocalIntegral(size_t nen, size_t,
+                                  bool neumann) const override;
 
   using IntegrandBase::finalizeElement;
   //! \brief Finalizes the element quantities after the numerical integration.
   //! \details This method is invoked once for each element, after the numerical
   //! integration loop over interior points is finished and before the resulting
   //! element quantities are assembled into their system level equivalents.
-  virtual bool finalizeElement(LocalIntegral& elmInt);
+  bool finalizeElement(LocalIntegral& elmInt) override;
 
   using IntegrandBase::evalInt;
   //! \brief Evaluates the integrand at an interior point.
   //! \param elmInt The local integral object to receive the contributions
   //! \param[in] fe Finite element data of current integration point
   //! \param[in] X Cartesian coordinates of current integration point
-  virtual bool evalInt(LocalIntegral& elmInt, const FiniteElement& fe,
-                       const Vec3& X) const;
+  bool evalInt(LocalIntegral& elmInt, const FiniteElement& fe,
+               const Vec3& X) const override;
 
   using IntegrandBase::evalBou;
   //! \brief Evaluates the integrand at a boundary point.
@@ -186,8 +186,8 @@ public:
   //! \param[in] fe Finite element data of current integration point
   //! \param[in] X Cartesian coordinates of current integration point
   //! \param[in] normal Boundary normal vector at current integration point
-  virtual bool evalBou(LocalIntegral& elmInt, const FiniteElement& fe,
-                       const Vec3& X, const Vec3& normal) const;
+  bool evalBou(LocalIntegral& elmInt, const FiniteElement& fe,
+               const Vec3& X, const Vec3& normal) const override;
 
   using IntegrandBase::evalSol;
   //! \brief Evaluates the secondary solution at a result point.
@@ -195,26 +195,26 @@ public:
   //! \param[in] fe Finite element data at current point
   //! \param[in] X Cartesian coordinates of current point
   //! \param[in] MNPC Nodal point correspondance for the basis function values
-  virtual bool evalSol(Vector& s, const FiniteElement& fe,
-                       const Vec3& X, const std::vector<int>& MNPC) const;
+  bool evalSol(Vector& s, const FiniteElement& fe,
+               const Vec3& X, const std::vector<int>& MNPC) const override;
 
   //! \brief Returns the number of primary/secondary solution field components.
   //! \param[in] fld which field set to consider (1=primary, 2=secondary)
-  virtual size_t getNoFields(int fld = 1) const { return fld > 1 ? nsd : 1; }
+  size_t getNoFields(int fld = 1) const override { return fld > 1 ? nsd : 1; }
   //! \brief Returns the name of the primary solution field.
   //! \param[in] prefix Name prefix
-  virtual std::string getField1Name(size_t, const char* prefix = 0) const;
+  std::string getField1Name(size_t, const char* prefix = 0) const override;
   //! \brief Returns the name of a secondary solution field component.
   //! \param[in] i Field component index
   //! \param[in] prefix Name prefix for all components
-  virtual std::string getField2Name(size_t i, const char* prefix = 0) const;
+  std::string getField2Name(size_t i, const char* prefix = 0) const override;
 
   //! \brief Returns a pointer to an Integrand for solution norm evaluation.
   //! \note The Integrand object is allocated dynamically and has to be deleted
   //! manually when leaving the scope of the pointer variable receiving the
   //! returned pointer value.
   //! \param[in] asol Pointer to analytical solution (optional)
-  virtual NormBase* getNormIntegrand(AnaSol* asol = 0) const;
+  NormBase* getNormIntegrand(AnaSol* asol = 0) const override;
 
   //! \brief Advances the integrand one time step forward.
   virtual void advanceStep() {}
@@ -223,6 +223,10 @@ public:
   AD::FluidProperties& getFluidProperties() { return props; }
   //! \brief Returns a const reference to the fluid properties.
   const AD::FluidProperties& getFluidProperties() const { return props; }
+
+  //! \brief Defines the solution mode before the element assembly is started.
+  //! \param[in] mode The solution mode to use
+  void setMode(SIM::SolutionMode mode) override;
 
 protected:
   VecFunc*  Uad;      //!< Pointer to advection field
@@ -243,19 +247,16 @@ protected:
 
 
 /*!
-  \brief Class representing the integrand of Advection-Diffusion energy norms
-  for stationary simulations.
+  \brief Class representing the integrand of Advection-Diffusion energy norms.
 */
 
 class AdvectionDiffusionNorm : public NormBase
 {
 public:
   //! \brief The only constructor initializes its data members.
-  //! \param[in] p The Advection-Diffusion problem to evaluate norms for
-  //! \param[in] u Analytical solution field
-  //! \param[in] du Analytical gradient field
-  AdvectionDiffusionNorm(AdvectionDiffusion& p,
-                         RealFunc* u = nullptr, VecFunc* du = nullptr);
+  //! \param[in] p The heat equation problem to evaluate norms for
+  //! \param[in] a The analytical aolution (optional)
+  AdvectionDiffusionNorm(AdvectionDiffusion& p, AnaSol* a = nullptr);
   //! \brief Empty destructor.
   virtual ~AdvectionDiffusionNorm() {}
 
@@ -264,66 +265,25 @@ public:
   //! \param elmInt The local integral object to receive the contributions
   //! \param[in] fe Finite element data of current integration point
   //! \param[in] X Cartesian coordinates of current integration point
-  virtual bool evalInt(LocalIntegral& elmInt, const FiniteElement& fe,
-                       const Vec3& X) const;
+  bool evalInt(LocalIntegral& elmInt, const FiniteElement& fe,
+               const Vec3& X) const override;
+
+  //! \brief Returns the number of norm groups or size of a specified group.
+  //! \param[in] group The norm group to return the size of
+  //! (if zero, return the number of groups)
+  size_t getNoFields(int group = 0) const override;
+
+  //! \brief Returns the name of a norm quantity.
+  //! \param[in] i The norm group (one-based index)
+  //! \param[in] j The norm number (one-based index)
+  //! \param[in] prefix Common prefix for all norm names
+  std::string getName(size_t i, size_t j, const char* prefix) const override;
 
   using NormBase::finalizeElement;
   //! \brief Finalizes the element norms after the numerical integration.
   //! \details This method is used to compute effectivity indices.
-  virtual bool finalizeElement(LocalIntegral& elmInt);
-
-  //! \brief Returns the number of norm groups or size of a specified group.
-  //! \param[in] group The norm group to return the size of
-  //! (if zero, return the number of groups)
-  virtual size_t getNoFields(int group = 0) const;
-
-  //! \brief Returns the name of a norm quantity.
-  //! \param[in] i The norm group (one-based index)
-  //! \param[in] j The norm number (one-based index)
-  //! \param[in] prefix Common prefix for all norm names
-  virtual std::string getName(size_t i, size_t j, const char* prefix) const;
-
-protected:
-  RealFunc* phi;     //!< Analytical solution field
-  VecFunc*  gradPhi; //!< Analytical gradient field
-};
-
-
-/*!
-  \brief Class representing the integrand of Advection-Diffusion energy norms.
-*/
-
-class ADNorm : public NormBase
-{
-public:
-  //! \brief The only constructor initializes its data members.
-  //! \param[in] p The heat equation problem to evaluate norms for
-  //! \param[in] a The analytical aolution (optional)
-  ADNorm(AdvectionDiffusion& p, AnaSol* a = nullptr);
-  //! \brief Empty destructor.
-  virtual ~ADNorm() {}
-
-  using NormBase::evalInt;
-  //! \brief Evaluates the integrand at an interior point.
   //! \param elmInt The local integral object to receive the contributions
-  //! \param[in] fe Finite element data of current integration point
-  //! \param[in] X Cartesian coordinates of current integration point
-  virtual bool evalInt(LocalIntegral& elmInt, const FiniteElement& fe,
-                       const Vec3& X) const;
-
-  //! \brief Returns the number of norm groups or size of a specified group.
-  //! \param[in] group The norm group to return the size of
-  //! (if zero, return the number of groups)
-  virtual size_t getNoFields(int group = 0) const;
-
-  //! \brief Returns the name of a norm quantity.
-  //! \param[in] i The norm group (one-based index)
-  //! \param[in] j The norm number (one-based index)
-  //! \param[in] prefix Common prefix for all norm names
-  virtual std::string getName(size_t i, size_t j, const char* prefix) const;
-
-  //! \brief Returns whether a norm quantity stores element contributions.
-  virtual bool hasElementContributions(size_t i, size_t j) const;
+  bool finalizeElement(LocalIntegral&) override;
 
 private:
   AnaSol* anasol; //!< Analytical solution

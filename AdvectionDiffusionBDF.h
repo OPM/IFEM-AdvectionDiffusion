@@ -49,7 +49,7 @@ public:
   //! \brief Initializes current element for numerical integration.
   //! \param[in] MNPC Matrix of nodal point correspondance for current element
   //! \param A Local integral for element
-  virtual bool initElement(const std::vector<int>& MNPC, LocalIntegral& A);
+  bool initElement(const std::vector<int>& MNPC, LocalIntegral& A) override;
 
   using AdvectionDiffusion::finalizeElement;
   //! \brief Finalizes the element quantities after the numerical integration.
@@ -57,7 +57,7 @@ public:
   //! integration loop over interior points is finished and before the resulting
   //! element quantities are assembled into their system level equivalents.
   //! It is used here to add stabilization terms to the element matrices.
-  virtual bool finalizeElement(LocalIntegral&);
+  bool finalizeElement(LocalIntegral&) override;
 
   using AdvectionDiffusion::evalInt;
   //! \brief Evaluates the integrand at an interior point.
@@ -65,27 +65,31 @@ public:
   //! \param[in] fe Finite element data of current integration point
   //! \param[in] time Parameters for time-dependent simulations
   //! \param[in] X Cartesian coordinates of current integration point
-  virtual bool evalInt(LocalIntegral& elmInt, const FiniteElement& fe,
-                       const TimeDomain& time, const Vec3& X) const;
+  bool evalInt(LocalIntegral& elmInt, const FiniteElement& fe,
+               const TimeDomain& time, const Vec3& X) const override;
 
   //! \brief Returns the integrand type.
-  virtual int getIntegrandType() const
+  int getIntegrandType() const override
   {
     return stab == NONE ? STANDARD : SECOND_DERIVATIVES | G_MATRIX;
   }
 
   //! \brief Advances the time stepping scheme.
-  virtual void advanceStep() { bdf.advanceStep(); }
+  void advanceStep() override { bdf.advanceStep(); }
 
   //! \brief Returns a pointer to an Integrand for solution norm evaluation.
   //! \note The Integrand object is allocated dynamically and has to be deleted
   //! manually when leaving the scope of the pointer variable receiving the
   //! returned pointer value.
   //! \param[in] asol Pointer to analytical solution (optional)
-  virtual NormBase* getNormIntegrand(AnaSol* asol = 0) const;
+  NormBase* getNormIntegrand(AnaSol* asol = 0) const override;
 
   //! \brief Registers where we can inject a mixed-basis vector field.
-  virtual void setNamedFields(const std::string&, Fields*);
+  void setNamedFields(const std::string&, Fields*) override;
+
+  //! \brief Defines the solution mode before the element assembly is started.
+  //! \param[in] mode The solution mode to use
+  void setMode(SIM::SolutionMode mode) override;
 
 protected:
   bool      ALEformulation; //!< Formulation switch (STANDARD or ALE)
