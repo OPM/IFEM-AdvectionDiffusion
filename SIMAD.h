@@ -339,7 +339,8 @@ public:
     if (Dim::opt.saveNorms)
       results |= DataExporter::NORMS;
 
-    exporter.registerField("u","temperature",DataExporter::SIM,results, prefix);
+    exporter.registerField("u","temperature",DataExporter::SIM,
+                           results, prefix);
     exporter.setFieldValue("u", this, &this->getSolution(0));
   }
 
