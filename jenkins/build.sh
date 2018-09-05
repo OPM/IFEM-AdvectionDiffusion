@@ -19,11 +19,13 @@ function clone_ifem {
 # Downstreams and revisions
 declare -a downstreams
 downstreams=(IFEM-Stokes
-             IFEM-NavierStokes)
+             IFEM-NavierStokes
+             IFEM-Boussinesq)
 
 declare -A downstreamRev
 downstreamRev[IFEM-Stokes]=master
 downstreamRev[IFEM-NavierStokes]=master
+downstreamRev[IFEM-Boussinesq]=master
 
 IFEM_REVISION=master
 if grep -qi "ifem=" <<< $ghprbCommentBody
