@@ -17,6 +17,7 @@
 #include "SIMExplicitRK.h"
 #include "SIMExplicitRKE.h"
 #include "SIMSolverAdap.h"
+#include "SIMSolverKRef.h"
 #include "SIMAD.h"
 #include "AdvectionDiffusionArgs.h"
 #include "AdvectionDiffusionBDF.h"
@@ -55,6 +56,28 @@ int runSimulatorStationary (char* infile, AD& model)
 
   return solver.solveProblem(infile,"Solving Advection-Diffusion problem");
 }
+
+
+#ifdef HAS_PETSC
+template<class Dim>
+int runSimulatorK(char* infile)
+{
+  typename SIMAD<Dim>::SetupProps props;
+  AdvectionDiffusion integrand(Dim::dimension);
+  props.integrand = &integrand;
+  props.standalone = true;
+  SIMKRefWrap<SIMAD<Dim>> model(props), model2(props);
+  SIMSolverKRef<SIMAD<Dim>> solver(model, model2);
+
+  if (!solver.read(infile))
+    return 1;
+
+  if (model.opt.dumpHDF5(infile))
+    solver.handleDataOutput(model.opt.hdf5);
+
+  return solver.solveProblem(infile,"Solving Advection-Diffusion problem");
+}
+#endif
 
 
 /*!
@@ -166,6 +189,7 @@ int main (int argc, char** argv)
   utl::profiler->start("Initialization");
 
   char* infile = nullptr;
+  bool kref = false;
   AdvectionDiffusionArgs args;
 
   IFEM::Init(argc,argv,"Advection-Diffusion solver");
@@ -174,6 +198,8 @@ int main (int argc, char** argv)
       ; // ignore the input file on the second pass
     else if (SIMoptions::ignoreOldOptions(argc,argv,i))
       ; // ignore the obsolete option
+    else if (!strcmp(argv[i],"-kref"))
+      kref = true;
     else if (!infile) {
       infile = argv[i];
       if (!args.readXML(infile,false))
@@ -200,8 +226,20 @@ int main (int argc, char** argv)
   IFEM::getOptions().print(IFEM::cout) << std::endl;
   utl::profiler->stop("Initialization");
 
-  if (args.dim == 2)
-    return runSimulator<SIM2D>(infile,args);
-  else
-    return runSimulator<SIM3D>(infile,args);
+  if (kref) {
+#ifndef HAS_PETSC
+    std::cerr << "K-refinement requested, but built without PETSc support. Bailing.." << std::endl;
+    return 1;
+#else
+    if (args.dim == 2)
+      return runSimulatorK<SIM2D>(infile);
+    else
+      return runSimulatorK<SIM3D>(infile);
+#endif
+  } else {
+    if (args.dim == 2)
+      return runSimulator<SIM2D>(infile,args);
+    else
+      return runSimulator<SIM3D>(infile,args);
+  }
 }
