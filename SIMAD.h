@@ -288,13 +288,18 @@ public:
       return true;
 
     int iDump = 1 + tp.step/Dim::opt.saveInc;
+    if (tp.iter > 0)
+      iDump = tp.iter;
     if (!this->writeGlvS1(this->getSolution(0),iDump,nBlock,
                           tp.time.t,"temperature",89))
       return false;
     else if (!standalone)
       return true;
 
-    return this->writeGlvStep(iDump,tp.time.t);
+    if (tp.iter > 0)
+      return this->writeGlvStep(iDump,iDump,1);
+    else
+      return this->writeGlvStep(iDump,tp.time.t);
   }
 
   //! \brief Serialize internal state for restarting purposes.
