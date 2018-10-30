@@ -20,10 +20,10 @@ Max temperature    : 0.261109
   step = 10  time = 1
 L2-norm            : 0.0534274
 Max temperature    : 0.28049
-L2 norm |t^h| = (t^h,t^h)^0.5       : 0.0476064
-H1 norm |t^h| = a(t^h,t^h)^0.5      : 0.0275339
-L2 norm |t|   = (t,t)^0.5           : 0.0474115
-H1 norm |t|   = a(t,t)^0.5          : 0.147154
-L2 norm |e|   = (e,e)^0,5, e=t-t^h  : 0.000230885
-H1 norm |e|   = a(e,e)^0.5, e=t-t^h : 0.00617404
-Exact relative error (%)            : 4.19563
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.0476064
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.208205
+  L2 norm |T|   = (T,T)^0.5           : 0.0474115
+  H1 norm |T|   = a(T,T)^0.5          : 0.208107
+  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 0.000230885
+  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.00873141
+  Exact relative error (%)            : 0.48698
