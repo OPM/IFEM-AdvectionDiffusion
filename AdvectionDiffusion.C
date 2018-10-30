@@ -407,7 +407,7 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
   for (const Vector& psol : pnorm.psol)
     if (psol.empty()) { // residual
       Vec3 hess;
-      if (this->getIntegrandType() & Integrand::SECOND_DERIVATIVES)
+      if (this->getIntegrandType() & Integrand::SECOND_DERIVATIVES) {
         for (size_t k = 1; k <= hep.getNoSpaceDim(); k++)
           for (size_t j = 1; j <= fe.N.size(); j++) {
             if (this->getIntegrandType() & Integrand::SECOND_DERIVATIVES)
@@ -424,6 +424,7 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
         pnorm[ip++] += kk*kk*res*res*fe.detJxW;
         if (anasol && anasol->getScalarSecSol())
           ip += 2;
+      }
     } else {
       Vec3 rGrad;
       for (size_t k = 0; k < hep.nsd; k++)
