@@ -222,6 +222,7 @@ public:
   {
     PROFILE1("SIMAD::solveStep");
 
+    this->setMode(tp.multiSteps() ? SIM::DYNAMIC : SIM::STATIC);
     if (Dim::msgLevel >= 0 && standalone && tp.multiSteps())
       IFEM::cout <<"\n  step = "<< tp.step <<"  time = "<< tp.time.t << std::endl;
 
