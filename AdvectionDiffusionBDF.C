@@ -166,11 +166,8 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
       elMat.A[0](i,j) += advect*fe.detJxW;
 
       if (stab == SUPG) {
-        double laplace = 0.0;
-        for (size_t k = 1;k <= nsd;k++) {
-          // Diffusion
-          laplace -= fe.d2NdX2(j,k,k);
-        }
+        // Diffusion
+        double laplace = -fe.d2NdX2.trace(j);
         elMat.eMs(i,j) += (props.getDiffusionConstant()*laplace+advect+
                            (props.getMassAdvectionConstant()*bdf[0]/time.dt+
                             props.getReactionConstant()*react)*fe.N(j))*convI;
@@ -198,7 +195,7 @@ bool AdvectionDiffusionBDF::finalizeElement (LocalIntegral& A)
 }
 
 
-void AdvectionDiffusionBDF::setNamedFields(const std::string& name, Fields* field)
+void AdvectionDiffusionBDF::setNamedFields (const std::string& name, Fields* field)
 {
   if (name == "velocity1")
     uFields[0].reset(field);
@@ -219,7 +216,7 @@ NormBase* AdvectionDiffusionBDF::getNormIntegrand (AnaSol* asol) const
 void AdvectionDiffusionBDF::setMode (SIM::SolutionMode mode)
 {
   m_mode = mode;
-  if (mode == SIM::RECOVERY)
+  if (mode >= SIM::RECOVERY)
     primsol.resize(1);
   else if (mode == SIM::STATIC)
     primsol.clear();

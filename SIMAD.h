@@ -258,16 +258,16 @@ public:
   void printFinalNorms(const TimeStep& tp)
   {
     Vectors gNorm;
-    this->setMode(SIM::RECOVERY);
+    this->setMode(SIM::NORMS);
     this->setQuadratureRule(Dim::opt.nGauss[1]);
     if (!this->solutionNorms(tp.time,solution,gNorm))
       return;
     else if (gNorm.empty())
       return;
 
-    IFEM::cout << ">>> Norm summary for AdvectionDiffusion <<<" << std::endl;
-    IFEM::cout <<"  L2 norm |T^h| = (T^h,T^h)^0.5       : "<< gNorm[0](1);
-    IFEM::cout <<"\n  H1 norm |T^h| = a(T^h,T^h)^0.5      : "<< gNorm[0](2);
+    IFEM::cout <<">>> Norm summary for AdvectionDiffusion <<<"
+               <<"\n  L2 norm |T^h| = (T^h,T^h)^0.5       : "<< gNorm[0](1)
+               <<"\n  H1 norm |T^h| = a(T^h,T^h)^0.5      : "<< gNorm[0](2);
     if (this->haveAnaSol() && gNorm[0].size() >= 6)
       IFEM::cout <<"\n  L2 norm |T|   = (T,T)^0.5           : "<< gNorm[0](5)
                  <<"\n  H1 norm |T|   = a(T,T)^0.5          : "<< gNorm[0](3)
