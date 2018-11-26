@@ -106,12 +106,12 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
   double theta=0;
   for (int t=0;t<bdf.getOrder();++t) {
     double val = fe.N.dot(elMat.vec[t+1]);
-    theta += -props.getMassAdvectionConstant()*bdf[1+t]/time.dt*val;
+    theta += -props->getMassAdvectionConstant()*bdf[1+t]/time.dt*val;
   }
 
   double tau=0;
   if (stab == SUPG)
-    tau = StabilizationUtils::getTauPt(time.dt, props.getDiffusivity(),
+    tau = StabilizationUtils::getTauPt(time.dt, props->getDiffusivity(fe),
                                        Vector(U[0].ptr(),nsd), fe.G);
 
   // Integrate source, if defined
@@ -123,9 +123,9 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
   }
 
   double timeCoef = timeMethod == TimeIntegration::THETA ? 0.5 : 1;
-  double mu = props.getDiffusionConstant()*timeCoef;
-  double reac = react*props.getReactionConstant()*timeCoef;
-  double s = props.getMassAdvectionConstant()*bdf[0]/time.dt;
+  double mu = props->getDiffusionConstant(fe)*timeCoef;
+  double reac = react*props->getReactionConstant(fe)*timeCoef;
+  double s = props->getMassAdvectionConstant()*bdf[0]/time.dt;
 
   WeakOps::Laplacian(elMat.A[0], fe, mu);
   WeakOps::Mass(elMat.A[0], fe, s + reac);
@@ -136,9 +136,9 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
     fe.dNdX.multiply(elMat.vec[1], g, true);
     grad = g;
     ResidualOps::Laplacian(elMat.b[0], fe, grad, -mu);
-    theta -= 0.5*props.getMassAdvectionConstant()*U[1]*g;
+    theta -= 0.5*props->getMassAdvectionConstant()*U[1]*g;
     if (reaction)
-      theta -= 0.5*props.getReactionConstant()*(*reaction)(Xt);
+      theta -= 0.5*props->getReactionConstant(fe)*(*reaction)(Xt);
   }
 
   WeakOps::Source(elMat.b.front(), fe, theta);
@@ -161,7 +161,7 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
       double advect = 0.0;
       for (size_t k = 1;k <= nsd; ++k)
         advect += U[0][k-1]*fe.dNdX(j,k);
-      advect *= fe.N(i)*props.getMassAdvectionConstant();
+      advect *= fe.N(i)*props->getMassAdvectionConstant();
 
       elMat.A[0](i,j) += advect*fe.detJxW;
 
@@ -171,9 +171,9 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
           // Diffusion
           laplace -= fe.d2NdX2(j,k,k);
         }
-        elMat.eMs(i,j) += (props.getDiffusionConstant()*laplace+advect+
-                           (props.getMassAdvectionConstant()*bdf[0]/time.dt+
-                            props.getReactionConstant()*react)*fe.N(j))*convI;
+        elMat.eMs(i,j) += (props->getDiffusionConstant(fe)*laplace+advect+
+                           (props->getMassAdvectionConstant()*bdf[0]/time.dt+
+                            props->getReactionConstant(fe)*react)*fe.N(j))*convI;
       }
     }
     if (stab == SUPG)

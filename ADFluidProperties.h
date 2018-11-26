@@ -14,6 +14,8 @@
 #ifndef _AD_FLUID_PROPERTIES_H
 #define _AD_FLUID_PROPERTIES_H
 
+#include "FiniteElement.h"
+
 class TiXmlElement;
 
 
@@ -36,19 +38,19 @@ public:
   FluidProperties();
 
   //! \brief Empty destructor.
-  ~FluidProperties() {}
+  virtual ~FluidProperties() {}
 
   //! \brief Parses material parementers from an XML element.
-  void parse(const TiXmlElement*);
+  virtual void parse(const TiXmlElement*);
 
   //! \brief Prints out fluid properties to the log stream.
-  void printLog() const;
+  virtual void printLog() const;
 
   //! \brief Returns the mass density.
   double getMassDensity() const { return rho; }
 
   //! \brief Returns thermal diffusivity.
-  double getDiffusivity() const { return kappa; }
+  virtual double getDiffusivity(const FiniteElement& fe) const { return kappa; }
 
   //! \brief Returns heat capacity.
   double getHeatCapacity() const { return C; }
@@ -66,10 +68,10 @@ public:
   double getMassAdvectionConstant() const;
 
   //! \brief Returns the diffusion constant acccording to scaling.
-  double getDiffusionConstant() const;
+  virtual double getDiffusionConstant(const FiniteElement& fe) const;
 
   //! \brief Returns the reaction constant acccording to scaling.
-  double getReactionConstant() const;
+  virtual double getReactionConstant(const FiniteElement& fe) const;
 
   //! \brief Get thermal expansion term
   //! \param[in] T Temperature

@@ -30,6 +30,9 @@
 #include "Utilities.h"
 #include "DataExporter.h"
 #include "tinyxml.h"
+#include "TextureMaterial.h"
+
+typedef std::vector<AD::FluidProperties*> MaterialVec; //!< Convenience declaration
 
 
 /*!
@@ -82,6 +85,9 @@ public:
       this->setVTF(nullptr);
     Dim::myProblem = nullptr;
     Dim::myInts.clear();
+    for (AD::FluidProperties* mat : mVec)
+      delete mat;
+    mVec.clear();
   }
 
   using Dim::parse;
@@ -118,6 +124,31 @@ public:
         AD.getFluidProperties().parse(child);
         weakDirBC.getFluidProperties().parse(child);
         AD.getFluidProperties().printLog();
+        AD::FluidProperties *prop = new AD::FluidProperties();
+        prop->parse(child);
+        prop->printLog();
+        mVec.push_back(prop);
+        this->initMaterial(0);
+      }
+      else if (!strcasecmp(child->Value(),"texturematerial")) {
+        Real2DMat domain;
+        for (ASMbase* pch : Dim::myModel)
+          if (pch->getParameterDomain(domain))
+            for (size_t d = 0; d < domain.size(); d++)
+              if (domain[d].front() != 0.0 || domain[d].back() != 1.0)
+              {
+                std::cerr <<" *** Texture material requires unit parametric"
+                          <<" domain, "<< char('u'+d) <<"0 = "
+                          << domain[d].front() <<", "<< char('u'+d) <<"1 = "
+                          << domain[d].back() << std::endl;
+                return false;
+              }
+        int code = this->parseMaterialSet(child,mVec.size());
+        IFEM::cout <<"\tMaterial code "<< code <<":";
+        TextureMaterial *prop = new TextureMaterial();
+        prop->parse(child);
+        prop->printLog();
+        mVec.push_back(prop);
       }
       else if ((value = utl::getValue(child,"advectionfield"))) {
         std::string variables;
@@ -159,6 +190,17 @@ public:
       else
         this->Dim::parse(child);
 
+    return true;
+  }
+
+  //! \brief Initializes material properties for integration of interior terms.
+  //! \param[in] propInd Physical property index
+  virtual bool initMaterial(size_t propInd)
+  {
+    if (propInd >= mVec.size()) propInd = mVec.size()-1;
+
+    AD.setMaterial(mVec[propInd]);
+    weakDirBC.setMaterial(mVec[propInd]);
     return true;
   }
 
@@ -432,6 +474,8 @@ protected:
 private:
   Integrand& AD; //!< Problem integrand definition
   AdvectionDiffusion::WeakDirichlet weakDirBC; //!< Weak Dirichlet integrand
+
+  MaterialVec mVec;      //!< Material data
 
   const Vector* extsol = nullptr; //!< Solution vector for adaptive simulators
   bool standalone = false; //!< If \e true, this simulator owns the VTF object

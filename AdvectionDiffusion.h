@@ -81,16 +81,19 @@ public:
     void setFlux(RealFunc* f) { flux = f; }
 
     //! \brief Returns a reference to the fluid properties.
-    AD::FluidProperties& getFluidProperties() { return props; }
+    AD::FluidProperties& getFluidProperties() { return *props; }
     //! \brief Returns a const reference to the fluid properties.
-    const AD::FluidProperties& getFluidProperties() const { return props; }
+    const AD::FluidProperties& getFluidProperties() const { return *props; }
+
+    //! \brief Sets material for integrand
+    void setMaterial(AD::FluidProperties *mat) { props = mat; }
 
   protected:
     const double CBI;   //!< Model constant
     const double gamma; //!< Adjoint factor
     VecFunc*     Uad;   //!< Pointer to advection field
     RealFunc*    flux;  //!< Pointer to the flux field
-    AD::FluidProperties props; //!< Fluid properties
+    AD::FluidProperties *props; //!< Fluid properties
   };
 
   //! \brief The default constructor initializes all pointers to zero.
@@ -220,9 +223,12 @@ public:
   virtual void advanceStep() {}
 
   //! \brief Returns a reference to the fluid properties.
-  AD::FluidProperties& getFluidProperties() { return props; }
+  AD::FluidProperties& getFluidProperties() { return *props; }
   //! \brief Returns a const reference to the fluid properties.
-  const AD::FluidProperties& getFluidProperties() const { return props; }
+  const AD::FluidProperties& getFluidProperties() const { return *props; }
+
+  //! \brief Sets material for integrand
+  void setMaterial(AD::FluidProperties *mat) { props = mat; }
 
   //! \brief Defines the solution mode before the element assembly is started.
   //! \param[in] mode The solution mode to use
@@ -237,7 +243,7 @@ protected:
   Vector tauE;  //!< Stored tau values - need for norm integration
   int    order; //!< Basis order
 
-  AD::FluidProperties props; //!< Fluid properties
+  AD::FluidProperties *props; //!< Fluid properties
 
   Stabilization stab; //!< The type of stabilization used
   double        Cinv; //!< Stabilization parameter

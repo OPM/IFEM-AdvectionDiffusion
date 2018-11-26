@@ -46,7 +46,7 @@ bool AdvectionDiffusionExplicit::evalInt (LocalIntegral& elmInt,
   if (source)
     WeakOps::Source(elMat.b.front(), fe, (*source)(X));
 
-  WeakOps::Laplacian(elMat.A[1], fe, -props.getDiffusivity());
+  WeakOps::Laplacian(elMat.A[1], fe, -props->getDiffusivity(fe));
   WeakOps::Mass(elMat.A[0], fe, 1.0);
   if (reaction)
     WeakOps::Mass(elMat.A[1], fe, -(*reaction)(X));

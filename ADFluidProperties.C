@@ -74,19 +74,19 @@ double FluidProperties::getMassAdvectionConstant() const
 }
 
 
-double FluidProperties::getDiffusionConstant() const
+double FluidProperties::getDiffusionConstant(const FiniteElement& fe) const
 {
   if (scaling == PR_RA)
     return 1.0/sqrt(Ra*Pr);
 
-  return getDiffusivity();
+  return getDiffusivity(fe);
 }
 
 
-double FluidProperties::getReactionConstant() const
+double FluidProperties::getReactionConstant(const FiniteElement& fe) const
 {
   if (scaling == PR_RA)
-    return 1.0/(sqrt(Ra*Pr)*getDiffusivity());
+    return 1.0/(sqrt(Ra*Pr)*getDiffusivity(fe));
 
   return 1.0;
 }
