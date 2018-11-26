@@ -11,6 +11,7 @@
 //==============================================================================
 
 #include "ADFluidProperties.h"
+#include "FiniteElement.h"
 #include <tinyxml.h>
 
 #include "gtest/gtest.h"
@@ -18,12 +19,13 @@
 TEST(TestFluidProperties, ADPhysical)
 {
   TiXmlDocument doc;
+  FiniteElement fe;
   doc.Parse("<fluidproperties rho=\"2.0\" kappa=\"3.0\" C=\"4.0\"/>");
   AD::FluidProperties props;
   props.parse(doc.RootElement());
 
   EXPECT_FLOAT_EQ(props.getMassDensity(), 2.0);
-  EXPECT_FLOAT_EQ(props.getDiffusivity(), 3.0);
+  EXPECT_FLOAT_EQ(props.getDiffusivity(fe), 3.0);
   EXPECT_FLOAT_EQ(props.getHeatCapacity(), 4.0);
 }
 

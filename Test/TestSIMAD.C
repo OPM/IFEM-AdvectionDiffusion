@@ -11,6 +11,7 @@
 //==============================================================================
 
 #include "AdvectionDiffusionBDF.h"
+#include "FiniteElement.h"
 #include "SIMAD.h"
 #include "SIM2D.h"
 
@@ -18,6 +19,7 @@
 
 TEST(TestSIMAD, Parse)
 {
+  FiniteElement fe;
   AdvectionDiffusionBDF integrand(2, TimeIntegration::BDF2, 0);
   SIMAD<SIM2D,AdvectionDiffusionBDF> sim(integrand, true);
   EXPECT_TRUE(sim.read("Lshape.xinp"));
@@ -26,7 +28,7 @@ TEST(TestSIMAD, Parse)
         static_cast<const AdvectionDiffusionBDF&>(*sim.getProblem());
 
   ASSERT_FLOAT_EQ(ad.getCinv(), 1.0);
-  ASSERT_FLOAT_EQ(ad.getFluidProperties().getDiffusivity(), 1e-6);
+  ASSERT_FLOAT_EQ(ad.getFluidProperties().getDiffusivity(fe), 1e-6);
   ASSERT_FLOAT_EQ(ad.getFluidProperties().getPrandtlNumber(), 0.5);
   EXPECT_EQ(ad.getStabilization(), AdvectionDiffusion::MS);
 }
