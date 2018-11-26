@@ -24,6 +24,7 @@ set(AD_SOURCES AdvectionDiffusion.C
                AdvectionDiffusionArgs.C
                AdvectionDiffusionBDF.C
                AdvectionDiffusionExplicit.C
+               TextureMaterial.C
                ADFluidProperties.C)
 
 add_library(CommonAD STATIC ${AD_SOURCES})

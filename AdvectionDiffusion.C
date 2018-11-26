@@ -81,7 +81,7 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
     if (Uad)
       U = (*Uad)(X);
 
-    WeakOps::Laplacian(elMat.A[0], fe, props.getDiffusivity());
+    WeakOps::Laplacian(elMat.A[0], fe, props->getDiffusivity(fe));
     WeakOps::Mass(elMat.A[0], fe, react);
     WeakOps::Advection(elMat.A[0], fe, U, 1.0);
 
@@ -92,7 +92,7 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
           double convV=0, Lu=0;
           for (size_t k = 1;k <= nsd;k++) {
             convV += U[k-1]*fe.dNdX(i,k);
-            Lu += U[k-1]*fe.dNdX(j,k)-props.getDiffusivity()*fe.d2NdX2(j,k,k);
+            Lu += U[k-1]*fe.dNdX(j,k)-props->getDiffusivity(fe)*fe.d2NdX2(j,k,k);
             elMat.Cv(k) += U[k-1]*fe.detJxW;
           }
           Lu += react*fe.N(j);
@@ -105,8 +105,8 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
         else if (stab == GLS) {
           double Lv=0, Lu=0;
           for (size_t k = 1;k <= nsd;k++) {
-            Lv += U[k-1]*fe.dNdX(i,k)-props.getDiffusivity()*fe.d2NdX2(i,k,k);
-            Lu += U[k-1]*fe.dNdX(j,k)-props.getDiffusivity()*fe.d2NdX2(j,k,k);
+            Lv += U[k-1]*fe.dNdX(i,k)-props->getDiffusivity(fe)*fe.d2NdX2(i,k,k);
+            Lu += U[k-1]*fe.dNdX(j,k)-props->getDiffusivity(fe)*fe.d2NdX2(j,k,k);
             elMat.Cv(k) += U[k-1]*fe.detJxW;
           }
           Lv += react*fe.N(i);
@@ -121,8 +121,8 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
         else if (stab == MS) {
           double Lav=0, Lu=0;
           for (size_t k = 1;k <= nsd;k++) {
-            Lav += -U[k-1]*fe.dNdX(i,k)-props.getDiffusivity()*fe.d2NdX2(i,k,k);
-            Lu += U[k-1]*fe.dNdX(j,k)-props.getDiffusivity()*fe.d2NdX2(j,k,k);
+            Lav += -U[k-1]*fe.dNdX(i,k)-props->getDiffusivity(fe)*fe.d2NdX2(i,k,k);
+            Lu += U[k-1]*fe.dNdX(j,k)-props->getDiffusivity(fe)*fe.d2NdX2(j,k,k);
             elMat.Cv(k) += U[k-1]*fe.detJxW;
           }
           Lav += react*fe.N(i);
@@ -221,7 +221,10 @@ bool AdvectionDiffusion::finalizeElement (LocalIntegral& A)
   ElementInfo& E = static_cast<ElementInfo&>(A);
 
   // Compute stabilization parameter
-  double tau = E.getTau(props.getDiffusivity(), Cinv, order);
+  FiniteElement fe;
+  fe.u = .5;
+  fe.v = .5;
+  double tau = E.getTau(props->getDiffusivity(fe), Cinv, order);
 
   E.eMs *= tau;
   E.eSs *= tau;
@@ -317,8 +320,8 @@ bool AdvectionDiffusion::WeakDirichlet::evalBou (LocalIntegral& elmInt,
 
   double g = flux ? (*flux)(X) : 0.0;
   double An = U*normal;
-  double C = CBI*fabs(props.getDiffusivity())/fe.h;
-  double kap = props.getDiffusivity();
+  double C = CBI*fabs(props->getDiffusivity(fe))/fe.h;
+  double kap = props->getDiffusivity(fe);
 
   // loop over test functions (i) and basis functions (j)
   for (size_t i = 1; i <= fe.N.size(); ++i) {
@@ -377,7 +380,7 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
 
   // Evaluate the FE temperature and thermal conductivity at current point
   double Uh = fe.N.dot(elmInt.vec.front());
-  double kappa = hep.getFluidProperties().getDiffusionConstant();
+  double kappa = hep.getFluidProperties().getDiffusionConstant(fe);
 
   // Evaluate the FE heat flux vector, gradU = dNdX^T * eV
   Vector gradUh;
@@ -419,7 +422,7 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
           U = (*hep.Uad)(X);
         double react = hep.reaction ? (*hep.reaction)(X) : 0.0;
         double res = -kappa*hess.sum() + U*gradUh + react*Uh - f;
-        double kk = fe.h*std::min(1.0/(sqrt(2.0)*sqrt(13.0)),fe.h/(3.0*sqrt(10.0)*hep.props.getDiffusivity()));
+        double kk = fe.h*std::min(1.0/(sqrt(2.0)*sqrt(13.0)),fe.h/(3.0*sqrt(10.0)*hep.props->getDiffusivity(fe)));
         ip++; // unused
         pnorm[ip++] += kk*kk*res*res*fe.detJxW;
         if (anasol && anasol->getScalarSecSol())
