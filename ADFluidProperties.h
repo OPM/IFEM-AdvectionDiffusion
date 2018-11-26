@@ -14,8 +14,7 @@
 #ifndef _AD_FLUID_PROPERTIES_H
 #define _AD_FLUID_PROPERTIES_H
 
-#include "FiniteElement.h"
-
+class FiniteElement;
 class TiXmlElement;
 
 
