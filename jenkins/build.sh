@@ -16,15 +16,20 @@ function clone_ifem {
   fi
 }
 
+# Sidestreams and revisions
+declare -a sidestreams
+sidestreams=(IFEM-Stokes
+             IFEM-NavierStokes)
+
+declare -A sidestreamRev
+sidestreamRev[IFEM-Stokes]=master
+sidestreamRev[IFEM-NavierStokes]=master
+
 # Downstreams and revisions
 declare -a downstreams
-downstreams=(IFEM-Stokes
-             IFEM-NavierStokes
-             IFEM-Boussinesq)
+downstreams=(IFEM-Boussinesq)
 
 declare -A downstreamRev
-downstreamRev[IFEM-Stokes]=master
-downstreamRev[IFEM-NavierStokes]=master
 downstreamRev[IFEM-Boussinesq]=master
 
 IFEM_REVISION=master
@@ -48,6 +53,8 @@ if ! grep -q "with downstreams" <<< $ghprbCommentBody
 then
   exit 0
 fi
+
+clone_sidestreams IFEM-AdvectionDiffusion
 
 build_downstreams IFEM-AdvectionDiffusion
 
