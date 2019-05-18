@@ -7,7 +7,9 @@ Number of nodes       81
 Number of dofs        81
 Number of constraints 32
 Number of unknowns    49
- *** SIMbase::preprocess: No partitioning information for 4 processors found. Using graph partitioning
+Graph partitioning: 16 elements in partition.
+Number of domains     4
+Number of equations   49 (16 on process)
  >>> Starting adaptive simulation based on exact errors <<<
 Adaptive step 1
 L2-norm            : 0.0703498
