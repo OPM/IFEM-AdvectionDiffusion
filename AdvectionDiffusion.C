@@ -418,8 +418,8 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
         if (hep.Uad)
           U = (*hep.Uad)(X);
         double react = hep.reaction ? (*hep.reaction)(X) : 0.0;
-        double res = -kappa*hess.sum() + U*gradUh + react*Uh - f;
-        double kk = fe.h*std::min(1.0/(sqrt(2.0)*sqrt(13.0)),fe.h/(3.0*sqrt(10.0)*hep.props.getDiffusivity()));
+        double res = f + kappa*hess.sum() - U*gradUh - react*Uh;
+        double kk = fe.h;//fe.h*std::min(1.0/(sqrt(2.0)*sqrt(13.0)),fe.h/(3.0*sqrt(10.0)*hep.props.getDiffusivity()));
         ip++; // unused
         pnorm[ip++] += kk*kk*res*res*fe.detJxW;
         if (anasol && anasol->getScalarSecSol())
@@ -496,15 +496,16 @@ std::string AdvectionDiffusionNorm::getName (size_t i, size_t j,
   };
 
   static const char* res[] = {
+    "",
     "|T^h|_res",
+    "",
     "effectivity index"
   };
 
-
+  AdvectionDiffusion& hep = static_cast<AdvectionDiffusion&>(myProblem);
   const char** n = s;
   if (i > 1) {
-    size_t nNrm = this->getNoFields(i);
-    if (nNrm == 1 || (nNrm == 2 && anasol))
+    if (hep.doResidualNorm())
       n = res;
     else
       n = rec;
@@ -514,4 +515,11 @@ std::string AdvectionDiffusionNorm::getName (size_t i, size_t j,
     return n[j-1];
 
   return prefix + std::string(" ") + n[j-1];
+}
+
+
+int AdvectionDiffusionNorm::getIntegrandType () const
+{
+  AdvectionDiffusion& hep = static_cast<AdvectionDiffusion&>(myProblem);
+  return hep.doResidualNorm() ? SECOND_DERIVATIVES | ELEMENT_CORNERS : STANDARD;
 }

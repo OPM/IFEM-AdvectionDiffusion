@@ -1,0 +1,72 @@
+Square-ad-adap-res.xinp -adap
+
+Input file: Square-ad-adap-res.xinp
+Equation solver: 2
+Number of Gauss points: 4
+LR-spline basis functions are used
+Number of elements    64
+Number of nodes       81
+Number of dofs        81
+Number of constraints 32
+Number of unknowns    49
+	Refinement percentage: 10 type=1
+	Refinement scheme: 2
+Pure residual error estimates enabled
+ >>> Starting adaptive simulation based on
+     Pure residuals error estimates (norm group 1) <<<
+Adaptive step 1
+L2-norm            : 0.0703498
+Max temperature    : 0.333333
+Energy norm              a(T^h,T^h)^0.5 : 0.247538
+Exact norm                   a(T,T)^0.5 : 0.247314
+Exact error         a(e,e)^0.5, e=T-T^h : 0.0208584
+Exact relative error (%)                : 8.43399
+Error estimate             |T^h|_res : 0.125968
+Relative error (%) : 91.1701
+Effectivity index  : 6.03921
+Root mean square (RMS) of error      : 0.997473
+Min element error                    : 3.07588e-05
+Max element error                    : 0.0488364
+Average element error                : 0.0111482
+Refining 49 basis functions with errors in range \[0.0175035,0.160098\] 10% of max error (0.0160098)
+Refined mesh: 211 elements 234 nodes.
+Adaptive step 2
+Number of elements    211
+Number of nodes       234
+Number of dofs        234
+Number of constraints 54
+Number of unknowns    180
+L2-norm            : 0.0704152
+Max temperature    : 0.333333
+Energy norm              a(T^h,T^h)^0.5 : 0.24732
+Exact norm                   a(T,T)^0.5 : 0.247314
+Exact error         a(e,e)^0.5, e=T-T^h : 0.0104134
+Exact relative error (%)                : 4.21059
+Error estimate             |T^h|_res : 0.0631065
+Relative error (%) : 74.5369
+Effectivity index  : 6.06015
+Root mean square (RMS) of error      : 0.818224
+Min element error                    : 3.07588e-05
+Max element error                    : 0.0134167
+Average element error                : 0.00336233
+Refining 181 basis functions with errors in range \[0.00487477,0.0487098\] 10% of max error (0.00487098)
+Refined mesh: 754 elements 788 nodes.
+Adaptive step 3
+Number of elements    754
+Number of nodes       788
+Number of dofs        788
+Number of constraints 96
+Number of unknowns    692
+L2-norm            : 0.0703668
+Max temperature    : 0.333333
+Energy norm              a(T^h,T^h)^0.5 : 0.247307
+Exact norm                   a(T,T)^0.5 : 0.247314
+Exact error         a(e,e)^0.5, e=T-T^h : 0.00523276
+Exact relative error (%)                : 2.11584
+Error estimate             |T^h|_res : 0.0317011
+Relative error (%) : 49.0196
+Effectivity index  : 6.0582
+Root mean square (RMS) of error      : 0.715177
+Min element error                    : 3.07588e-05
+Max element error                    : 0.00351516
+Average element error                : 0.000939048

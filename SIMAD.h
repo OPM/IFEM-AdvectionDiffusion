@@ -195,6 +195,10 @@ public:
     std::string str = "temperature1";
     for (n = 0; n < nSols && n < 2; n++, str[11]++)
       this->registerField(str,solution[n]);
+
+    if (this->opt.project.find(SIMoptions::NONE) != this->opt.project.end())
+      AD.setResidualNorm(true);
+
     return true;
   }
 
