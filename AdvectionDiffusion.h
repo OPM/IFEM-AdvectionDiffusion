@@ -158,6 +158,12 @@ public:
   //! \brief Defines which FE quantities are needed by the integrand.
   int getIntegrandType() const override;
 
+  //! \brief Set whether we evaluate residual norm
+  void setResidualNorm(bool on) { residualNorm = on; }
+
+  //! \brief True if we evaluate residual norm
+  bool doResidualNorm() const { return residualNorm; }
+
   using IntegrandBase::getLocalIntegral;
   //! \brief Returns a local integral container for the given element.
   //! \param[in] nen Number of nodes on element
@@ -241,6 +247,7 @@ protected:
 
   Stabilization stab; //!< The type of stabilization used
   double        Cinv; //!< Stabilization parameter
+  bool residualNorm = false; //!< If \e true we will evaluate residual norm
 
   friend class AdvectionDiffusionNorm;
 };
@@ -284,6 +291,9 @@ public:
   //! \details This method is used to compute effectivity indices.
   //! \param elmInt The local integral object to receive the contributions
   bool finalizeElement(LocalIntegral&) override;
+
+  //! \brief Defines which FE quantities are needed by the integrand.
+  int getIntegrandType() const override;
 
 private:
   AnaSol* anasol; //!< Analytical solution
