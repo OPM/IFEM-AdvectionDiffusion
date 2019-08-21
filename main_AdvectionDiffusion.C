@@ -16,6 +16,7 @@
 #include "SIM3D.h"
 #include "SIMExplicitRK.h"
 #include "SIMExplicitRKE.h"
+#include "SIMExplicitLMM.h"
 #include "SIMSolverAdap.h"
 #include "SIMAD.h"
 #include "AdvectionDiffusionArgs.h"
@@ -115,19 +116,27 @@ int runSimulator(char* infile, const AdvectionDiffusionArgs& args)
     AdvectionDiffusionBDF integrand(Dim::dimension,
                                     args.timeMethod,
                                     args.integrandType);
-    SIMAD<Dim,AdvectionDiffusionBDF> model(integrand, true);
+    using ADSIM = SIMAD<Dim,AdvectionDiffusionBDF>;
+    ADSIM model(integrand, true);
     return runSimulatorTransientImpl(infile, model, model);
   }
   else {
-    AdvectionDiffusionExplicit integrand(Dim::dimension, args.integrandType);
-    typedef SIMAD<Dim,AdvectionDiffusionExplicit> ADSIM;
+    AdvectionDiffusionExplicit integrand(Dim::dimension,
+                                         args.timeMethod,
+                                         args.integrandType);
+    using ADSIM = SIMAD<Dim,AdvectionDiffusionExplicit>;
     ADSIM model(integrand, true);
-    if (args.timeMethod >= TimeIntegration::HEUNEULER) {
+    if (args.timeMethod >= TimeIntegration::AB2 &&
+        args.timeMethod <= TimeIntegration::AB5) {
+      TimeIntegration::SIMExplicitLMM<ADSIM> sim(model, args.timeMethod, true, "temperature");
+      sim.setLinear(true);
+      return runSimulatorTransientImpl(infile, sim, model);
+    } else if (args.timeMethod >= TimeIntegration::HEUNEULER) {
       TimeIntegration::SIMExplicitRKE<ADSIM> sim(model, args.timeMethod, args.errTol);
       return runSimulatorTransientImpl(infile, sim, model);
-    }
-    else {
+    } else {
       TimeIntegration::SIMExplicitRK<ADSIM> sim(model, args.timeMethod);
+      sim.setLinear(true);
       return runSimulatorTransientImpl(infile, sim, model);
     }
   }

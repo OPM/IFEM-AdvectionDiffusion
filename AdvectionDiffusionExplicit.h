@@ -15,6 +15,7 @@
 #define _ADVECTION_DIFFUSION_EXPLICIT_H
 
 #include "AdvectionDiffusion.h"
+#include "TimeIntUtils.h"
 
 
 /*!
@@ -28,9 +29,11 @@ class AdvectionDiffusionExplicit : public AdvectionDiffusion
 public:
   //! \brief The default constructor initializes all pointers to zero.
   //! \param[in] n Number of spatial dimensions
+  //! \param[in] method The time integration method to use
   //! \param[in] itg_type The integrand type to use
   //! \param[in] form Integrand formulation
   AdvectionDiffusionExplicit(unsigned short int n = 3,
+                             TimeIntegration::Method method = TimeIntegration::EULER,
                              int itg_type = STANDARD, int form = 0);
 
   //! \brief Empty destructor.
@@ -74,6 +77,9 @@ public:
   //! \brief Defines the solution mode before the element assembly is started.
   //! \param[in] mode The solution mode to use
   void setMode(SIM::SolutionMode mode) override;
+
+protected:
+  TimeIntegration::Method timeMethod; //!< Time stepping method used
 };
 
 #endif

@@ -31,7 +31,7 @@ AdvectionDiffusionBDF::AdvectionDiffusionBDF (unsigned short int n,
     timeMethod(method)
 {
   ALEformulation = useALE;
-  primsol.resize(3);
+  primsol.resize(1+TimeIntegration::Steps(method));
   velocity.resize(2);
   registerVector("velocity1", &velocity[0]);
   registerVector("velocity2", &velocity[1]);
@@ -221,5 +221,5 @@ void AdvectionDiffusionBDF::setMode (SIM::SolutionMode mode)
   else if (mode == SIM::STATIC)
     primsol.clear();
   else
-    primsol.resize(3);
+    primsol.resize(1+bdf.getActualOrder());
 }

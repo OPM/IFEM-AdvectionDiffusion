@@ -18,10 +18,12 @@
 
 
 AdvectionDiffusionExplicit::AdvectionDiffusionExplicit (unsigned short int n,
+                                                        TimeIntegration::Method method,
                                                         int itg_type, int form) :
-  AdvectionDiffusion(n, itg_type == Integrand::STANDARD?NONE:SUPG)
+  AdvectionDiffusion(n, itg_type == Integrand::STANDARD?NONE:SUPG),
+  timeMethod(method)
 {
-  primsol.resize(1);
+  primsol.resize(1 + TimeIntegration::Steps(method));
 }
 
 
@@ -81,5 +83,5 @@ void AdvectionDiffusionExplicit::setMode (SIM::SolutionMode mode)
   if (mode == SIM::STATIC)
     primsol.clear();
   else
-    primsol.resize(1);
+    primsol.resize(1 + TimeIntegration::Steps(timeMethod));
 }
