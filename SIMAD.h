@@ -190,10 +190,10 @@ public:
     AD.setElements(this->getNoElms());
 
     // Initialize temperature solution vectors
-    this->initSolution(this->getNoDOFs(),3);
     size_t n, nSols = this->getNoSolutions();
+    this->initSolution(this->getNoDOFs(),nSols);
     std::string str = "temperature1";
-    for (n = 0; n < nSols && n < 2; n++, str[11]++)
+    for (n = 0; n < nSols; n++, str[11]++)
       this->registerField(str,solution[n]);
 
     if (this->opt.project.find(SIMoptions::NONE) != this->opt.project.end())
