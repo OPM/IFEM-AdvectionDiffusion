@@ -49,6 +49,7 @@ LocalIntegral* AdvectionDiffusion::getLocalIntegral (size_t nen, size_t,
                                                      bool neumann) const
 {
   ElementInfo* result = new ElementInfo(!neumann);
+  result->rhsOnly = m_mode >= SIM::RHS_ONLY;
   result->resize(neumann ? 0 : 1, 1);
   result->redim(nen);
 

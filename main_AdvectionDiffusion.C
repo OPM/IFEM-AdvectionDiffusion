@@ -17,11 +17,13 @@
 #include "SIMExplicitRK.h"
 #include "SIMExplicitRKE.h"
 #include "SIMExplicitLMM.h"
+#include "SIMImplicitLMM.h"
 #include "SIMSolverAdap.h"
 #include "SIMAD.h"
 #include "AdvectionDiffusionArgs.h"
 #include "AdvectionDiffusionBDF.h"
 #include "AdvectionDiffusionExplicit.h"
+#include "AdvectionDiffusionImplicit.h"
 #include "Profiler.h"
 #include <stdlib.h>
 #include <string.h>
@@ -119,8 +121,16 @@ int runSimulator(char* infile, const AdvectionDiffusionArgs& args)
     using ADSIM = SIMAD<Dim,AdvectionDiffusionBDF>;
     ADSIM model(integrand, true);
     return runSimulatorTransientImpl(infile, model, model);
-  }
-  else {
+  } else if (args.timeMethod >= TimeIntegration::AM1 &&
+             args.timeMethod <= TimeIntegration::AM4) {
+    AdvectionDiffusionImplicit integrand(Dim::dimension,
+                                         args.timeMethod,
+                                         args.integrandType);
+    using ADSIM = SIMAD<Dim,AdvectionDiffusionImplicit>;
+    ADSIM model(integrand, true);
+    TimeIntegration::SIMImplicitLMM<ADSIM> sim(model, args.timeMethod, true, "temperature");
+    return runSimulatorTransientImpl(infile, sim, model);
+  } else {
     AdvectionDiffusionExplicit integrand(Dim::dimension,
                                          args.timeMethod,
                                          args.integrandType);

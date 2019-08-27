@@ -1,0 +1,46 @@
+Square-abd2-ad.xinp -am2
+
+1. Advection-Diffusion solver
+Number of elements    16
+Number of nodes       64
+Number of dofs        64
+Number of unknowns    36
+  step = 1  time = 0.1
+L2-norm            : 3.23481e-05
+Max temperature    : 0.000114014
+  step = 2  time = 0.2
+L2-norm            : 0.000164903
+Max temperature    : 0.000600086
+  step = 3  time = 0.3
+L2-norm            : 0.000546667
+Max temperature    : 0.00199659
+  step = 4  time = 0.4
+L2-norm            : 0.00128912
+Max temperature    : 0.00470861
+  step = 5  time = 0.5
+L2-norm            : 0.0025138
+Max temperature    : 0.00918426
+  step = 6  time = 0.6
+L2-norm            : 0.00434039
+Max temperature    : 0.0158584
+  step = 7  time = 0.7
+L2-norm            : 0.00688985
+Max temperature    : 0.0251744
+  step = 8  time = 0.8
+L2-norm            : 0.0102823
+Max temperature    : 0.0375704
+  step = 9  time = 0.9
+L2-norm            : 0.0146383
+Max temperature    : 0.0534877
+  step = 10  time = 1
+L2-norm            : 0.0200783
+Max temperature    : 0.0733656
+  Time integration completed.
+>>> Norm summary for AdvectionDiffusion <<<
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.025403
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.124444
+  L2 norm |T|   = (T,T)^0.5           : 0.0253968
+  H1 norm |T|   = a(T,T)^0.5          : 0.124419
+  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 6.29023e-06
+  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 2.80335e-05
+  Exact relative error (%)            : 0.0247678
