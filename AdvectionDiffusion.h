@@ -234,11 +234,16 @@ public:
   //! \param[in] mode The solution mode to use
   void setMode(SIM::SolutionMode mode) override;
 
+  //! \brief Set time scaling factor from ODE solver.
+  //! \param scale Time scaling factor
+  void setTimeScale(double scale) { timeScale = scale; }
+
 protected:
   VecFunc*  Uad;      //!< Pointer to advection field
   RealFunc* reaction; //!< Pointer to the reaction field
   RealFunc* source;   //!< Pointer to source field
   RealFunc* flux;     //!< Pointer to the flux field
+  double timeScale = 1.0; //!< Time scale factor
 
   Vector tauE;  //!< Stored tau values - need for norm integration
   int    order; //!< Basis order

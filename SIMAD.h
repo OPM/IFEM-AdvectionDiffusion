@@ -434,6 +434,10 @@ public:
                                         "temperature ", outPrec);
   }
 
+  //! \brief Set time scaling factor from ODE solver.
+  //! \param scale Time scaling factor
+  void setTimeScale(double scale) { AD.setTimeScale(scale); }
+
 protected:
   //! \brief Initializes for integration of Neumann terms for a given property.
   //! \param[in] propInd Physical property index

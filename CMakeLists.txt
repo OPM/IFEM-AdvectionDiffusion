@@ -24,6 +24,7 @@ set(AD_SOURCES AdvectionDiffusion.C
                AdvectionDiffusionArgs.C
                AdvectionDiffusionBDF.C
                AdvectionDiffusionExplicit.C
+               AdvectionDiffusionImplicit.C
                ADFluidProperties.C)
 
 add_library(CommonAD STATIC ${AD_SOURCES})
@@ -70,6 +71,10 @@ if(NOT MPI_FOUND OR IFEM_SERIAL_TESTS_IN_PARALLEL)
                    Square-abd2-ad-ab3.reg
                    Square-abd2-ad-ab4.reg
                    Square-abd2-ad-ab5.reg
+                   Square-abd2-ad-am1.reg
+                   Square-abd2-ad-am2.reg
+                   Square-abd2-ad-am3.reg
+                   Square-abd2-ad-am4.reg
                    Square-abd2-ad-bdf2.reg
                    Square-abd2-ad-be.reg
                    Square-abd2-ad-bs.reg
