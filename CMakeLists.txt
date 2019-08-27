@@ -65,6 +65,7 @@ if(NOT MPI_FOUND OR IFEM_SERIAL_TESTS_IN_PARALLEL)
                    Square-abd1-ad-heun.reg
                    Square-abd1-ad-rk3.reg
                    Square-abd1-ad-rk4.reg
+                   Square-abd2-ad-ab1.reg
                    Square-abd2-ad-ab2.reg
                    Square-abd2-ad-ab3.reg
                    Square-abd2-ad-ab4.reg

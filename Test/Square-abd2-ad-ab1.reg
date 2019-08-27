@@ -1,0 +1,171 @@
+Square-abd2-ad-explicit-lmm.xinp -ab1
+
+Input file: Square-abd2-ad-explicit-lmm.xinp
+Equation solver: 2
+Number of Gauss points: 4
+Number of elements    16
+Number of nodes       64
+Number of dofs        64
+Number of unknowns    36
+
+Loading initial condition for "temperature1" component 0
+from expression function: f = 4\*pow(x-x\*x,2); g = 4\*pow(y-y\*y,2); h = pow(0.5,3); f\*g\*h
+  step = 1  time = 0.501
+L2-norm            : 0.00252428
+Max temperature    : 0.00922385
+  step = 2  time = 0.502
+L2-norm            : 0.00253939
+Max temperature    : 0.00927908
+  step = 3  time = 0.503
+L2-norm            : 0.00255457
+Max temperature    : 0.00933454
+  step = 4  time = 0.504
+L2-norm            : 0.00256981
+Max temperature    : 0.00939021
+  step = 5  time = 0.505
+L2-norm            : 0.0025851
+Max temperature    : 0.00944611
+  step = 6  time = 0.506
+L2-norm            : 0.00260046
+Max temperature    : 0.00950223
+  step = 7  time = 0.507
+L2-norm            : 0.00261588
+Max temperature    : 0.00955857
+  step = 8  time = 0.508
+L2-norm            : 0.00263136
+Max temperature    : 0.00961513
+  step = 9  time = 0.509
+L2-norm            : 0.0026469
+Max temperature    : 0.00967192
+  step = 10  time = 0.51
+L2-norm            : 0.0026625
+Max temperature    : 0.00972893
+  step = 11  time = 0.511
+L2-norm            : 0.00267817
+Max temperature    : 0.00978617
+  step = 12  time = 0.512
+L2-norm            : 0.00269389
+Max temperature    : 0.00984363
+  step = 13  time = 0.513
+L2-norm            : 0.00270968
+Max temperature    : 0.00990131
+  step = 14  time = 0.514
+L2-norm            : 0.00272553
+Max temperature    : 0.00995922
+  step = 15  time = 0.515
+L2-norm            : 0.00274144
+Max temperature    : 0.0100174
+  step = 16  time = 0.516
+L2-norm            : 0.00275741
+Max temperature    : 0.0100757
+  step = 17  time = 0.517
+L2-norm            : 0.00277344
+Max temperature    : 0.0101343
+  step = 18  time = 0.518
+L2-norm            : 0.00278954
+Max temperature    : 0.0101931
+  step = 19  time = 0.519
+L2-norm            : 0.0028057
+Max temperature    : 0.0102522
+  step = 20  time = 0.52
+L2-norm            : 0.00282192
+Max temperature    : 0.0103115
+  step = 21  time = 0.521
+L2-norm            : 0.0028382
+Max temperature    : 0.010371
+  step = 22  time = 0.522
+L2-norm            : 0.00285455
+Max temperature    : 0.0104307
+  step = 23  time = 0.523
+L2-norm            : 0.00287096
+Max temperature    : 0.0104906
+  step = 24  time = 0.524
+L2-norm            : 0.00288743
+Max temperature    : 0.0105508
+  step = 25  time = 0.525
+L2-norm            : 0.00290397
+Max temperature    : 0.0106113
+  step = 26  time = 0.526
+L2-norm            : 0.00292057
+Max temperature    : 0.0106719
+  step = 27  time = 0.527
+L2-norm            : 0.00293723
+Max temperature    : 0.0107328
+  step = 28  time = 0.528
+L2-norm            : 0.00295395
+Max temperature    : 0.0107939
+  step = 29  time = 0.529
+L2-norm            : 0.00297074
+Max temperature    : 0.0108553
+  step = 30  time = 0.53
+L2-norm            : 0.0029876
+Max temperature    : 0.0109168
+  step = 31  time = 0.531
+L2-norm            : 0.00300451
+Max temperature    : 0.0109786
+  step = 32  time = 0.532
+L2-norm            : 0.00302149
+Max temperature    : 0.0110407
+  step = 33  time = 0.533
+L2-norm            : 0.00303854
+Max temperature    : 0.011103
+  step = 34  time = 0.534
+L2-norm            : 0.00305564
+Max temperature    : 0.0111655
+  step = 35  time = 0.535
+L2-norm            : 0.00307282
+Max temperature    : 0.0112282
+  step = 36  time = 0.536
+L2-norm            : 0.00309005
+Max temperature    : 0.0112912
+  step = 37  time = 0.537
+L2-norm            : 0.00310735
+Max temperature    : 0.0113544
+  step = 38  time = 0.538
+L2-norm            : 0.00312472
+Max temperature    : 0.0114179
+  step = 39  time = 0.539
+L2-norm            : 0.00314215
+Max temperature    : 0.0114816
+  step = 40  time = 0.54
+L2-norm            : 0.00315965
+Max temperature    : 0.0115455
+  step = 41  time = 0.541
+L2-norm            : 0.00317721
+Max temperature    : 0.0116097
+  step = 42  time = 0.542
+L2-norm            : 0.00319483
+Max temperature    : 0.0116741
+  step = 43  time = 0.543
+L2-norm            : 0.00321252
+Max temperature    : 0.0117387
+  step = 44  time = 0.544
+L2-norm            : 0.00323028
+Max temperature    : 0.0118036
+  step = 45  time = 0.545
+L2-norm            : 0.0032481
+Max temperature    : 0.0118687
+  step = 46  time = 0.546
+L2-norm            : 0.00326599
+Max temperature    : 0.0119341
+  step = 47  time = 0.547
+L2-norm            : 0.00328394
+Max temperature    : 0.0119997
+  step = 48  time = 0.548
+L2-norm            : 0.00330196
+Max temperature    : 0.0120655
+  step = 49  time = 0.549
+L2-norm            : 0.00332005
+Max temperature    : 0.0121316
+  step = 50  time = 0.55
+L2-norm            : 0.0033382
+Max temperature    : 0.012198
+  Time integration completed.
+>>> Norm summary for AdvectionDiffusion <<<
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.0042234
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.000654286
+  L2 norm |T|   = (T,T)^0.5           : 0.0042254
+  H1 norm |T|   = a(T,T)^0.5          : 0.000654596
+  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 1.99821e-06
+  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 3.09393e-07
+  Exact relative error (%)            : 0.0472905
