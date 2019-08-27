@@ -126,7 +126,7 @@ int runSimulator(char* infile, const AdvectionDiffusionArgs& args)
                                          args.integrandType);
     using ADSIM = SIMAD<Dim,AdvectionDiffusionExplicit>;
     ADSIM model(integrand, true);
-    if (args.timeMethod >= TimeIntegration::AB2 &&
+    if (args.timeMethod >= TimeIntegration::AB1 &&
         args.timeMethod <= TimeIntegration::AB5) {
       TimeIntegration::SIMExplicitLMM<ADSIM> sim(model, args.timeMethod, true, "temperature");
       sim.setLinear(true);
