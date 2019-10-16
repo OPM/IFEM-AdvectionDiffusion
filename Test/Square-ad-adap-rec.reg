@@ -18,6 +18,10 @@ Energy norm              a(T^h,T^h)^0.5 : 0.247538
 Exact norm                   a(T,T)^0.5 : 0.247314
 Exact error         a(e,e)^0.5, e=T-T^h : 0.0208584
 Exact relative error (%)                : 8.43399
+Error estimates based on >>> Continuous global L2-projection <<<
+  H1 norm |T^r-T^h|                  : 0.0199447
+  H1 norm |T^r-T|                    : 0.006106
+  Effectivity index eta^rec          : 0.956193
 Error estimate a(e,e)^0.5, e=T^r-T^h : 0.0199447
 Relative error (%) : 33.1478
 Effectivity index  : 0.956193
@@ -40,6 +44,10 @@ Energy norm              a(T^h,T^h)^0.5 : 0.247319
 Exact norm                   a(T,T)^0.5 : 0.247314
 Exact error         a(e,e)^0.5, e=T-T^h : 0.0104102
 Exact relative error (%)                : 4.20932
+Error estimates based on >>> Continuous global L2-projection <<<
+  H1 norm |T^r-T^h|                  : 0.0101668
+  H1 norm |T^r-T|                    : 0.00224588
+  Effectivity index eta^rec          : 0.976617
 Error estimate a(e,e)^0.5, e=T^r-T^h : 0.0101668
 Relative error (%) : 17.7275
 Effectivity index  : 0.976617
@@ -62,6 +70,10 @@ Energy norm              a(T^h,T^h)^0.5 : 0.247307
 Exact norm                   a(T,T)^0.5 : 0.247314
 Exact error         a(e,e)^0.5, e=T-T^h : 0.00522134
 Exact relative error (%)                : 2.11122
+Error estimates based on >>> Continuous global L2-projection <<<
+  H1 norm |T^r-T^h|                  : 0.00515417
+  H1 norm |T^r-T|                    : 0.000841267
+  Effectivity index eta^rec          : 0.987137
 Error estimate a(e,e)^0.5, e=T^r-T^h : 0.00515417
 Relative error (%) : 9.10589
 Effectivity index  : 0.987137
