@@ -476,6 +476,32 @@ protected:
     delete norm;
   }
 
+  //! \brief Prints a norm group to the log stream.
+  void printNormGroup(const Vector& rNorm, const Vector& fNorm,
+                      const std::string& name) const override
+  {
+    IFEM::cout << "\nError estimates based on >>> " << name << " <<<";
+    size_t w = 36;
+    if (name == "Pure residuals")
+      IFEM::cout << "\n  Residual norm"
+                 << utl::adjustRight(w-15,"") << rNorm[1]
+                 << "\n  Effectivity index eta^res"
+                 << utl::adjustRight(w-27,"")
+                 << this->getEffectivityIndex(Vectors{fNorm, rNorm},1,2);
+    else {
+      IFEM::cout << "\n  H1 norm |T^r-T^h|"
+                 << utl::adjustRight(w-19,"") << rNorm[1];
+      if (rNorm.size() > 3) {
+        IFEM::cout << "\n  H1 norm |T^r-T|"
+                   << utl::adjustRight(w-17,"") << rNorm[2]
+                   << "\n  Effectivity index eta^rec"
+                   << utl::adjustRight(w-27,"")
+                   << this->getEffectivityIndex(Vectors{fNorm, rNorm},1,2);
+      }
+    }
+  }
+
+
 private:
   Integrand& AD; //!< Problem integrand definition
   AdvectionDiffusion::WeakDirichlet weakDirBC; //!< Weak Dirichlet integrand
