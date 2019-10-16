@@ -21,6 +21,9 @@ Energy norm              a(T^h,T^h)^0.5 : 0.247538
 Exact norm                   a(T,T)^0.5 : 0.247314
 Exact error         a(e,e)^0.5, e=T-T^h : 0.0208584
 Exact relative error (%)                : 8.43399
+Error estimates based on >>> Pure residuals <<<
+  Residual norm                      : 0.125968
+  Effectivity index eta^res          : 6.03921
 Error estimate             |T^h|_res : 0.125968
 Relative error (%) : 91.1701
 Effectivity index  : 6.03921
@@ -42,6 +45,9 @@ Energy norm              a(T^h,T^h)^0.5 : 0.24732
 Exact norm                   a(T,T)^0.5 : 0.247314
 Exact error         a(e,e)^0.5, e=T-T^h : 0.0104134
 Exact relative error (%)                : 4.21059
+Error estimates based on >>> Pure residuals <<<
+  Residual norm                      : 0.0631065
+  Effectivity index eta^res          : 6.06015
 Error estimate             |T^h|_res : 0.0631065
 Relative error (%) : 74.5369
 Effectivity index  : 6.06015
@@ -63,6 +69,9 @@ Energy norm              a(T^h,T^h)^0.5 : 0.247307
 Exact norm                   a(T,T)^0.5 : 0.247314
 Exact error         a(e,e)^0.5, e=T-T^h : 0.00523276
 Exact relative error (%)                : 2.11584
+Error estimates based on >>> Pure residuals <<<
+  Residual norm                      : 0.0317011
+  Effectivity index eta^res          : 6.0582
 Error estimate             |T^h|_res : 0.0317011
 Relative error (%) : 49.0196
 Effectivity index  : 6.0582
