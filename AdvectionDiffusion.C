@@ -17,12 +17,11 @@
 #include "AnaSol.h"
 #include "Function.h"
 #include "Vec3Oper.h"
-#include "Utilities.h"
 
 
 AdvectionDiffusion::AdvectionDiffusion (unsigned short int n,
                                         AdvectionDiffusion::Stabilization s)
-  : IntegrandBase(n), order(1), stab(s), Cinv(5.0)
+  : IntegrandBase(n), order(1), stab(s), Cinv(5.0), residualNorm(false)
 {
   primsol.resize(1);
 
@@ -168,15 +167,10 @@ bool AdvectionDiffusion::evalBou (LocalIntegral& elmInt,
 }
 
 
-bool AdvectionDiffusion::evalSol (Vector& s, const FiniteElement& fe,
-                                  const Vec3&,
-                                  const std::vector<int>& MNPC) const
+bool AdvectionDiffusion::evalSol2 (Vector& s, const Vectors& eV,
+                                   const FiniteElement& fe, const Vec3&) const
 {
-  Vector ePhi;
-  if (utl::gather(MNPC,1,primsol.front(),ePhi) > 0)
-    return false;
-
-  return fe.dNdX.multiply(ePhi,s,true);
+  return eV.empty() ? false : fe.dNdX.multiply(eV.front(),s,true);
 }
 
 
@@ -291,16 +285,7 @@ LocalIntegral* AdvectionDiffusion::WeakDirichlet::getLocalIntegral (size_t nen,
 bool AdvectionDiffusion::WeakDirichlet::initElementBou (const std::vector<int>& MNPC,
                                                         LocalIntegral& A)
 {
-  int ierr = 0;
-  size_t nvec = primsol.size();
-  for (size_t i = 0; i < nvec && !primsol[i].empty() && ierr == 0; i++)
-    ierr = utl::gather(MNPC,1,primsol[i],A.vec[i]);
-
-  if (ierr == 0) return true;
-
-  std::cerr <<" *** AdvectionDiffusion::WeakDirichlet::initElementBou: Detected "
-            << ierr <<" node numbers out of range."<< std::endl;
-  return false;
+  return this->IntegrandBase::initElement(MNPC,A);
 }
 
 

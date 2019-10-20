@@ -195,32 +195,30 @@ public:
   bool evalBou(LocalIntegral& elmInt, const FiniteElement& fe,
                const Vec3& X, const Vec3& normal) const override;
 
-  using IntegrandBase::evalSol;
   //! \brief Evaluates the secondary solution at a result point.
   //! \param[out] s Array of solution field values at current point
+  //! \param[in] eV Element-level primary solution vectors
   //! \param[in] fe Finite element data at current point
-  //! \param[in] X Cartesian coordinates of current point
-  //! \param[in] MNPC Nodal point correspondance for the basis function values
-  bool evalSol(Vector& s, const FiniteElement& fe,
-               const Vec3& X, const std::vector<int>& MNPC) const override;
+  bool evalSol2(Vector& s, const Vectors& eV,
+                const FiniteElement& fe, const Vec3&) const override;
 
   //! \brief Returns the number of primary/secondary solution field components.
   //! \param[in] fld which field set to consider (1=primary, 2=secondary)
-  size_t getNoFields(int fld = 1) const override { return fld > 1 ? nsd : 1; }
+  size_t getNoFields(int fld) const override { return fld > 1 ? nsd : 1; }
   //! \brief Returns the name of the primary solution field.
   //! \param[in] prefix Name prefix
-  std::string getField1Name(size_t, const char* prefix = 0) const override;
+  std::string getField1Name(size_t, const char* prefix) const override;
   //! \brief Returns the name of a secondary solution field component.
   //! \param[in] i Field component index
   //! \param[in] prefix Name prefix for all components
-  std::string getField2Name(size_t i, const char* prefix = 0) const override;
+  std::string getField2Name(size_t i, const char* prefix) const override;
 
   //! \brief Returns a pointer to an Integrand for solution norm evaluation.
   //! \note The Integrand object is allocated dynamically and has to be deleted
   //! manually when leaving the scope of the pointer variable receiving the
   //! returned pointer value.
   //! \param[in] asol Pointer to analytical solution (optional)
-  NormBase* getNormIntegrand(AnaSol* asol = 0) const override;
+  NormBase* getNormIntegrand(AnaSol* asol) const override;
 
   //! \brief Advances the integrand one time step forward.
   virtual void advanceStep() {}
@@ -252,7 +250,7 @@ protected:
 
   Stabilization stab; //!< The type of stabilization used
   double        Cinv; //!< Stabilization parameter
-  bool residualNorm = false; //!< If \e true we will evaluate residual norm
+  bool  residualNorm; //!< If \e true, we will evaluate residual norm
 
   friend class AdvectionDiffusionNorm;
 };
