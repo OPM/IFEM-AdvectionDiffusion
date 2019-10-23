@@ -10,74 +10,70 @@ Enabled projection(s): Continuous global L2-projection
  >>> Starting adaptive simulation based on
      Continuous global L2-projection error estimates (norm group 1) <<<
 Adaptive step 1
-L2-norm            : 0.0703498
-Max temperature    : 0.333333
-Projecting secondary solution ...
-	Continuous global L2-projection
-Energy norm              a(T^h,T^h)^0.5 : 0.247538
-Exact norm                   a(T,T)^0.5 : 0.247314
-Exact error         a(e,e)^0.5, e=T-T^h : 0.0208584
-Exact relative error (%)                : 8.43399
+Energy norm              a(T^h,T^h)^0.5 : 0.135588
+Exact norm                   a(T,T)^0.5 : 0.135459
+Exact error         a(e,e)^0.5, e=T-T^h : 0.0114247
+Exact relative error (%)                : 8.43402
 Error estimates based on >>> Continuous global L2-projection <<<
-  H1 norm |T^r-T^h|                  : 0.0199447
-  H1 norm |T^r-T|                    : 0.006106
-  Effectivity index eta^rec          : 0.956193
-Error estimate a(e,e)^0.5, e=T^r-T^h : 0.0199447
-Relative error (%) : 33.1478
-Effectivity index  : 0.956193
-Root mean square (RMS) of error      : 0.94744
-Min element error                    : 5.6288e-06
-Max element error                    : 0.00771462
-Average element error                : 0.0018098
-Refining 50 basis functions with errors in range \[0.00271649,0.0242887\] 10% of max error (0.00242887)
+  H1 norm |T^r-T^h|                  : 0.0109273
+  H1 norm |T^r-T|                    : 0.00333434
+  Effectivity index eta^rec          : 0.956463
+Error estimate a(e,e)^0.5, e=T^r-T^h : 0.0109273
+Relative error (%) : 18.9033
+Effectivity index  : 0.956463
+Root mean square (RMS) of error      : 0.947684
+Min element error                    : 3.08336e-06
+Max element error                    : 0.0042274
+Average element error                : 0.000991428
+Refining 50 basis functions with errors in range \[0.00148772,0.0133136\] 10% of max error (0.00133136)
 Adaptive step 2
 Number of elements    214
 Number of nodes       238
 Number of dofs        238
 Number of constraints 55
 Number of unknowns    183
-L2-norm            : 0.069821
+L2-norm            : 0.0698201
 Max temperature    : 0.333333
 Projecting secondary solution ...
 	Continuous global L2-projection
-Energy norm              a(T^h,T^h)^0.5 : 0.247319
-Exact norm                   a(T,T)^0.5 : 0.247314
-Exact error         a(e,e)^0.5, e=T-T^h : 0.0104102
+Energy norm              a(T^h,T^h)^0.5 : 0.135464
+Exact norm                   a(T,T)^0.5 : 0.135459
+Exact error         a(e,e)^0.5, e=T-T^h : 0.00570192
 Exact relative error (%)                : 4.20932
 Error estimates based on >>> Continuous global L2-projection <<<
-  H1 norm |T^r-T^h|                  : 0.0101668
-  H1 norm |T^r-T|                    : 0.00224588
-  Effectivity index eta^rec          : 0.976617
-Error estimate a(e,e)^0.5, e=T^r-T^h : 0.0101668
-Relative error (%) : 17.7275
-Effectivity index  : 0.976617
-Root mean square (RMS) of error      : 0.783537
-Min element error                    : 5.71602e-06
-Max element error                    : 0.00224729
-Average element error                : 0.00054706
-Refining 185 basis functions with errors in range \[0.000772819,0.00759008\] 10% of max error (0.000759008)
+  H1 norm |T^r-T^h|                  : 0.00556922
+  H1 norm |T^r-T|                    : 0.00122728
+  Effectivity index eta^rec          : 0.976727
+Error estimate a(e,e)^0.5, e=T^r-T^h : 0.00556922
+Relative error (%) : 9.81962
+Effectivity index  : 0.976727
+Root mean square (RMS) of error      : 0.783647
+Min element error                    : 3.13089e-06
+Max element error                    : 0.00123131
+Average element error                : 0.000299655
+Refining 185 basis functions with errors in range \[0.000423284,0.00415853\] 10% of max error (0.000415853)
 Adaptive step 3
 Number of elements    769
 Number of nodes       802
 Number of dofs        802
 Number of constraints 95
 Number of unknowns    707
-L2-norm            : 0.0697497
+L2-norm            : 0.0697495
 Max temperature    : 0.333333
 Projecting secondary solution ...
 	Continuous global L2-projection
-Energy norm              a(T^h,T^h)^0.5 : 0.247307
-Exact norm                   a(T,T)^0.5 : 0.247314
-Exact error         a(e,e)^0.5, e=T-T^h : 0.00522134
+Energy norm              a(T^h,T^h)^0.5 : 0.135456
+Exact norm                   a(T,T)^0.5 : 0.135459
+Exact error         a(e,e)^0.5, e=T-T^h : 0.00285984
 Exact relative error (%)                : 2.11122
 Error estimates based on >>> Continuous global L2-projection <<<
-  H1 norm |T^r-T^h|                  : 0.00515417
-  H1 norm |T^r-T|                    : 0.000841267
-  Effectivity index eta^rec          : 0.987137
-Error estimate a(e,e)^0.5, e=T^r-T^h : 0.00515417
-Relative error (%) : 9.10589
-Effectivity index  : 0.987137
-Root mean square (RMS) of error      : 0.686846
-Min element error                    : 4.91794e-06
-Max element error                    : 0.000605533
-Average element error                : 0.000153207
+  H1 norm |T^r-T^h|                  : 0.00282316
+  H1 norm |T^r-T|                    : 0.000460157
+  Effectivity index eta^rec          : 0.987173
+Error estimate a(e,e)^0.5, e=T^r-T^h : 0.00282316
+Relative error (%) : 5.00224
+Effectivity index  : 0.987173
+Root mean square (RMS) of error      : 0.686885
+Min element error                    : 2.69367e-06
+Max element error                    : 0.000331733
+Average element error                : 8.39163e-05
