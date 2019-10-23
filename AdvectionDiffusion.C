@@ -430,12 +430,12 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
       for (size_t k = 0; k < hep.nsd; k++)
         rGrad[k] += psol.dot(fe.N,k,hep.nsd);
 
-      pnorm[ip++] += rGrad*rGrad*fe.detJxW;
+      pnorm[ip++] += kappa*rGrad*rGrad*fe.detJxW;
       // Recovery based estimate
-      pnorm[ip++] += (rGrad-gradUh)*(rGrad-gradUh)*fe.detJxW;
+      pnorm[ip++] += kappa*(rGrad-gradUh)*(rGrad-gradUh)*fe.detJxW;
 
       if (anasol && anasol->getScalarSecSol()) {
-        pnorm[ip++] += (dT-rGrad)*(dT-rGrad)*fe.detJxW;
+        pnorm[ip++] += kappa*(dT-rGrad)*(dT-rGrad)*fe.detJxW;
         ip++; // effectivity index
       }
     }
