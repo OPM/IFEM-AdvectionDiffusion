@@ -40,4 +40,4 @@ Max temperature    : 2.24392
   H1 norm |T|   = a(T,T)^0.5          : 1.68063
   L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 0.000686353
   H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.0082561
-  Exact relative error (%)            : 0.127955
+  Exact relative error (%)            : 0.491251

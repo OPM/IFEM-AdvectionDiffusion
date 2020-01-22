@@ -17,10 +17,14 @@ Pure residual error estimates enabled
 Adaptive step 1
 L2-norm            : 0.0703498
 Max temperature    : 0.333333
-Energy norm              a(T^h,T^h)^0.5 : 0.247538
-Exact norm                   a(T,T)^0.5 : 0.247314
-Exact error         a(e,e)^0.5, e=T-T^h : 0.0208584
-Exact relative error (%)                : 8.43399
+>>> Norm summary for AdvectionDiffusion <<<
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.056767
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.247538
+  L2 norm |T|   = (T,T)^0.5           : 0.0563436
+  H1 norm |T|   = a(T,T)^0.5          : 0.247314
+  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 0.000572013
+  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.0208584
+  Exact relative error (%)            : 8.43399
 Error estimates based on >>> Pure residuals <<<
   Residual norm                      : 0.125968
   Effectivity index eta^res          : 6.03921
@@ -41,10 +45,14 @@ Number of constraints 54
 Number of unknowns    180
 L2-norm            : 0.0704152
 Max temperature    : 0.333333
-Energy norm              a(T^h,T^h)^0.5 : 0.24732
-Exact norm                   a(T,T)^0.5 : 0.247314
-Exact error         a(e,e)^0.5, e=T-T^h : 0.0104134
-Exact relative error (%)                : 4.21059
+>>> Norm summary for AdvectionDiffusion <<<
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.056442
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.24732
+  L2 norm |T|   = (T,T)^0.5           : 0.0563436
+  H1 norm |T|   = a(T,T)^0.5          : 0.247314
+  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 0.000139722
+  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.0104134
+  Exact relative error (%)            : 4.21059
 Error estimates based on >>> Pure residuals <<<
   Residual norm                      : 0.0631065
   Effectivity index eta^res          : 6.06015
@@ -65,10 +73,14 @@ Number of constraints 96
 Number of unknowns    692
 L2-norm            : 0.0703668
 Max temperature    : 0.333333
-Energy norm              a(T^h,T^h)^0.5 : 0.247307
-Exact norm                   a(T,T)^0.5 : 0.247314
-Exact error         a(e,e)^0.5, e=T-T^h : 0.00523276
-Exact relative error (%)                : 2.11584
+>>> Norm summary for AdvectionDiffusion <<<
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.0563674
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.247307
+  L2 norm |T|   = (T,T)^0.5           : 0.0563436
+  H1 norm |T|   = a(T,T)^0.5          : 0.247314
+  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 3.60383e-05
+  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.00523276
+  Exact relative error (%)            : 2.11584
 Error estimates based on >>> Pure residuals <<<
   Residual norm                      : 0.0317011
   Effectivity index eta^res          : 6.0582
