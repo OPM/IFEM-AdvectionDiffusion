@@ -10,10 +10,14 @@ Enabled projection(s): Continuous global L2-projection
  >>> Starting adaptive simulation based on
      Continuous global L2-projection error estimates (norm group 1) <<<
 Adaptive step 1
-Energy norm              a(T^h,T^h)^0.5 : 0.135588
-Exact norm                   a(T,T)^0.5 : 0.135459
-Exact error         a(e,e)^0.5, e=T-T^h : 0.0114247
-Exact relative error (%)                : 8.43402
+>>> Norm summary for AdvectionDiffusion <<<
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.0567639
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.135588
+  L2 norm |T|   = (T,T)^0.5           : 0.0563436
+  H1 norm |T|   = a(T,T)^0.5          : 0.135459
+  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 0.000569312
+  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.0114247
+  Exact relative error (%)            : 8.43402
 Error estimates based on >>> Continuous global L2-projection <<<
   H1 norm |T^r-T^h|                  : 0.0109273
   H1 norm |T^r-T|                    : 0.00333434
@@ -36,10 +40,14 @@ L2-norm            : 0.0698201
 Max temperature    : 0.333333
 Projecting secondary solution ...
 	Continuous global L2-projection
-Energy norm              a(T^h,T^h)^0.5 : 0.135464
-Exact norm                   a(T,T)^0.5 : 0.135459
-Exact error         a(e,e)^0.5, e=T-T^h : 0.00570192
-Exact relative error (%)                : 4.20932
+>>> Norm summary for AdvectionDiffusion <<<
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.0564411
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.135464
+  L2 norm |T|   = (T,T)^0.5           : 0.0563436
+  H1 norm |T|   = a(T,T)^0.5          : 0.135459
+  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 0.000138679
+  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.00570192
+  Exact relative error (%)            : 4.20932
 Error estimates based on >>> Continuous global L2-projection <<<
   H1 norm |T^r-T^h|                  : 0.00556922
   H1 norm |T^r-T|                    : 0.00122728
@@ -62,10 +70,14 @@ L2-norm            : 0.0697495
 Max temperature    : 0.333333
 Projecting secondary solution ...
 	Continuous global L2-projection
-Energy norm              a(T^h,T^h)^0.5 : 0.135456
-Exact norm                   a(T,T)^0.5 : 0.135459
-Exact error         a(e,e)^0.5, e=T-T^h : 0.00285984
-Exact relative error (%)                : 2.11122
+>>> Norm summary for AdvectionDiffusion <<<
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.0563673
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.135456
+  L2 norm |T|   = (T,T)^0.5           : 0.0563436
+  H1 norm |T|   = a(T,T)^0.5          : 0.135459
+  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 3.5641e-05
+  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.00285984
+  Exact relative error (%)            : 2.11122
 Error estimates based on >>> Continuous global L2-projection <<<
   H1 norm |T^r-T^h|                  : 0.00282316
   H1 norm |T^r-T|                    : 0.000460157

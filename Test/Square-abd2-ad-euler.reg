@@ -310,4 +310,4 @@ Max temperature    : 0.0158393
   H1 norm |T|   = a(T,T)^0.5          : 0.0268744
   L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 1.84437e-06
   H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 8.23774e-06
-  Exact relative error (%)            : 0.0336214
+  Exact relative error (%)            : 0.0306528

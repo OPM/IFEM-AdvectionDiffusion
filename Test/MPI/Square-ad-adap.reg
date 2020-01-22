@@ -14,10 +14,14 @@ Number of equations   49 (16 on process)
 Adaptive step 1
 L2-norm            : 0.0703498
 Max temperature    : 0.333333
-Energy norm              a(T^h,T^h)^0.5 : 0.247538
-Exact norm                   a(T,T)^0.5 : 0.247314
-Exact error         a(e,e)^0.5, e=T-T^h : 0.0208584
-Exact relative error (%)                : 8.43399
+>>> Norm summary for AdvectionDiffusion <<<
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.056767
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.247538
+  L2 norm |T|   = (T,T)^0.5           : 0.0563436
+  H1 norm |T|   = a(T,T)^0.5          : 0.247314
+  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 0.000572013
+  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.0208584
+  Exact relative error (%)            : 8.43399
 Root mean square (RMS) of error      : 0.965235
 Min element error                    : 1.9328e-05
 Max element error                    : 0.00808375
@@ -32,10 +36,14 @@ Number of constraints 55
 Number of unknowns    183
 L2-norm            : 0.069821
 Max temperature    : 0.333333
-Energy norm              a(T^h,T^h)^0.5 : 0.247319
-Exact norm                   a(T,T)^0.5 : 0.247314
-Exact error         a(e,e)^0.5, e=T-T^h : 0.0104102
-Exact relative error (%)                : 4.20932
+>>> Norm summary for AdvectionDiffusion <<<
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.056442
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.247319
+  L2 norm |T|   = (T,T)^0.5           : 0.0563436
+  H1 norm |T|   = a(T,T)^0.5          : 0.247314
+  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 0.000139436
+  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.0104102
+  Exact relative error (%)            : 4.20932
 Root mean square (RMS) of error      : 0.791463
 Min element error                    : 1.2117e-05
 Max element error                    : 0.00221066
@@ -50,10 +58,14 @@ Number of constraints 96
 Number of unknowns    698
 L2-norm            : 0.0700995
 Max temperature    : 0.333333
-Energy norm              a(T^h,T^h)^0.5 : 0.247307
-Exact norm                   a(T,T)^0.5 : 0.247314
-Exact error         a(e,e)^0.5, e=T-T^h : 0.00522775
-Exact relative error (%)                : 2.11381
+>>> Norm summary for AdvectionDiffusion <<<
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.0563675
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.247307
+  L2 norm |T|   = (T,T)^0.5           : 0.0563436
+  H1 norm |T|   = a(T,T)^0.5          : 0.247314
+  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 3.58438e-05
+  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.00522775
+  Exact relative error (%)            : 2.11381
 Root mean square (RMS) of error      : 0.680999
 Min element error                    : 8.16742e-06
 Max element error                    : 0.000578205

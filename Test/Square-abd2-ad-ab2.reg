@@ -170,4 +170,4 @@ Max temperature    : 0.0122037
   H1 norm |T|   = a(T,T)^0.5          : 0.000654596
   L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 2.97456e-09
   H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 4.39512e-10
-  Exact relative error (%)            : 7.03972e-05
+  Exact relative error (%)            : 6.71425e-05

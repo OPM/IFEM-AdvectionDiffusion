@@ -312,17 +312,7 @@ public:
     else if (gNorm.empty())
       return;
 
-    IFEM::cout <<">>> Norm summary for AdvectionDiffusion <<<"
-               <<"\n  L2 norm |T^h| = (T^h,T^h)^0.5       : "<< gNorm[0](1)
-               <<"\n  H1 norm |T^h| = a(T^h,T^h)^0.5      : "<< gNorm[0](2);
-    if (this->haveAnaSol() && gNorm[0].size() >= 6)
-      IFEM::cout <<"\n  L2 norm |T|   = (T,T)^0.5           : "<< gNorm[0](5)
-                 <<"\n  H1 norm |T|   = a(T,T)^0.5          : "<< gNorm[0](3)
-                 <<"\n  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : "<< gNorm[0](6)
-                 <<"\n  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : "<< gNorm[0](4)
-                 <<"\n  Exact relative error (%)            : "
-                 << gNorm[0](6)/gNorm[0](5)*100.0;
-    IFEM::cout << std::endl;
+    this->printExactNorms(gNorm.front());
   }
 
   //! \brief Saves the converged results to VTF file of a given time step.
@@ -451,6 +441,24 @@ protected:
     return true;
   }
 
+  //! \brief Prints solution norms to the log stream.
+  //! \param[in] gNorm The norm values
+  void printExactNorms(const Vector& gNorm) const
+  {
+    IFEM::cout <<">>> Norm summary for AdvectionDiffusion <<<"
+               <<"\n  L2 norm |T^h| = (T^h,T^h)^0.5       : "<< gNorm(1)
+               <<"\n  H1 norm |T^h| = a(T^h,T^h)^0.5      : "<< gNorm(2);
+    if (this->haveAnaSol() && gNorm.size() >= 6)
+      IFEM::cout <<"\n  L2 norm |T|   = (T,T)^0.5           : "<< gNorm(5)
+                 <<"\n  H1 norm |T|   = a(T,T)^0.5          : "<< gNorm(3)
+                 <<"\n  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : "<< gNorm(6)
+                 <<"\n  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : "<< gNorm(4)
+                 <<"\n  Exact relative error (%)            : "
+                 << gNorm(4)/gNorm(3)*100.0;
+    IFEM::cout << std::endl;
+
+  }
+
   //! \brief Prints integrated solution norms to the log stream.
   //! \param[in] norms The norm values
   //! \param[in] w Total number of characters in the norm labels
@@ -461,15 +469,7 @@ protected:
     NormBase* norm = this->getNormIntegrand();
     const Vector& n = norms.front();
 
-    IFEM::cout <<"Energy norm"
-      << utl::adjustRight(w-8,norm->getName(1,2)) << n(2);
-
-    if (this->haveAnaSol() && n.size() >= 4)
-      IFEM::cout <<"\nExact norm"
-        << utl::adjustRight(w-7,norm->getName(1,3)) << n(3)
-        <<"\nExact error"
-        << utl::adjustRight(w-8,norm->getName(1,4)) << n(4)
-        <<"\nExact relative error (%)                : "<< 100.0*n(4)/n(3);
+    this->printExactNorms(norms.front());
 
     size_t j = 0;
     for (const auto& prj : Dim::opt.project)
