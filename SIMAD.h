@@ -169,6 +169,13 @@ public:
        utl::getAttribute(child,"max",maxSubIt);
        utl::getAttribute(child,"tol",subItTol);
       }
+      else if (strcasecmp(child->Value(),"advection") == 0) {
+        const char* value = child->FirstChild()->Value();
+        if (!strcasecmp(value, "convective"))
+          AD.setAdvectionForm(WeakOperators::CONVECTIVE);
+        else if (!strcasecmp(value, "conservative"))
+          AD.setAdvectionForm(WeakOperators::CONSERVATIVE);
+      }
       else
         this->Dim::parse(child);
 
