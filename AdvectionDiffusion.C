@@ -83,7 +83,7 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
 
     WeakOps::Laplacian(elMat.A[0], fe, props.getDiffusivity());
     WeakOps::Mass(elMat.A[0], fe, react);
-    WeakOps::Advection(elMat.A[0], fe, U, 1.0);
+    WeakOps::Advection(elMat.A[0], fe, U, 1.0, advForm);
 
     // loop over test functions (i) and basis functions (j)
     for (size_t i = 1; i <= fe.N.size(); i++)
