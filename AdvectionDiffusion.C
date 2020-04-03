@@ -418,3 +418,30 @@ int AdvectionDiffusionNorm::getIntegrandType () const
   AdvectionDiffusion& hep = static_cast<AdvectionDiffusion&>(myProblem);
   return hep.doResidualNorm() ? SECOND_DERIVATIVES | ELEMENT_CORNERS : STANDARD;
 }
+
+
+AdvectionDiffusion::Robin::Robin(unsigned short int n, const AdvectionDiffusion& itg) :
+  IntegrandBase(n),
+  integrand(itg)
+{
+}
+
+
+bool AdvectionDiffusion::Robin::evalBou(LocalIntegral& elmInt, const FiniteElement& fe,
+                                        const Vec3& X, const Vec3& normal) const
+{
+  ElmMats& elMat = static_cast<ElmMats&>(elmInt);
+  if (integrand.getAdvForm() != WeakOperators::CONSERVATIVE) {
+    std::cerr << "Robin boundary conditions only implemented for conservative form." << std::endl;
+    return false;
+  }
+
+  Vec3 ax = alpha ? (*alpha)(X) : Vec3(1.0, 1.0, 1.0);
+  if (g)
+    ax[1] = (*g)(X);
+
+  elMat.A[0].outer_product(fe.N, fe.N, true, fe.detJxW * ax[0]); // mass
+  elMat.b[0].add(fe.N, fe.detJxW * ax[1]); // source
+
+  return true;
+}

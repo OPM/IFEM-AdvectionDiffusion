@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<simulation>
+
+  <!-- General - geometry definitions !-->
+  <geometry dim="2" sets="true" Lx="2" Ly="2"X0="-1 -1">
+    <raiseorder patch="1" u="1" v="1"/>
+    <refine patch="1" u="3" v="3"/>
+  </geometry>
+
+  <!-- General - boundary conditions !-->
+  <boundaryconditions>
+    <robin set="Edge1" type="expression" direction="-1">1.0|-2.0</robin>
+    <robin set="Edge2" type="expression">-2.0</robin>
+    <dirichlet set="Edge3" comp="1" type="expression">1-x*x</dirichlet>
+    <robin set="Edge4" comp="1" type="expression">1-x*x</robin>
+  </boundaryconditions>
+
+  <!-- Problem-specific block !-->
+  <advectiondiffusion>
+    <advection>conservative</advection>
+    <advectionfield>2|0</advectionfield>
+    <source type="expression">-4*x + 2</source>
+    <anasol type="expression">
+      <primary>1-x*x</primary>
+      <secondary>-2*x | 0.0</secondary>
+    </anasol>
+  </advectiondiffusion>
+
+  <discretization>
+    <nGauss>3</nGauss>
+  </discretization>
+
+</simulation>
