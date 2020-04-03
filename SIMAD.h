@@ -56,7 +56,7 @@ public:
   //! \param[in] alone Integrand is used stand-alone (controls time stepping)
   explicit SIMAD(Integrand& ad, bool alone = false) :
     SIMMultiPatchModelGen<Dim>(1), AD(ad),
-    weakDirBC(Dim::dimension, 4.0, 1.0), inputContext("advectiondiffusion")
+    inputContext("advectiondiffusion")
   {
     standalone = alone;
     Dim::myProblem = &AD;
@@ -66,7 +66,7 @@ public:
   //! \brief Constructs from given properties.
   explicit SIMAD(const SetupProps& props) :
     SIMMultiPatchModelGen<Dim>(1), AD(*props.integrand),
-    weakDirBC(Dim::dimension, 4.0, 1.0), inputContext("advectiondiffusion")
+    inputContext("advectiondiffusion")
   {
     standalone = props.standalone;
     Dim::myProblem = &AD;
@@ -131,14 +131,12 @@ public:
       }
       else if (!strcasecmp(child->Value(),"fluidproperties")) {
         AD.getFluidProperties().parse(child);
-        weakDirBC.getFluidProperties().parse(child);
         AD.getFluidProperties().printLog();
       }
       else if ((value = utl::getValue(child,"advectionfield"))) {
         std::string variables;
         utl::getAttribute(child,"variables",variables);
         AD.setAdvectionField(new VecFuncExpr(value,variables));
-        weakDirBC.setAdvectionField(new VecFuncExpr(value,variables));
         IFEM::cout <<"Advection field: "<< value;
         if (!variables.empty())
           IFEM::cout <<" (variables: "<< variables <<")";
@@ -212,7 +210,7 @@ public:
     for (Property& p : Dim::myProps)
       if (p.pcode == Property::ROBIN) {
         if (Dim::myInts.find(p.pindx) == Dim::myInts.end())
-          Dim::myInts.insert(std::make_pair(p.pindx,&weakDirBC));
+          ;//Dim::myInts.insert(std::make_pair(p.pindx,&weakDirBC));
       } else if (p.pcode == Property::DIRICHLET_ANASOL) {
         if (!Dim::mySol->getScalarSol())
           p.pcode = Property::UNDEFINED;
@@ -436,7 +434,6 @@ protected:
     typename Dim::SclFuncMap::const_iterator tit = Dim::myScalars.find(propInd);
     if (tit == Dim::myScalars.end()) return false;
 
-    weakDirBC.setFlux(tit->second);
     AD.setFlux(tit->second);
     return true;
   }
@@ -508,7 +505,6 @@ protected:
 
 private:
   Integrand& AD; //!< Problem integrand definition
-  AdvectionDiffusion::WeakDirichlet weakDirBC; //!< Weak Dirichlet integrand
 
   const Vector* extsol = nullptr; //!< Solution vector for adaptive simulators
   bool standalone = false; //!< If \e true, this simulator owns the VTF object

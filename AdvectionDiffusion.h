@@ -36,63 +36,6 @@ public:
   //! \brief Enum defining the available stabilization methods.
   enum Stabilization { NONE, SUPG, GLS, MS };
 
-  //! \brief Class representing the weak Dirichlet integrand.
-  class WeakDirichlet : public IntegrandBase
-  {
-  public:
-    //! \brief Default constructor.
-    //! \param[in] n Number of spatial dimensions
-    //! \param[in] CBI_ Model constant
-    //! \param[in] gamma_ Adjoint factor
-    WeakDirichlet(unsigned short int n, double CBI_ = 4, double gamma_ = 1.0);
-    //! \brief The destructor deletes the advection field.
-    virtual ~WeakDirichlet();
-
-    //! \brief Returns that this integrand has no interior contributions.
-    virtual bool hasInteriorTerms() const { return false; }
-
-    //! \brief Defines which FE quantities are needed by the integrand.
-    virtual int getIntegrandType() const { return ELEMENT_CORNERS; }
-
-    using IntegrandBase::getLocalIntegral;
-    //! \brief Returns a local integral contribution object for given element.
-    //! \param[in] nen Number of nodes on element
-    virtual LocalIntegral* getLocalIntegral(size_t nen, size_t, bool) const;
-
-    using IntegrandBase::initElementBou;
-    //! \brief Initializes current element for boundary integration.
-    //! \param[in] MNPC Matrix of nodal point correspondance for current element
-    //! \param elmInt Local integral for element
-    virtual bool initElementBou(const std::vector<int>& MNPC,
-                                LocalIntegral& elmInt);
-
-    using IntegrandBase::evalBou;
-    //! \brief Evaluates the integrand at a boundary point.
-    //! \param elmInt The local integral object to receive the contributions
-    //! \param[in] fe Finite element data of current integration point
-    //! \param[in] X Cartesian coordinates of current integration point
-    //! \param[in] normal Boundary normal vector at current integration point
-    virtual bool evalBou(LocalIntegral& elmInt, const FiniteElement& fe,
-                         const Vec3& X, const Vec3& normal) const;
-
-    //! \brief Defines the advection field.
-    void setAdvectionField(VecFunc* U) { Uad = U; }
-    //! \brief Defines the flux function.
-    void setFlux(RealFunc* f) { flux = f; }
-
-    //! \brief Returns a reference to the fluid properties.
-    AD::FluidProperties& getFluidProperties() { return props; }
-    //! \brief Returns a const reference to the fluid properties.
-    const AD::FluidProperties& getFluidProperties() const { return props; }
-
-  protected:
-    const double CBI;   //!< Model constant
-    const double gamma; //!< Adjoint factor
-    VecFunc*     Uad;   //!< Pointer to advection field
-    RealFunc*    flux;  //!< Pointer to the flux field
-    AD::FluidProperties props; //!< Fluid properties
-  };
-
   //! \brief The default constructor initializes all pointers to zero.
   //! \param[in] n Number of spatial dimensions
   //! \param[in] s Stabilization option
