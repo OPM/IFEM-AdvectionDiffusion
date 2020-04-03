@@ -55,7 +55,9 @@ public:
   //! \param[in] ad Integrand for advection-diffusion problem
   //! \param[in] alone Integrand is used stand-alone (controls time stepping)
   explicit SIMAD(Integrand& ad, bool alone = false) :
-    SIMMultiPatchModelGen<Dim>(1), AD(ad),
+    SIMMultiPatchModelGen<Dim>(1),
+    AD(ad),
+    robinBC(Dim::dimension, ad),
     inputContext("advectiondiffusion")
   {
     standalone = alone;
@@ -65,7 +67,9 @@ public:
 
   //! \brief Constructs from given properties.
   explicit SIMAD(const SetupProps& props) :
-    SIMMultiPatchModelGen<Dim>(1), AD(*props.integrand),
+    SIMMultiPatchModelGen<Dim>(1),
+    AD(*props.integrand),
+    robinBC(Dim::dimension, AD),
     inputContext("advectiondiffusion")
   {
     standalone = props.standalone;
@@ -217,7 +221,7 @@ public:
     for (Property& p : Dim::myProps)
       if (p.pcode == Property::ROBIN) {
         if (Dim::myInts.find(p.pindx) == Dim::myInts.end())
-          ;//Dim::myInts.insert(std::make_pair(p.pindx,&weakDirBC));
+          Dim::myInts.insert(std::make_pair(p.pindx,&robinBC));
       } else if (p.pcode == Property::DIRICHLET_ANASOL) {
         if (!Dim::mySol->getScalarSol())
           p.pcode = Property::UNDEFINED;
@@ -438,10 +442,16 @@ protected:
   //! \param[in] propInd Physical property index
   bool initNeumann(size_t propInd) override
   {
-    typename Dim::SclFuncMap::const_iterator tit = Dim::myScalars.find(propInd);
-    if (tit == Dim::myScalars.end()) return false;
+    auto tit = Dim::myScalars.find(propInd);
+    auto vit = Dim::myVectors.find(propInd);
+    if (tit != Dim::myScalars.end()) {
+      AD.setFlux(tit->second);
+      robinBC.setFlux(tit->second);
+    } else if (vit != Dim::myVectors.end())
+      robinBC.setAlpha(vit->second);
+    else
+      return false;
 
-    AD.setFlux(tit->second);
     return true;
   }
 
@@ -512,6 +522,7 @@ protected:
 
 private:
   Integrand& AD; //!< Problem integrand definition
+  typename Integrand::Robin robinBC; //!< Robin integrand definition
 
   const Vector* extsol = nullptr; //!< Solution vector for adaptive simulators
   bool standalone = false; //!< If \e true, this simulator owns the VTF object

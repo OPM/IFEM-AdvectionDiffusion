@@ -85,7 +85,9 @@ if(NOT MPI_FOUND OR IFEM_SERIAL_TESTS_IN_PARALLEL)
                    Square-abd2-ad-rk3.reg
                    Square-abd2-ad-rk4.reg
                    Square-ad-RaPr.reg
-                   Square-ad.reg)
+                   Square-ad.reg
+                   Square-robin.reg
+                   Cube-robin.reg)
   if(LRSpline_FOUND)
     list(APPEND TESTFILES Square-2-LR-bdf2.reg)
     list(APPEND TESTFILES Square-ad-adap.reg)

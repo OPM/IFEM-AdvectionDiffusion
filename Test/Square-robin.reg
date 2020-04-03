@@ -1,0 +1,24 @@
+Square-robin.xinp
+
+Input file: Square-robin.xinp
+	Robin code 1000000 (expression): 1.0|-2.0
+	Robin code 2000000 (expression): -2.0
+	Dirichlet code 1 (expression): 1-x\*x
+	Robin code 3000000 (expression): 1-x\*x
+Advection field: 2|0
+Source field: -4\*x + 2
+	Analytical solution: Expression
+	Primary=1-x\*x
+	Secondary=-2\*x | 0.0
+Number of elements    16
+Number of nodes       36
+Number of dofs        36
+Number of constraints 6
+Number of unknowns    30
+L2-norm            : 0.645497
+Max temperature    : 1
+>>> Norm summary for AdvectionDiffusion <<<
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 1.46059
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 2.3094
+  L2 norm |T|   = (T,T)^0.5           : 1.46059
+  H1 norm |T|   = a(T,T)^0.5          : 2.3094

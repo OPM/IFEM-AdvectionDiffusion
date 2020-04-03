@@ -1,0 +1,25 @@
+Cube-robin.xinp
+
+Input file: Cube-robin.xinp
+	Robin code 1000000 (expression): 1.0|-2.0
+	Robin code 2000000 (expression): -2.0
+	Dirichlet code 1 (expression): 1-x\*x
+	Robin code 3000000 (expression): 1.0|1-x\*x
+	Dirichlet code 1000001 (expression): 1-x\*x
+	Robin code 4000000 (expression): 1-x\*x
+Advection field: 2|0|0
+Source field: -4\*x + 2
+	Analytical solution: Expression
+	Primary=1-x\*x
+	Secondary=-2\*x | 0.0 | 0.0
+Number of elements    64
+Number of nodes       216
+Number of dofs        216
+Number of constraints 66
+Number of unknowns    150
+L2-norm            : 0.645497
+Max temperature    : 1
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 2.06559
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 3.26599
+  L2 norm |T|   = (T,T)^0.5           : 2.06559
+  H1 norm |T|   = a(T,T)^0.5          : 3.26599
