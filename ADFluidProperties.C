@@ -34,7 +34,7 @@ void FluidProperties::parse(const TiXmlElement* elem)
   utl::getAttribute(elem,"type",type);
   if (type == "physical")
     scaling = PHYSICAL;
-  if (type == "pr/ra")
+  if (type == "prandtlrayleigh")
     scaling = PR_RA;
 
   utl::getAttribute(elem,"rho",rho);
@@ -50,7 +50,7 @@ void FluidProperties::printLog() const
 {
   static const std::map<Scaling,std::string> name_map =
         {{PHYSICAL, "Physical dimensions"},
-         {PR_RA,    "Prandtl/Rayleigh"}};
+         {PR_RA,    "Prandtl/Rayleigh numbers"}};
 
   IFEM::cout << "\tFluid properties:"
              << "\n\t\tScaling = " << name_map.find(scaling)->second;
@@ -58,8 +58,8 @@ void FluidProperties::printLog() const
     IFEM::cout << "\n\t\t\t            Density,   rho = " << rho
                << "\n\t\t\tThermal diffusivity, kappa = " << kappa;
   } else if (scaling == PR_RA) {
-    IFEM::cout << "\n\t\t\tRayleigh number, Ra = " << Ra;
     IFEM::cout << "\n\t\t\t Prandtl number, Pr = " << Pr;
+    IFEM::cout << "\n\t\t\tRayleigh number, Ra = " << Ra;
   }
   IFEM::cout << std::endl;
 }

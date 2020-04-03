@@ -28,7 +28,7 @@
             ut-1.0/sqrt(Ra*Pr)*(uxx+uyy)+u*ux+v*uy
     </source>
 
-    <fluidproperties type="pr/ra" Ra="105" Pr="890"/>
+    <fluidproperties type="prandtlrayleigh" Ra="105" Pr="890"/>
 
     <advectionfield>
       1/3*pow(x,3)*pow(y,2)*sin(t) | -1/3*pow(x,2)*pow(y,3)*sin(t)
