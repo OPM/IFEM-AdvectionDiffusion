@@ -32,9 +32,6 @@ AdvectionDiffusionBDF::AdvectionDiffusionBDF (unsigned short int n,
 {
   ALEformulation = useALE;
   primsol.resize(1+TimeIntegration::Steps(method));
-  velocity.resize(2);
-  registerVector("velocity1", &velocity[0]);
-  registerVector("velocity2", &velocity[1]);
   registerVector("grid velocity", &ux);
 }
 
@@ -192,15 +189,6 @@ bool AdvectionDiffusionBDF::finalizeElement (LocalIntegral& A)
   }
 
   return true;
-}
-
-
-void AdvectionDiffusionBDF::setNamedFields (const std::string& name, Fields* field)
-{
-  if (name == "velocity1")
-    uFields[0].reset(field);
-  else
-    uFields[1].reset(field);
 }
 
 

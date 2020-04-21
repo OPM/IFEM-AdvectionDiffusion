@@ -16,6 +16,7 @@
 #include "ElmNorm.h"
 #include "AnaSol.h"
 #include "Function.h"
+#include "Fields.h"
 #include "Vec3Oper.h"
 
 
@@ -27,6 +28,10 @@ AdvectionDiffusion::AdvectionDiffusion (unsigned short int n,
 
   Uad = nullptr;
   reaction = source = flux = nullptr;
+
+  velocity.resize(2);
+  registerVector("velocity1", &velocity[0]);
+  registerVector("velocity2", &velocity[1]);
 }
 
 
@@ -78,7 +83,11 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
 
     // evaluate advection field
     Vec3 U;
-    if (Uad)
+    if (uFields[0]) {
+      Vector u;
+      uFields[0]->valueFE(fe, u);
+      U = u;
+    } else if (Uad)
       U = (*Uad)(X);
 
     WeakOps::Laplacian(elMat.A[0], fe, props.getDiffusionConstant());
@@ -228,6 +237,15 @@ bool AdvectionDiffusion::finalizeElement (LocalIntegral& A)
   E.b[0] += E.eSs;
 
   return true;
+}
+
+
+void AdvectionDiffusion::setNamedFields (const std::string& name, Fields* field)
+{
+  if (name == "velocity1")
+    uFields[0].reset(field);
+  else
+    uFields[1].reset(field);
 }
 
 
