@@ -88,6 +88,9 @@ public:
   //! \param[in] mode The solution mode to use
   void setMode(SIM::SolutionMode mode) override;
 
+  //! \brief Returns time integration method used.
+  TimeIntegration::Method getTimeMethod() const override { return timeMethod; }
+
 protected:
   bool      ALEformulation; //!< Formulation switch (STANDARD or ALE)
   TimeIntegration::BDF bdf; //!< BDF helper class
