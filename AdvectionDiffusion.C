@@ -209,11 +209,7 @@ std::string AdvectionDiffusion::getField2Name (size_t i,
 void AdvectionDiffusion::setMode (SIM::SolutionMode mode)
 {
   m_mode = mode;
-
-  if (mode >= SIM::RECOVERY)
-    primsol.resize(1);
-  else
-    primsol.clear();
+  primsol.resize(1);
 }
 
 
