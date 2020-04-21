@@ -56,7 +56,10 @@ int runSimulatorStationary (char* infile, AD& model)
   if (model.opt.dumpHDF5(infile))
     solver.handleDataOutput(model.opt.hdf5);
 
-  return solver.solveProblem(infile,"Solving Advection-Diffusion problem");
+  res = solver.solveProblem(infile,"Solving Advection-Diffusion problem");
+  if (!res) model.printFinalNorms(TimeStep());
+
+  return res;
 }
 
 

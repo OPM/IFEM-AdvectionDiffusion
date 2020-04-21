@@ -301,9 +301,6 @@ public:
                  << std::endl;
     }
 
-    if (!tp.multiSteps())
-      printFinalNorms(tp);
-
     return true;
   }
 
@@ -334,14 +331,18 @@ public:
     if (tp.step%Dim::opt.saveInc > 0 || Dim::opt.format < 0)
       return true;
 
-    int iDump = 1 + tp.step/Dim::opt.saveInc;
+    TimeIntegration::Method method = AD.getTimeMethod();
+    int iDump = tp.step/Dim::opt.saveInc +
+                (method == TimeIntegration::NONE ? 0 : 1);
     if (!this->writeGlvS1(this->getSolution(0),iDump,nBlock,
                           tp.time.t,"temperature",89))
       return false;
     else if (!standalone)
       return true;
 
-    return this->writeGlvStep(iDump,tp.time.t);
+    double param2 = method==TimeIntegration::NONE ? iDump : tp.time.t;
+    return this->writeGlvStep(iDump, param2,
+                              method==TimeIntegration::NONE ? 1 : 0);
   }
 
   //! \brief Serialize internal state for restarting purposes.
@@ -409,7 +410,7 @@ public:
   //! \details Since this solver is linear, this is just a normal solve.
   SIM::ConvStatus solveIteration(TimeStep& tp)
   {
-    if (Dim::msgLevel == 1)
+    if (Dim::msgLevel == 1 && tp.multiSteps())
       IFEM::cout <<"\n  step="<< tp.step <<"  time="<< tp.time.t << std::endl;
     return this->solveStep(tp,false) ? SIM::CONVERGED : SIM::FAILURE;
   }

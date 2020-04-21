@@ -18,6 +18,7 @@
 #include "ElmMats.h"
 #include "EqualOrderOperators.h"
 #include "ADFluidProperties.h"
+#include "TimeIntUtils.h"
 
 #include <memory>
 
@@ -235,6 +236,10 @@ public:
   //! \brief Returns used advection form.
   WeakOperators::ConvectionForm getAdvForm() const
   { return advForm; }
+
+  //! \brief Returns time integration method used.
+  virtual TimeIntegration::Method getTimeMethod() const
+  { return TimeIntegration::NONE; }
 
   //! \brief Registers where we can inject a mixed-basis vector field.
   void setNamedFields(const std::string&, Fields*) override;
