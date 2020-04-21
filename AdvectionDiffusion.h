@@ -19,6 +19,8 @@
 #include "EqualOrderOperators.h"
 #include "ADFluidProperties.h"
 
+#include <memory>
+
 class RealFunc;
 class VecFunc;
 
@@ -234,6 +236,10 @@ public:
   WeakOperators::ConvectionForm getAdvForm() const
   { return advForm; }
 
+  //! \brief Registers where we can inject a mixed-basis vector field.
+  void setNamedFields(const std::string&, Fields*) override;
+
+
 protected:
   VecFunc*  Uad;      //!< Pointer to advection field
   RealFunc* reaction; //!< Pointer to the reaction field
@@ -250,6 +256,9 @@ protected:
   double        Cinv; //!< Stabilization parameter
   bool  residualNorm; //!< If \e true, we will evaluate residual norm
   WeakOperators::ConvectionForm advForm = WeakOperators::CONVECTIVE; //!< Advection formulation to use
+
+  Vectors velocity; //!< The advecting velocity field
+  std::array<std::unique_ptr<Fields>,2> uFields; //!< Externally provided velocity fields
 
   friend class AdvectionDiffusionNorm;
 };

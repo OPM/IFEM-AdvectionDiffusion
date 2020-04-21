@@ -84,9 +84,6 @@ public:
   //! \param[in] asol Pointer to analytical solution (optional)
   NormBase* getNormIntegrand(AnaSol* asol = 0) const override;
 
-  //! \brief Registers where we can inject a mixed-basis vector field.
-  void setNamedFields(const std::string&, Fields*) override;
-
   //! \brief Defines the solution mode before the element assembly is started.
   //! \param[in] mode The solution mode to use
   void setMode(SIM::SolutionMode mode) override;
@@ -96,9 +93,7 @@ protected:
   TimeIntegration::BDF bdf; //!< BDF helper class
   TimeIntegration::Method timeMethod; //!< Time integration method
 
-  Vectors velocity; //!< The advecting velocity field
   Vector  ux;       //!< Grid velocity (ALE)
-  std::array<std::unique_ptr<Fields>,2> uFields; //!< Externally provided velocity fields
 };
 
 #endif
