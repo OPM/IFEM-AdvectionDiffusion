@@ -388,7 +388,7 @@ public:
 
     exporter.registerField("u","temperature",DataExporter::SIM,
                            results, prefix);
-    exporter.setFieldValue("u", this, &this->getSolution(0));
+    exporter.setFieldValue("u", this, &this->getSolution(0),&projs,&eNorm);
   }
 
   //! \brief Set context to read from input file
@@ -459,6 +459,12 @@ public:
     delete norm;
   }
 
+  //! \brief Returns a reference to the element norm matrix.
+  Matrix& getElmNorms() { return eNorm; }
+
+  //! \brief Returns a reference to the projection vectors.
+  Vectors& getProjections() { return projs; }
+
 protected:
   //! \brief Initializes for integration of Neumann terms for a given property.
   //! \param[in] propInd Physical property index
@@ -520,10 +526,11 @@ protected:
     }
   }
 
-
 private:
   Integrand& AD; //!< Problem integrand definition
   typename Integrand::Robin robinBC; //!< Robin integrand definition
+  Vectors projs; //!< Projection vectors
+  Matrix eNorm; //!< Element norms
 
   const Vector* extsol = nullptr; //!< Solution vector for adaptive simulators
   bool standalone = false; //!< If \e true, this simulator owns the VTF object
