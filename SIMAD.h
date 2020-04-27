@@ -438,6 +438,27 @@ public:
   //! \param scale Time scaling factor
   void setTimeScale(double scale) { AD.setTimeScale(scale); }
 
+  //! \brief Prints integrated solution norms to the log stream.
+  //! \param[in] norms The norm values
+  //! \param[in] w Total number of characters in the norm labels
+  void printNorms (const Vectors& norms, size_t w) const override
+  {
+    if (norms.empty()) return;
+
+    NormBase* norm = this->getNormIntegrand();
+    const Vector& n = norms.front();
+
+    this->printExactNorms(norms.front());
+
+    size_t j = 0;
+    for (const auto& prj : Dim::opt.project)
+      if (++j < norms.size())
+        this->printNormGroup(norms[j],n,prj.second);
+
+    IFEM::cout << std::endl;
+    delete norm;
+  }
+
 protected:
   //! \brief Initializes for integration of Neumann terms for a given property.
   //! \param[in] propInd Physical property index
@@ -472,27 +493,6 @@ protected:
                  << gNorm(4)/gNorm(3)*100.0;
     IFEM::cout << std::endl;
 
-  }
-
-  //! \brief Prints integrated solution norms to the log stream.
-  //! \param[in] norms The norm values
-  //! \param[in] w Total number of characters in the norm labels
-  void printNorms (const Vectors& norms, size_t w) const override
-  {
-    if (norms.empty()) return;
-
-    NormBase* norm = this->getNormIntegrand();
-    const Vector& n = norms.front();
-
-    this->printExactNorms(norms.front());
-
-    size_t j = 0;
-    for (const auto& prj : Dim::opt.project)
-      if (++j < norms.size())
-        this->printNormGroup(norms[j],n,prj.second);
-
-    IFEM::cout << std::endl;
-    delete norm;
   }
 
   //! \brief Prints a norm group to the log stream.
