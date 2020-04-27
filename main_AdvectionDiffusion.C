@@ -35,7 +35,7 @@
 */
 
 template<template<class T> class Solver=SIMSolverStat, class AD>
-int runSimulatorStationary (char* infile, AD& model)
+int runSimulatorStationary (char* infile, AD& model, bool printNorms)
 {
   utl::profiler->start("Model input");
 
@@ -57,7 +57,7 @@ int runSimulatorStationary (char* infile, AD& model)
     solver.handleDataOutput(model.opt.hdf5);
 
   res = solver.solveProblem(infile,"Solving Advection-Diffusion problem");
-  if (!res) model.printFinalNorms(TimeStep());
+  if (!res && printNorms) model.printFinalNorms(TimeStep());
 
   return res;
 }
@@ -111,9 +111,9 @@ int runSimulator(char* infile, const AdvectionDiffusionArgs& args)
     AdvectionDiffusion integrand(Dim::dimension);
     SIMAD<Dim> model(integrand,true);
     if (args.adap)
-      return runSimulatorStationary<SIMSolverAdap>(infile, model);
+      return runSimulatorStationary<SIMSolverAdap>(infile, model, false);
     else
-      return runSimulatorStationary(infile, model);
+      return runSimulatorStationary(infile, model, true);
   }
   else if (args.timeMethod == TimeIntegration::BE ||
            args.timeMethod == TimeIntegration::BDF2 ||
