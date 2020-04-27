@@ -14,8 +14,12 @@
 #ifndef _AD_FLUID_PROPERTIES_H
 #define _AD_FLUID_PROPERTIES_H
 
-class TiXmlElement;
+#include "Functions.h"
+#include <memory>
+#include <string>
 
+class TiXmlElement;
+class Vec3;
 
 namespace AD {
 
@@ -34,9 +38,6 @@ public:
 
   //! \brief Empty constructor.
   FluidProperties();
-
-  //! \brief Empty destructor.
-  ~FluidProperties() {}
 
   //! \brief Parses material parementers from an XML element.
   void parse(const TiXmlElement*);
@@ -66,14 +67,15 @@ public:
   double getMassAdvectionConstant() const;
 
   //! \brief Returns the diffusion constant acccording to scaling.
-  double getDiffusionConstant() const;
+  double getDiffusionConstant(const Vec3& X) const;
 
   //! \brief Returns the reaction constant acccording to scaling.
-  double getReactionConstant() const;
+  double getReactionConstant(const Vec3& X) const;
 
   //! \brief Get thermal expansion term
   //! \param[in] T Temperature
   double getThermalExpansion(double T) const;
+
 protected:
   // Physical properties (constant)
   double rho;   //!< Mass density
@@ -82,6 +84,8 @@ protected:
   double C;     //!< Heat capacity
 
   double Ra; //!< Rayleigh number
+  std::string RaFdef; //!< Definition of Rayleigh number as a function
+  std::unique_ptr<RealFunc> RaF; //!< Rayleigh number as a function
   double Pr; //!< Prandtl number
 
   Scaling scaling; //!< Scaling to use.

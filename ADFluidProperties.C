@@ -43,6 +43,13 @@ void FluidProperties::parse(const TiXmlElement* elem)
   utl::getAttribute(elem,"kappa",kappa);
   utl::getAttribute(elem,"Ra",Ra);
   utl::getAttribute(elem,"Pr",Pr);
+  const TiXmlElement* raf = elem->FirstChildElement("rayleigh");
+  if (raf) {
+    std::string type;
+    utl::getAttribute(raf,"type",type);
+    RaFdef = utl::getValue(raf,"rayleigh");
+    RaF.reset(utl::parseRealFunc(RaFdef, type, false));
+  }
 }
 
 
@@ -59,9 +66,13 @@ void FluidProperties::printLog() const
                << "\n\t\t\tThermal diffusivity, kappa = " << kappa;
   } else if (scaling == PR_RA) {
     IFEM::cout << "\n\t\t\t Prandtl number, Pr = " << Pr;
-    IFEM::cout << "\n\t\t\tRayleigh number, Ra = " << Ra;
+    IFEM::cout << "\n\t\t\tRayleigh number, Ra = ";
+    if (RaFdef.empty())
+      IFEM::cout << Ra;
+    else
+      IFEM::cout << RaFdef;
+    IFEM::cout << std::endl;
   }
-  IFEM::cout << std::endl;
 }
 
 
@@ -74,19 +85,23 @@ double FluidProperties::getMassAdvectionConstant() const
 }
 
 
-double FluidProperties::getDiffusionConstant() const
+double FluidProperties::getDiffusionConstant(const Vec3& X) const
 {
-  if (scaling == PR_RA)
-    return 1.0/sqrt(Ra*Pr);
+  if (scaling == PR_RA) {
+    double eRa = RaF ? (*RaF)(X) : Ra;
+    return 1.0/sqrt(eRa*Pr);
+  }
 
   return getDiffusivity();
 }
 
 
-double FluidProperties::getReactionConstant() const
+double FluidProperties::getReactionConstant(const Vec3& X) const
 {
-  if (scaling == PR_RA)
-    return 1.0/(sqrt(Ra*Pr)*getDiffusivity());
+  if (scaling == PR_RA) {
+    double eRa = RaF ? (*RaF)(X) : Ra;
+    return 1.0/(sqrt(eRa*Pr)*getDiffusivity());
+  }
 
   return 1.0;
 }
