@@ -209,10 +209,13 @@ public:
       }
       else if (strcasecmp(child->Value(),"advection") == 0) {
         const char* value = child->FirstChild()->Value();
-        if (!strcasecmp(value, "convective"))
+        if (!strcasecmp(value, "convective")) {
+          IFEM::cout << "\n\tUsing convective advection operator\n";
           AD.setAdvectionForm(WeakOperators::CONVECTIVE);
-        else if (!strcasecmp(value, "conservative"))
+        } else if (!strcasecmp(value, "conservative")) {
+          IFEM::cout << "\n\tUsing conservative advection operator\n";
           AD.setAdvectionForm(WeakOperators::CONSERVATIVE);
+        }
       }
       else
         this->Dim::parse(child);
