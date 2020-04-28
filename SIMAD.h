@@ -51,6 +51,13 @@ public:
     bool standalone = false; //!< Simulator runs standalone
   };
 
+  //! \brief Norm to use to measure subiteration convergence.
+  enum SubItNorm {
+    RESIDUAL_L2 = 0, //!< L2-norm of residual
+    RESIDUAL_LINFTY = 1, //!< L-infty norm of residual
+    RESIDUAL_L2_SCALED = 2 //!< L2-norm scaled with sqrt(n)
+  };
+
   //! \brief Default constructor.
   //! \param[in] ad Integrand for advection-diffusion problem
   //! \param[in] alone Integrand is used stand-alone (controls time stepping)
@@ -178,6 +185,27 @@ public:
        if (utl::getAttribute(child,"maxFunc",func))
          maxSubItFunc.reset(utl::parseRealFunc(func,"expression",false));
        utl::getAttribute(child,"continue_on_failure",continue_on_failure);
+       std::string norm;
+       utl::getAttribute(child,"norm",norm);
+       std::string normType = "L2-norm of residual";
+       if (norm == "L2")
+         subItNorm = RESIDUAL_L2;
+       else if (norm == "Linfty") {
+         normType = "Linfty-norm of residual";
+         subItNorm = RESIDUAL_LINFTY;
+       }
+       else if (norm == "L2n") {
+         normType = "Scaled L2-norm of residual";
+         subItNorm = RESIDUAL_L2_SCALED;
+       }
+       IFEM::cout << "\tUsing subiterations";
+       if (func.empty())
+         IFEM::cout <<"\n\t\tmax = " << maxSubIt;
+       else
+         IFEM::cout << "\n\t\tmax = " << func;
+
+       IFEM::cout <<"\n\t\ttol = " << subItTol
+                  <<"\n\t\tnorm = " << normType;
       }
       else if (strcasecmp(child->Value(),"advection") == 0) {
         const char* value = child->FirstChild()->Value();
@@ -420,6 +448,9 @@ public:
   //! \brief True to continue even if subiterations failed to converge.
   bool getSubItContinue() const { return continue_on_failure; }
 
+  //! \brief Norm to use to measure subiteration convergence.
+  SubItNorm getSubItNorm() const { return subItNorm; }
+
   //! \brief Returns the sub-iteration tolerance.
   double getSubItTol() const { return subItTol; }
 
@@ -556,6 +587,7 @@ private:
   std::string inputContext; //!< Input context
   double subItTol = 1e-4; //!< Sub-iteration tolerance
   int maxSubIt = 50; //!< Maximum number of sub-iterations
+  SubItNorm subItNorm = RESIDUAL_L2; //!< Norm to use for measure subiteration convergence
   std::unique_ptr<RealFunc> maxSubItFunc; //!< Maximum number of sub-iterations as a function
   bool continue_on_failure = false; //!< Continue simulation if subiterations fails.
   int aCode[2] = {0}; //!< Analytical BC code (used by destructor)
