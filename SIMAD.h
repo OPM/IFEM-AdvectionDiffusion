@@ -100,6 +100,8 @@ public:
     if (aCode[1] > 0) Dim::myVectors.erase(aCode[1]);
     aCode[0] = aCode[1] = 0;
 
+    ++this->isRefined;
+
     this->Dim::clearProperties();
   }
 
@@ -172,6 +174,10 @@ public:
       else if (strcasecmp(child->Value(),"subiterations") == 0) {
        utl::getAttribute(child,"max",maxSubIt);
        utl::getAttribute(child,"tol",subItTol);
+       std::string func;
+       if (utl::getAttribute(child,"maxFunc",func))
+         maxSubItFunc.reset(utl::parseRealFunc(func,"expression",false));
+       utl::getAttribute(child,"continue_on_failure",continue_on_failure);
       }
       else if (strcasecmp(child->Value(),"advection") == 0) {
         const char* value = child->FirstChild()->Value();
@@ -400,7 +406,20 @@ public:
   }
 
   //! \brief Returns the maximum number of iterations.
-  int getMaxit() const { return maxSubIt; }
+  int getMaxit(int iStep = 0) const
+  {
+    if (maxSubItFunc) {
+      Vec4 X;
+      X.t = iStep;
+      return static_cast<int>((*maxSubItFunc)(X));
+    }
+
+    return maxSubIt;
+  }
+
+  //! \brief True to continue even if subiterations failed to converge.
+  bool getSubItContinue() const { return continue_on_failure; }
+
   //! \brief Returns the sub-iteration tolerance.
   double getSubItTol() const { return subItTol; }
 
@@ -537,6 +556,8 @@ private:
   std::string inputContext; //!< Input context
   double subItTol = 1e-4; //!< Sub-iteration tolerance
   int maxSubIt = 50; //!< Maximum number of sub-iterations
+  std::unique_ptr<RealFunc> maxSubItFunc; //!< Maximum number of sub-iterations as a function
+  bool continue_on_failure = false; //!< Continue simulation if subiterations fails.
   int aCode[2] = {0}; //!< Analytical BC code (used by destructor)
 };
 
