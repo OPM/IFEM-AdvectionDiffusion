@@ -371,8 +371,8 @@ public:
     TimeIntegration::Method method = AD.getTimeMethod();
     int iDump = tp.step/Dim::opt.saveInc +
                 (method == TimeIntegration::NONE ? 0 : 1);
-    if (!this->writeGlvS1(this->getSolution(0),iDump,nBlock,
-                          tp.time.t,"temperature",89))
+    if (!this->writeGlvS(this->getSolution(0),iDump,nBlock,
+                          tp.time.t,"temperature",70))
       return false;
     else if (!standalone)
       return true;
