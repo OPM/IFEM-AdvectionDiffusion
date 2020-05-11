@@ -87,10 +87,8 @@ double FluidProperties::getMassAdvectionConstant() const
 
 double FluidProperties::getDiffusionConstant(const Vec3& X) const
 {
-  if (scaling == PR_RA) {
-    double eRa = RaF ? (*RaF)(X) : Ra;
-    return 1.0/sqrt(eRa*Pr);
-  }
+  if (scaling == PR_RA)
+    return 1.0;
 
   return getDiffusivity();
 }
@@ -98,11 +96,6 @@ double FluidProperties::getDiffusionConstant(const Vec3& X) const
 
 double FluidProperties::getReactionConstant(const Vec3& X) const
 {
-  if (scaling == PR_RA) {
-    double eRa = RaF ? (*RaF)(X) : Ra;
-    return 1.0/(sqrt(eRa*Pr)*getDiffusivity());
-  }
-
   return 1.0;
 }
 
