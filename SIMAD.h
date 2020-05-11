@@ -181,6 +181,7 @@ public:
       else if (strcasecmp(child->Value(),"subiterations") == 0) {
        utl::getAttribute(child,"max",maxSubIt);
        utl::getAttribute(child,"tol",subItTol);
+       utl::getAttribute(child,"relax",subItRelax);
        std::string func;
        if (utl::getAttribute(child,"maxFunc",func))
          maxSubItFunc.reset(utl::parseRealFunc(func,"expression",false));
@@ -206,6 +207,8 @@ public:
 
        IFEM::cout <<"\n\t\ttol = " << subItTol
                   <<"\n\t\tnorm = " << normType;
+       if (subItRelax != 1.0)
+         IFEM::cout <<"\n\t\trelaxation = " << subItRelax;
       }
       else if (strcasecmp(child->Value(),"advection") == 0) {
         const char* value = child->FirstChild()->Value();
@@ -457,6 +460,9 @@ public:
   //! \brief Returns the sub-iteration tolerance.
   double getSubItTol() const { return subItTol; }
 
+  //! \brief Returns the sub-iteration relaxation factor.
+  double getSubItRelax() const { return subItRelax; }
+
   //! \brief Solves the linearized system of current iteration.
   //! \param[in] tp Time stepping parameters
   //!
@@ -591,6 +597,7 @@ private:
   double subItTol = 1e-4; //!< Sub-iteration tolerance
   int maxSubIt = 50; //!< Maximum number of sub-iterations
   SubItNorm subItNorm = RESIDUAL_L2; //!< Norm to use for measure subiteration convergence
+  double subItRelax = 1.0; //!< Relaxation factor in subiterations
   std::unique_ptr<RealFunc> maxSubItFunc; //!< Maximum number of sub-iterations as a function
   bool continue_on_failure = false; //!< Continue simulation if subiterations fails.
   int aCode[2] = {0}; //!< Analytical BC code (used by destructor)
