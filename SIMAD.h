@@ -21,6 +21,7 @@
 #include "Property.h"
 #include "ASMstruct.h"
 #include "AdvectionDiffusion.h"
+#include "AdvectionDiffusionSource.h"
 #include "AnaSol.h"
 #include "Functions.h"
 #include "ExprFunctions.h"
@@ -160,8 +161,15 @@ public:
         IFEM::cout <<"Reaction field: "<< value << std::endl;
       }
       else if ((value = utl::getValue(child,"source"))) {
-        AD.setSource(new EvalFunction(value));
-        IFEM::cout <<"Source field: "<< value << std::endl;
+        std::string type;
+        utl::getAttribute(child, "type", type);
+        if (type == "expression") {
+          AD.setSource(new EvalFunction(value));
+          IFEM::cout <<"Source field: "<< value << std::endl;
+        } else if (type == "components") {
+           IFEM::cout << "\tSource function:";
+           AD.setSource(new AD::AdvectionDiffusionSource(child, AD.getFluidProperties()));
+        }
       }
       else if (strcasecmp(child->Value(),"anasol") == 0) {
         IFEM::cout <<"\tAnalytical solution: Expression"<< std::endl;
@@ -212,6 +220,7 @@ public:
           IFEM::cout <<"\n\t\trelaxation = " << subItRelax;
           if (subItAitken)
             IFEM::cout << " (aitken)";
+          IFEM::cout << "\n";
         }
       }
       else if (strcasecmp(child->Value(),"advection") == 0) {

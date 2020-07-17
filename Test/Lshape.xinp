@@ -21,7 +21,7 @@
 
   <!-- Problem-specific block !-->
   <advectiondiffusion>
-    <source>100*sqrt((x-0.5)*(x-0.5)+(y-0.5)*(y-0.5))*(sqrt((x-0.5)*(x-0.5)+(y-0.5)*(y-0.5))-0.5)*(sqrt((x-0.5)*(x-0.5)+(y-0.5)*(y-0.5))-1/sqrt(2))</source>
+    <source type="expression">100*sqrt((x-0.5)*(x-0.5)+(y-0.5)*(y-0.5))*(sqrt((x-0.5)*(x-0.5)+(y-0.5)*(y-0.5))-0.5)*(sqrt((x-0.5)*(x-0.5)+(y-0.5)*(y-0.5))-1/sqrt(2))</source>
     <advectionfield>3|1</advectionfield>
     <reactionfield>1</reactionfield>
     <stabilization type="MS" Cinv="1.0"/>
