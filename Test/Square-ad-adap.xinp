@@ -14,19 +14,20 @@
     <boundaryconditions>
       <dirichlet set="all" comp="1" type="anasol"/>
     </boundaryconditions>
-    <source type="expression">
-            u=1/3*pow(x,3)*pow(y,2);
-            ux=pow(x,2)*pow(y,2);
-            uy=1/3*pow(x,3)*2*y;
-            v=-1/3*pow(x,2)*pow(y,3);
-            uxx=2*x*pow(y,2);
-            uyy=2/3*pow(x,3);
-            -uxx-uyy+u*ux+v*uy
+    <source type="components">
+      <temperature_grad type="expression">
+        pow(x,2)*pow(y,2) | 1/3*pow(x,3)*2*y
+      </temperature_grad>
+      <laplacian type="expression">
+          2*x*pow(y,2) | 2/3*pow(x,3)
+      </laplacian>
+      <velocity type="expression">
+        1/3*pow(x,3)*pow(y,2) | -1/3*pow(x,2)*pow(y,3)
+      </velocity>
     </source>
     <advectionfield>
       1/3*pow(x,3)*pow(y,2) | -1/3*pow(x,2)*pow(y,3)
     </advectionfield>
-
     <anasol type="expression">
       <variables>u=1/3*pow(x,3)*pow(y,2);
                  ux=pow(x,2)*pow(y,2);
