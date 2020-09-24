@@ -7,7 +7,7 @@
 //!
 //! \author Arne Morten Kvarving / SINTEF
 //!
-//! \brief Class for Stokes source function.
+//! \brief Class for Advection-Diffusion source function.
 //!
 //==============================================================================
 

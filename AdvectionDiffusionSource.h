@@ -34,7 +34,8 @@ public:
   //! \brief Constructor.
   //! \param elem XML element to parse
   //! \param props Fluid properties
-  AdvectionDiffusionSource(const TiXmlElement* elem, const FluidProperties& prop);
+  AdvectionDiffusionSource(const TiXmlElement* elem,
+                           const FluidProperties& props);
 
 protected:
   //! \brief Evaluates the function.
