@@ -54,7 +54,7 @@ int runSimulatorStationary (char* infile, AD& model, bool printNorms)
   utl::profiler->stop("Model input");
 
   if (model.opt.dumpHDF5(infile))
-    solver.handleDataOutput(model.opt.hdf5);
+    solver.handleDataOutput(model.opt.hdf5,model.getProcessAdm());
 
   res = solver.solveProblem(infile,"Solving Advection-Diffusion problem");
   if (!res && printNorms) model.printFinalNorms(TimeStep());
@@ -90,8 +90,8 @@ int runSimulatorTransientImpl (char* infile, Solver& sim, AD& model)
     return 2;
 
   if (model.opt.dumpHDF5(infile))
-    solver.handleDataOutput(model.opt.hdf5, model.opt.saveInc,
-                            model.opt.restartInc);
+    solver.handleDataOutput(model.opt.hdf5,model.getProcessAdm(),
+                            model.opt.saveInc,model.opt.restartInc);
 
   res = solver.solveProblem(infile,"Solving Advection-Diffusion problem");
   if (!res) model.printFinalNorms(solver.getTimePrm());
