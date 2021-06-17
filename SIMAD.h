@@ -52,13 +52,6 @@ public:
     bool standalone = false; //!< Simulator runs standalone
   };
 
-  //! \brief Norm to use to measure subiteration convergence.
-  enum SubItNorm {
-    RESIDUAL_L2 = 0, //!< L2-norm of residual
-    RESIDUAL_LINFTY = 1, //!< L-infty norm of residual
-    RESIDUAL_L2_SCALED = 2 //!< L2-norm scaled with sqrt(n)
-  };
-
   //! \brief Default constructor.
   //! \param[in] ad Integrand for advection-diffusion problem
   //! \param[in] alone Integrand is used stand-alone (controls time stepping)
@@ -184,43 +177,6 @@ public:
             this->setPropertyType(code,Property::NEUMANN);
             Dim::myVectors[code] = Dim::mySol->getScalarSecSol();
           }
-        }
-      }
-      else if (strcasecmp(child->Value(),"subiterations") == 0) {
-        utl::getAttribute(child,"max",maxSubIt);
-        utl::getAttribute(child,"tol",subItTol);
-        utl::getAttribute(child,"relax",subItRelax);
-        utl::getAttribute(child,"aitken",subItAitken);
-        std::string func;
-        if (utl::getAttribute(child,"maxFunc",func))
-          maxSubItFunc.reset(utl::parseRealFunc(func,"expression",false));
-        utl::getAttribute(child,"continue_on_failure",continue_on_failure);
-        std::string norm;
-        utl::getAttribute(child,"norm",norm);
-        std::string normType = "L2-norm of residual";
-        if (norm == "L2")
-          subItNorm = RESIDUAL_L2;
-        else if (norm == "Linfty") {
-          normType = "Linfty-norm of residual";
-          subItNorm = RESIDUAL_LINFTY;
-        }
-        else if (norm == "L2n") {
-          normType = "Scaled L2-norm of residual";
-          subItNorm = RESIDUAL_L2_SCALED;
-        }
-        IFEM::cout << "\tUsing subiterations";
-        if (func.empty())
-          IFEM::cout <<"\n\t\tmax = " << maxSubIt;
-        else
-          IFEM::cout << "\n\t\tmax = " << func;
-
-        IFEM::cout <<"\n\t\ttol = " << subItTol
-                  <<"\n\t\tnorm = " << normType;
-        if (subItRelax != 1.0) {
-          IFEM::cout <<"\n\t\trelaxation = " << subItRelax;
-          if (subItAitken)
-            IFEM::cout << " (aitken)";
-          IFEM::cout << "\n";
         }
       }
       else if (strcasecmp(child->Value(),"advection") == 0) {
@@ -452,35 +408,6 @@ public:
     inputContext = str.str();
   }
 
-  //! \brief Returns the maximum number of iterations.
-  int getMaxit(int iStep = 0) const
-  {
-    if (maxSubItFunc) {
-      Vec4 X;
-      X.t = iStep;
-      return static_cast<int>((*maxSubItFunc)(X));
-    }
-
-    return maxSubIt;
-  }
-
-  //! \brief True to continue even if subiterations failed to converge.
-  bool getSubItContinue() const { return continue_on_failure; }
-
-  //! \brief Norm to use to measure subiteration convergence.
-  SubItNorm getSubItNorm() const { return subItNorm; }
-
-  //! \brief Returns the sub-iteration tolerance.
-  double getSubItTol() const { return subItTol; }
-
-  //! \brief Returns the sub-iteration relaxation factor.
-  double getSubItRelax(double aScale)
-  {
-    if (subItAitken)
-      subItRelax *= -aScale;
-    return subItRelax;
-  }
-
   //! \brief Solves the linearized system of current iteration.
   //! \param[in] tp Time stepping parameters
   //!
@@ -612,13 +539,6 @@ private:
   const Vector* extsol = nullptr; //!< Solution vector for adaptive simulators
   bool standalone = false; //!< If \e true, this simulator owns the VTF object
   std::string inputContext; //!< Input context
-  double subItTol = 1e-4; //!< Sub-iteration tolerance
-  int maxSubIt = 50; //!< Maximum number of sub-iterations
-  SubItNorm subItNorm = RESIDUAL_L2; //!< Norm to use for measure subiteration convergence
-  double subItRelax = 1.0; //!< Relaxation factor in subiterations
-  std::unique_ptr<RealFunc> maxSubItFunc; //!< Maximum number of sub-iterations as a function
-  bool subItAitken = false; //!< Use Aitken relaxation
-  bool continue_on_failure = false; //!< Continue simulation if subiterations fails.
   int aCode[2] = {0}; //!< Analytical BC code (used by destructor)
 };
 
