@@ -109,7 +109,7 @@ int runSimulator(char* infile, const AdvectionDiffusionArgs& args)
 {
   if (args.timeMethod == TimeIntegration::NONE)  {
     AdvectionDiffusion integrand(Dim::dimension);
-    SIMAD<Dim> model(integrand,true);
+    SIMAD<Dim,AdvectionDiffusion> model(integrand,true);
     if (args.adap)
       return runSimulatorStationary<SIMSolverAdap>(infile, model, false);
     else
