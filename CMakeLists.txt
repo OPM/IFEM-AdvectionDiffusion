@@ -27,7 +27,15 @@ set(AD_SOURCES AdvectionDiffusion.C
                AdvectionDiffusionImplicit.C
                AdvectionDiffusionSource.C
                ADFluidProperties.C
-               SIMAD.C)
+               SIMAD.C
+               ADFluidProperties.h
+               AdvectionDiffusionArgs.h
+               AdvectionDiffusionBDF.h
+               AdvectionDiffusionExplicit.h
+               AdvectionDiffusion.h
+               AdvectionDiffusionImplicit.h
+               AdvectionDiffusionSource.h
+               SIMAD.h)
 
 add_library(CommonAD STATIC ${AD_SOURCES})
 
