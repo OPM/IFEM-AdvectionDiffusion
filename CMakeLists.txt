@@ -16,30 +16,13 @@ ENDIF(NOT IFEM_CONFIGURED)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IFEM_CXX_FLAGS}")
 
-include_directories(${IFEM_INCLUDES} ../Common ${PROJECT_SOURCE_DIR})
+include_directories(${IFEM_INCLUDES} ../Common ${PROJECT_SOURCE_DIR} Common/AdvectionDiffusion)
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
-set(AD_SOURCES AdvectionDiffusion.C
-               AdvectionDiffusionArgs.C
-               AdvectionDiffusionBDF.C
-               AdvectionDiffusionExplicit.C
-               AdvectionDiffusionImplicit.C
-               AdvectionDiffusionSource.C
-               ADFluidProperties.C
-               SIMAD.C
-               ADFluidProperties.h
-               AdvectionDiffusionArgs.h
-               AdvectionDiffusionBDF.h
-               AdvectionDiffusionExplicit.h
-               AdvectionDiffusion.h
-               AdvectionDiffusionImplicit.h
-               AdvectionDiffusionSource.h
-               SIMAD.h)
+add_subdirectory(Common/AdvectionDiffusion)
 
-add_library(CommonAD STATIC ${AD_SOURCES})
-
-add_executable(AdvectionDiffusion main_AdvectionDiffusion.C)
+add_executable(AdvectionDiffusion main_AdvectionDiffusion.C AdvectionDiffusionArgs.C)
 list(APPEND CHECK_SOURCES ${AD_SOURCES} main_AdvectionDiffusion.C)
 
 target_link_libraries(AdvectionDiffusion CommonAD IFEMAppCommon ${IFEM_LIBRARIES})
