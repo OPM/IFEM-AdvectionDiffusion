@@ -23,6 +23,8 @@ set(AD_SOURCES AdvectionDiffusion.C
 
 add_library(CommonAD STATIC ${AD_SOURCES})
 
-list(APPEND CHECK_SOURCES ${AD_SOURCES})
+foreach(src ${AD_SOURCES})
+  list(APPEND CHECK_SOURCES ${PROJECT_SOURCE_DIR}/${src})
+endforeach()
 
 set(CHECK_SOURCES ${CHECK_SOURCES} PARENT_SCOPE)
