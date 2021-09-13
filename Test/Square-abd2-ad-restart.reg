@@ -8,7 +8,7 @@ Number of nodes       64
 Number of dofs        64
 Number of unknowns    36
 === Restarting from a serialized state ===
-  file = .*Square-abd2-ad-restart_restart
+  file = .*Square-abd2-ad-restart_.*_restart
   step = 5
   step = 6  time = 0.6
 L2-norm            : 0.004354
