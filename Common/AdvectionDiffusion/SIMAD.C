@@ -24,6 +24,7 @@
 #include "ExprFunctions.h"
 #include "IFEM.h"
 #include "Profiler.h"
+#include "SIM1D.h"
 #include "SIM2D.h"
 #include "SIM3D.h"
 #include "TimeStep.h"
@@ -494,11 +495,12 @@ setup (SIMAD<Dim,Integrand>& ad,
 
 //! \brief Helper macro for explicit template instancing.
 #define INSTANCE(T) \
+  template class SIMAD<SIM1D,T>; \
   template class SIMAD<SIM2D,T>; \
   template class SIMAD<SIM3D,T>; \
+  template struct SolverConfigurator<SIMAD<SIM1D,T>>; \
   template struct SolverConfigurator<SIMAD<SIM2D,T>>; \
-  template struct SolverConfigurator<SIMAD<SIM3D,T>>; \
-
+  template struct SolverConfigurator<SIMAD<SIM3D,T>>;
 
 INSTANCE(AdvectionDiffusion)
 INSTANCE(AdvectionDiffusionBDF)
