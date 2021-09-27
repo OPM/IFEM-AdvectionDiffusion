@@ -436,13 +436,14 @@ void SIMAD<Dim,Integrand>::printNormGroup (const Vector& rNorm,
 {
   IFEM::cout << "\nError estimates based on >>> " << name << " <<<";
   size_t w = 36;
-  if (name == "Pure residuals")
+  if (name == "Pure residuals") {
     IFEM::cout << "\n  Residual norm"
-                 << utl::adjustRight(w-15,"") << rNorm[1]
-                 << "\n  Effectivity index eta^res"
+                 << utl::adjustRight(w-15,"") << rNorm[1];
+    if (fNorm.size() > 2)
+      IFEM::cout << "\n  Effectivity index eta^res"
                  << utl::adjustRight(w-27,"")
                  << this->getEffectivityIndex(Vectors{fNorm, rNorm},1,2);
-  else {
+  } else {
     IFEM::cout << "\n  H1 norm |T^r-T^h|"
                  << utl::adjustRight(w-19,"") << rNorm[1];
     if (rNorm.size() > 3) {
