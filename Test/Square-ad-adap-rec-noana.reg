@@ -1,0 +1,75 @@
+Square-ad-adap-rec-noana.xinp -adap
+
+LR-spline basis functions are used
+Number of elements    64
+Number of nodes       81
+Number of dofs        81
+Number of constraints 32
+Number of unknowns    49
+Enabled projection(s): Continuous global L2-projection
+
+ >>> Starting adaptive simulation based on
+     Continuous global L2-projection error estimates (norm group 1) <<<
+Adaptive step 1
+L2-norm            : 0.0703478
+Max temperature    : 0.333333
+Projecting secondary solution ...
+	Continuous global L2-projection
+>>> Norm summary for AdvectionDiffusion <<<
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.0567639
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.135588
+Error estimates based on >>> Continuous global L2-projection <<<
+  H1 norm |T^r-T^h|                  : 0.0109273
+Error estimate a(e,e)^0.5, e=T^r-T^h : 0.0109273
+Relative error (%) : 18.9033
+Root mean square (RMS) of error      : 0.947684
+Min element error                    : 3.08336e-06
+Max element error                    : 0.0042274
+Average element error                : 0.000991428
+Refining 50 basis functions with errors in range \[0.00148772,0.0133136\] 10% of max error (0.00133136)
+Refined mesh: 214 elements 238 nodes.
+Adaptive step 2
+Number of elements    214
+Number of nodes       238
+Number of dofs        238
+Number of constraints 55
+Number of unknowns    183
+L2-norm            : 0.0698201
+Max temperature    : 0.333333
+Projecting secondary solution ...
+	Continuous global L2-projection
+>>> Norm summary for AdvectionDiffusion <<<
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.0564411
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.135464
+Error estimates based on >>> Continuous global L2-projection <<<
+  H1 norm |T^r-T^h|                  : 0.00556922
+Error estimate a(e,e)^0.5, e=T^r-T^h : 0.00556922
+Relative error (%) : 9.81962
+Root mean square (RMS) of error      : 0.783647
+Min element error                    : 3.13089e-06
+Max element error                    : 0.00123131
+Average element error                : 0.000299655
+Refining 185 basis functions with errors in range \[0.000423284,0.00415853\] 10% of max error (0.000415853)
+Refined mesh: 769 elements 802 nodes.
+Adaptive step 3
+Number of elements    769
+Number of nodes       802
+Number of dofs        802
+Number of constraints 95
+Number of unknowns    707
+L2-norm            : 0.0697495
+Max temperature    : 0.333333
+Projecting secondary solution ...
+	Continuous global L2-projection
+>>> Norm summary for AdvectionDiffusion <<<
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.0563673
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.135456
+Error estimates based on >>> Continuous global L2-projection <<<
+  H1 norm |T^r-T^h|                  : 0.00282316
+Error estimate a(e,e)^0.5, e=T^r-T^h : 0.00282316
+Relative error (%) : 5.00224
+Root mean square (RMS) of error      : 0.686885
+Min element error                    : 2.69367e-06
+Max element error                    : 0.000331733
+Average element error                : 8.39163e-05
+   \* Stopping the adaptive cyles as max steps 3 was reached.

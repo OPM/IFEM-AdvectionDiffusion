@@ -1,0 +1,69 @@
+Square-ad-adap-res-noana.xinp -adap
+
+LR-spline basis functions are used
+Number of elements    64
+Number of nodes       81
+Number of dofs        81
+Number of constraints 32
+Number of unknowns    49
+Pure residual error estimates enabled
+ >>> Starting adaptive simulation based on
+     Pure residuals error estimates (norm group 1) <<<
+Adaptive step 1
+L2-norm            : 0.0703498
+Max temperature    : 0.333333
+>>> Norm summary for AdvectionDiffusion <<<
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.056767
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.247538
+Error estimates based on >>> Pure residuals <<<
+  Residual norm                      : 0.125968
+Error estimate             |T^h|_res : 0.125968
+Relative error (%) : 91.1701
+Root mean square (RMS) of error      : 0.997473
+Min element error                    : 3.07588e-05
+Max element error                    : 0.0488364
+Average element error                : 0.0111482
+
+Refining 49 basis functions with errors in range \[0.0175035,0.160098\] 10% of max error (0.0160098)
+Refined mesh: 211 elements 234 nodes.
+Adaptive step 2
+Number of elements    211
+Number of nodes       234
+Number of dofs        234
+Number of constraints 54
+Number of unknowns    180
+L2-norm            : 0.0704152
+Max temperature    : 0.333333
+>>> Norm summary for AdvectionDiffusion <<<
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.056442
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.24732
+Error estimates based on >>> Pure residuals <<<
+  Residual norm                      : 0.0631065
+Error estimate             |T^h|_res : 0.0631065
+Relative error (%) : 74.5369
+Root mean square (RMS) of error      : 0.818224
+Min element error                    : 3.07588e-05
+Max element error                    : 0.0134167
+Average element error                : 0.00336233
+Refining 181 basis functions with errors in range \[0.00487477,0.0487098\] 10% of max error (0.00487098)
+Refined mesh: 754 elements 788 nodes.
+Adaptive step 3
+Number of elements    754
+Number of nodes       788
+Number of dofs        788
+Number of constraints 96
+Number of unknowns    692
+L2-norm            : 0.0703668
+Max temperature    : 0.333333
+>>> Norm summary for AdvectionDiffusion <<<
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.0563674
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.247307
+Error estimates based on >>> Pure residuals <<<
+  Residual norm                      : 0.0317011
+Error estimate             |T^h|_res : 0.0317011
+Relative error (%) : 49.0196
+Root mean square (RMS) of error      : 0.715177
+Min element error                    : 3.07588e-05
+Max element error                    : 0.00351516
+Average element error                : 0.000939048
+   \* Stopping the adaptive cyles as max steps 3 was reached.
