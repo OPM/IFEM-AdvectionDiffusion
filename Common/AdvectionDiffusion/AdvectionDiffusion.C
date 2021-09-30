@@ -282,7 +282,7 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
                                       const Vec3& X) const
 {
   ElmNorm& pnorm = static_cast<ElmNorm&>(elmInt);
-  AdvectionDiffusion& hep = static_cast<AdvectionDiffusion&>(myProblem);
+  const AdvectionDiffusion& hep = static_cast<const AdvectionDiffusion&>(myProblem);
 
   // Evaluate the FE temperature and thermal conductivity at current point
   double Uh = fe.N.dot(elmInt.vec.front());
@@ -411,7 +411,7 @@ std::string AdvectionDiffusionNorm::getName (size_t i, size_t j,
     "effectivity index"
   };
 
-  AdvectionDiffusion& hep = static_cast<AdvectionDiffusion&>(myProblem);
+  const AdvectionDiffusion& hep = static_cast<const AdvectionDiffusion&>(myProblem);
   const char** n = s;
   if (i > 1) {
     if (hep.doResidualNorm())
@@ -429,7 +429,7 @@ std::string AdvectionDiffusionNorm::getName (size_t i, size_t j,
 
 int AdvectionDiffusionNorm::getIntegrandType () const
 {
-  AdvectionDiffusion& hep = static_cast<AdvectionDiffusion&>(myProblem);
+  const AdvectionDiffusion& hep = static_cast<const AdvectionDiffusion&>(myProblem);
   return hep.doResidualNorm() ? SECOND_DERIVATIVES | ELEMENT_CORNERS : STANDARD;
 }
 
