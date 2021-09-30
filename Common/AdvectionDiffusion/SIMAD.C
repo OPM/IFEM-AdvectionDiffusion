@@ -146,11 +146,11 @@ bool SIMAD<Dim,Integrand>::parse (const TiXmlElement* elem)
       }
     }
     else if (strcasecmp(child->Value(),"advection") == 0) {
-      const char* value = child->FirstChild()->Value();
-      if (!strcasecmp(value, "convective")) {
+      value = child->FirstChild()->Value();
+      if (value && !strcasecmp(value, "convective")) {
         IFEM::cout << "\n\tUsing convective advection operator\n";
         AD.setAdvectionForm(WeakOperators::CONVECTIVE);
-      } else if (!strcasecmp(value, "conservative")) {
+      } else if (value && !strcasecmp(value, "conservative")) {
         IFEM::cout << "\n\tUsing conservative advection operator\n";
         AD.setAdvectionForm(WeakOperators::CONSERVATIVE);
       }
