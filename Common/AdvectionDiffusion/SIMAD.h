@@ -50,7 +50,7 @@ public:
   //! \brief Default constructor.
   //! \param[in] ad Integrand for advection-diffusion problem
   //! \param[in] alone Integrand is used stand-alone (controls time stepping)
-  SIMAD(Integrand& ad, bool alone = false);
+  explicit SIMAD(Integrand& ad, bool alone = false);
 
   //! \brief Constructs from given properties.
   explicit SIMAD(const SetupProps& props) :
