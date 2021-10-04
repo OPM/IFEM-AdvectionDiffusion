@@ -251,7 +251,7 @@ bool SIMAD<Dim,Integrand>::advanceStep (TimeStep&)
 
 
 template<class Dim, class Integrand>
-bool SIMAD<Dim,Integrand>::solveStep (TimeStep& tp, bool)
+bool SIMAD<Dim,Integrand>::solveStep (const TimeStep& tp, bool)
 {
   PROFILE1("SIMAD::solveStep");
 
