@@ -92,7 +92,7 @@ public:
   bool advanceStep(TimeStep&);
 
   //! \brief Computes the solution for the current time step.
-  bool solveStep(TimeStep& tp, bool = false);
+  bool solveStep(const TimeStep& tp, bool = false);
 
   //! \brief No solution postprocessing.
   bool postSolve(const TimeStep&) { return true; }
