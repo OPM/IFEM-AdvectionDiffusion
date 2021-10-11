@@ -11,23 +11,34 @@
 //!
 //==============================================================================
 
-#include "IFEM.h"
-#include "SIM2D.h"
-#include "SIM3D.h"
-#include "SIMExplicitRK.h"
-#include "SIMExplicitRKE.h"
-#include "SIMExplicitLMM.h"
-#include "SIMImplicitLMM.h"
-#include "SIMSolverAdap.h"
-#include "SIMAD.h"
+#include "AdvectionDiffusion.h"
 #include "AdvectionDiffusionArgs.h"
 #include "AdvectionDiffusionBDF.h"
 #include "AdvectionDiffusionExplicit.h"
 #include "AdvectionDiffusionImplicit.h"
+#include "SIMAD.h"
+
+#include "ASMenums.h"
+#include "IFEM.h"
+#include "LogStream.h"
 #include "Profiler.h"
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
+#include "SIM2D.h"
+#include "SIM3D.h"
+#include "SIMconfigure.h"
+#include "SIMExplicitRK.h"
+#include "SIMExplicitRKE.h"
+#include "SIMExplicitLMM.h"
+#include "SIMImplicitLMM.h"
+#include "SIMoptions.h"
+#include "SIMSolver.h"
+#include "SIMSolverAdap.h"
+#include "TimeStep.h"
+#include "TimeIntUtils.h"
+
+#include <algorithm>
+#include <iostream>
+#include <string>
+#include <vector>
 
 
 /*!

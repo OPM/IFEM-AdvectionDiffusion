@@ -14,6 +14,7 @@
 #ifndef _SIM_AD_H
 #define _SIM_AD_H
 
+#include "MatVec.h"
 #include "SIMMultiPatchModelGen.h"
 #include "SIMsolution.h"
 #include "SIMconfigure.h"
@@ -22,10 +23,15 @@
 #include "PETScSupport.h"
 #endif
 
+#include <cstddef>
+#include <iosfwd>
+#include <string>
+
 
 class DataExporter;
 class SIMoutput;
 class TimeStep;
+class TiXmlElement;
 
 
 /*!

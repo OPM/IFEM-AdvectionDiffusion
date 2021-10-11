@@ -19,6 +19,9 @@
 #include "TimeIntUtils.h"
 
 
+class TiXmlElement;
+
+
 /*!
   \brief Class holding application parameters.
 */

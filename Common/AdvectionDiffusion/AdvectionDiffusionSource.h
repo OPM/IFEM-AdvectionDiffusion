@@ -17,6 +17,8 @@
 
 #include <memory>
 
+
+class Vec3;
 class TiXmlElement;
 
 

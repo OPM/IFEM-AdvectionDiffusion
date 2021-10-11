@@ -13,8 +13,21 @@
 //==============================================================================
 
 #include "AdvectionDiffusionExplicit.h"
-#include "FiniteElement.h"
+#include "ADFluidProperties.h"
+
+#include "ElmMats.h"
 #include "Function.h"
+#include "MatVec.h"
+#include "Vec3.h"
+
+#include <ext/alloc_traits.h>
+#include <memory>
+#include <vector>
+
+
+class FiniteElement;
+class LocalIntegral;
+class NormBase;
 
 
 AdvectionDiffusionExplicit::AdvectionDiffusionExplicit (unsigned short int n,

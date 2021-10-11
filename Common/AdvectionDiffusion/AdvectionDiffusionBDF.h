@@ -16,11 +16,20 @@
 
 #include "AdvectionDiffusion.h"
 #include "BDF.h"
+#include "Integrand.h"
+#include "MatVec.h"
+#include "SIMenums.h"
 #include "TimeIntUtils.h"
-#include "Fields.h"
-#include "TimeIntUtils.h"
-#include <array>
-#include <memory>
+
+#include <vector>
+
+
+class AnaSol;
+class FiniteElement;
+class LocalIntegral;
+class NormBase;
+class Vec3;
+struct TimeDomain;
 
 
 /*!

@@ -18,18 +18,34 @@
 #include "AdvectionDiffusionExplicit.h"
 #include "AdvectionDiffusionImplicit.h"
 #include "AdvectionDiffusionSource.h"
+
 #include "AnaSol.h"
 #include "ASMstruct.h"
 #include "DataExporter.h"
+#include "EqualOrderOperators.h"
 #include "ExprFunctions.h"
 #include "IFEM.h"
+#include "IntegrandBase.h"
+#include "LogStream.h"
 #include "Profiler.h"
+#include "Property.h"
 #include "SIM1D.h"
 #include "SIM2D.h"
 #include "SIM3D.h"
+#include "SIMoptions.h"
+#include "TimeDomain.h"
+#include "TimeIntUtils.h"
 #include "TimeStep.h"
-#include "tinyxml.h"
 #include "Utilities.h"
+
+#include <cmath>
+#include <cstdlib>
+#include <map>
+#include <ostream>
+#include "strings.h"
+#include <vector>
+#include "tinyxml.h"
+#include <utility>
 
 
 template<class Dim, class Integrand>

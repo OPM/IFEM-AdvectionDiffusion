@@ -14,10 +14,10 @@
 #ifndef _AD_FLUID_PROPERTIES_H
 #define _AD_FLUID_PROPERTIES_H
 
-#include "Functions.h"
 #include <memory>
 #include <string>
 
+class RealFunc;
 class TiXmlElement;
 class Vec3;
 
@@ -38,6 +38,9 @@ public:
 
   //! \brief Empty constructor.
   FluidProperties();
+
+  //! \brief Destructor.
+  ~FluidProperties();
 
   //! \brief Parses material parementers from an XML element.
   void parse(const TiXmlElement*);

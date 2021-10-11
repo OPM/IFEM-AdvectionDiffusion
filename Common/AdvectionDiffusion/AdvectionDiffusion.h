@@ -14,15 +14,27 @@
 #ifndef _ADVECTION_DIFFUSION_H
 #define _ADVECTION_DIFFUSION_H
 
-#include "IntegrandBase.h"
+#include "ADFluidProperties.h"
+
 #include "ElmMats.h"
 #include "EqualOrderOperators.h"
-#include "ADFluidProperties.h"
+#include "IntegrandBase.h"
+#include "MatVec.h"
+#include "SIMenums.h"
 #include "TimeIntUtils.h"
 
+#include <array>
+#include <cstddef>
 #include <memory>
+#include <string>
 
+
+class AnaSol;
+class Fields;
+class FiniteElement;
+class LocalIntegral;
 class RealFunc;
+class Vec3;
 class VecFunc;
 
 

@@ -12,13 +12,18 @@
 //==============================================================================
 
 #include "AdvectionDiffusionSource.h"
-#include "ExprFunctions.h"
-#include "IFEM.h"
 #include "ADFluidProperties.h"
-#include "Functions.h"
-#include "Vec3Oper.h"
-#include "Utilities.h"
 
+#include "Functions.h"
+#include "IFEM.h"
+#include "LogStream.h"
+#include "Utilities.h"
+#include "Vec3.h"
+#include "Vec3Oper.h"
+
+#include <ostream>
+#include <string>
+#include <vector>
 #include <tinyxml.h>
 
 
