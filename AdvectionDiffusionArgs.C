@@ -15,6 +15,10 @@
 #include "Utilities.h"
 #include "tinyxml.h"
 
+#include <cstring>
+#include <string>
+#include <strings.h>
+
 
 bool AdvectionDiffusionArgs::parseArg (const char* argv)
 {

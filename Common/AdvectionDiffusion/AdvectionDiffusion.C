@@ -12,12 +12,21 @@
 //==============================================================================
 
 #include "AdvectionDiffusion.h"
-#include "FiniteElement.h"
-#include "ElmNorm.h"
+
 #include "AnaSol.h"
+#include "ElmNorm.h"
+#include "FiniteElement.h"
 #include "Function.h"
 #include "Fields.h"
+#include "Integrand.h"
+#include "LocalIntegral.h"
 #include "Vec3Oper.h"
+
+#include <algorithm>
+#include <cmath>
+#include <ext/alloc_traits.h>
+#include <iostream>
+#include <vector>
 
 
 AdvectionDiffusion::AdvectionDiffusion (unsigned short int n,

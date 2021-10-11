@@ -17,10 +17,6 @@
 #include "AdvectionDiffusion.h"
 #include "BDF.h"
 #include "TimeIntUtils.h"
-#include "Fields.h"
-#include "TimeIntUtils.h"
-#include <array>
-#include <memory>
 
 
 /*!

@@ -15,14 +15,29 @@
 #include "ADFluidProperties.h"
 
 #include "IFEM.h"
-#include "tinyxml.h"
+#include "Functions.h"
+#include "LogStream.h"
+#include "Function.h"
 #include "Utilities.h"
 #include "Vec3.h"
+
+#include <cassert>
+#include <map>
+#include <ostream>
+#include "tinyxml.h"
+#include <utility>
+#include <vector>
+
 
 namespace AD {
 
 FluidProperties::FluidProperties() :
   rho(1.0), kappa(1.0), alpha(1.0), C(1.0), Ra(1.0), Pr(1.0), scaling(PHYSICAL)
+{
+}
+
+
+FluidProperties::~FluidProperties()
 {
 }
 

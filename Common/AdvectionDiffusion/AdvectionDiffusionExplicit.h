@@ -15,7 +15,19 @@
 #define _ADVECTION_DIFFUSION_EXPLICIT_H
 
 #include "AdvectionDiffusion.h"
+
+#include "Integrand.h"
+#include "SIMenums.h"
 #include "TimeIntUtils.h"
+
+#include <cstddef>
+
+
+class AnaSol;
+class FiniteElement;
+class LocalIntegral;
+class NormBase;
+class Vec3;
 
 
 /*!

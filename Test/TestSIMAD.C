@@ -10,9 +10,15 @@
 //!
 //==============================================================================
 
+#include "AdvectionDiffusion.h"
 #include "AdvectionDiffusionBDF.h"
+#include "ADFluidProperties.h"
 #include "SIMAD.h"
+
 #include "SIM2D.h"
+#include "TimeIntUtils.h"
+
+#include <string>
 
 #include "gtest/gtest.h"
 

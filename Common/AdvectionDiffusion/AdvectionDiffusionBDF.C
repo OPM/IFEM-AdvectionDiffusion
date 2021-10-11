@@ -13,14 +13,26 @@
 //==============================================================================
 
 #include "AdvectionDiffusionBDF.h"
+#include "ADFluidProperties.h"
+
 #include "FiniteElement.h"
-#include "TimeDomain.h"
-#include "ElmNorm.h"
-#include "AnaSol.h"
+#include "Fields.h"
 #include "Function.h"
-#include "Vec3Oper.h"
-#include "Utilities.h"
+#include "LocalIntegral.h"
 #include "StabilizationUtils.h"
+#include "TimeDomain.h"
+#include "Utilities.h"
+#include "Vec3Oper.h"
+
+#include <array>
+#include <cstddef>
+#include <ext/alloc_traits.h>
+#include <iostream>
+#include <memory>
+
+
+class AnaSol;
+class NormBase;
 
 
 AdvectionDiffusionBDF::AdvectionDiffusionBDF (unsigned short int n,

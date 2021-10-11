@@ -13,10 +13,22 @@
 //==============================================================================
 
 #include "AdvectionDiffusionImplicit.h"
+
+#include "ElmMats.h"
 #include "FiniteElement.h"
 #include "Function.h"
-#include "TimeDomain.h"
+#include "MatVec.h"
+#include "matrix.h"
 #include "Vec3Oper.h"
+
+#include <cstddef>
+#include <memory>
+#include <vector>
+
+
+class AnaSol;
+class LocalIntegral;
+class NormBase;
 
 
 AdvectionDiffusionImplicit::AdvectionDiffusionImplicit (unsigned short int n,
