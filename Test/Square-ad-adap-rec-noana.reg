@@ -72,4 +72,4 @@ Root mean square (RMS) of error      : 0.686885
 Min element error                    : 2.69367e-06
 Max element error                    : 0.000331733
 Average element error                : 8.39163e-05
-   \* Stopping the adaptive cyles as max steps 3 was reached.
+   \* Stopping the adaptive cycles as max steps 3 was reached.
