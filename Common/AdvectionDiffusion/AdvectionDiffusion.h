@@ -133,6 +133,18 @@ public:
   //! \brief Returns the current Cinv value.
   double getCinv() const { return Cinv; }
 
+  //! \brief Defines the Cbar element size parameter.
+  void setCbar(double Cbar_) { Cbar = Cbar_; }
+
+  //! \brief Returns the current Cbar value.
+  double getCbar() const { return Cbar; }
+
+  //! \brief Defines whether or not to use modified element size in residual estimator.
+  void setModified(bool use) { useModified = use; }
+
+  //! \brief Returns whether or not to use modified element size in residual estimator.
+  bool useModifiedElmSize() const { return useModified; }
+
   //! \brief Defines the stabilization type.
   void setStabilization(Stabilization s) { stab = s; }
 
@@ -271,7 +283,9 @@ protected:
 
   Stabilization stab; //!< The type of stabilization used
   double        Cinv; //!< Stabilization parameter
+  double        Cbar = 0.0; //!< Used in element size calculations
   bool  residualNorm; //!< If \e true, we will evaluate residual norm
+  bool useModified = false; //!< If \e true use modified element size in residual estimate
   WeakOperators::ConvectionForm advForm = WeakOperators::CONVECTIVE; //!< Advection formulation to use
 
   Vectors velocity; //!< The advecting velocity field
