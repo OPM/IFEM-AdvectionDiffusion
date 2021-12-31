@@ -170,7 +170,19 @@ bool SIMAD<Dim,Integrand>::parse (const TiXmlElement* elem)
         AD.setAdvectionForm(WeakOperators::CONSERVATIVE);
       }
     }
-    else
+    else if (strcasecmp(child->Value(),"residual") == 0) {
+      bool useModified = false;
+      utl::getAttribute(child,"modified_elm_size",useModified);
+      if (useModified)
+        IFEM::cout << "\tUsing modified element size in residual estimator." << std::endl;
+      AD.setModified(useModified);
+      double Cbar = 0.0;
+      utl::getAttribute(child,"Cbar",Cbar);
+      if (Cbar > 0.0) {
+        AD.setCbar(Cbar);
+        IFEM::cout << "\tUpper bound for reaction field: " << Cbar << std::endl;
+      }
+    } else
       this->Dim::parse(child);
 
   return true;

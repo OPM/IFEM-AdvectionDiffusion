@@ -338,7 +338,14 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
           U = (*hep.Uad)(X);
         double react = hep.reaction ? (*hep.reaction)(X) : 0.0;
         double res = f + kappa*hess.sum() - U*gradUh - react*Uh;
-        double kk = fe.h;//fe.h*std::min(1.0/(sqrt(2.0)*sqrt(13.0)),fe.h/(3.0*sqrt(10.0)*hep.props.getDiffusivity()));
+        double kk;
+        if (hep.useModifiedElmSize()) {
+          if (hep.getCbar() > 0.0)
+            kk = std::min(fe.h/sqrt(kappa), 1.0/sqrt(hep.getCbar()));
+          else
+            kk = fe.h/sqrt(kappa);
+        } else
+          kk = fe.h;
         ip++; // unused
         pnorm[ip++] += kk*kk*res*res*fe.detJxW;
         if (anasol && anasol->getScalarSecSol())
