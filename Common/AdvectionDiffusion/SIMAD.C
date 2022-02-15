@@ -284,7 +284,7 @@ bool SIMAD<Dim,Integrand>::solveStep (const TimeStep& tp, bool)
   if (!this->solveSystem(solution.front(),Dim::msgLevel-1,"temperature "))
     return false;
 
-  if (Dim::msgLevel == 1)
+  if (Dim::msgLevel >= 1)
   {
     size_t iMax[1];
     double dMax[1];
