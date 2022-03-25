@@ -35,9 +35,7 @@ AdvectionDiffusion::AdvectionDiffusion (unsigned short int n,
   : IntegrandBase(n), order(1), stab(s), Cinv(5.0), residualNorm(false)
 {
   primsol.resize(1);
-
-  Uad = nullptr;
-  reaction = source = flux = nullptr;
+  flux = nullptr;
 
   velocity.resize(2);
   registerVector("velocity1", &velocity[0]);
@@ -47,9 +45,6 @@ AdvectionDiffusion::AdvectionDiffusion (unsigned short int n,
 
 AdvectionDiffusion::~AdvectionDiffusion()
 {
-  delete Uad;
-  delete reaction;
-  delete source;
 }
 
 

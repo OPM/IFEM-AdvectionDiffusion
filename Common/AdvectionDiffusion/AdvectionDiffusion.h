@@ -18,6 +18,7 @@
 
 #include "ElmMats.h"
 #include "EqualOrderOperators.h"
+#include "Functions.h"
 #include "IntegrandBase.h"
 #include "MatVec.h"
 #include "SIMenums.h"
@@ -33,7 +34,6 @@ class AnaSol;
 class Fields;
 class FiniteElement;
 class LocalIntegral;
-class RealFunc;
 class Vec3;
 class VecFunc;
 
@@ -126,7 +126,7 @@ public:
   virtual ~AdvectionDiffusion();
 
   //! \brief Defines the source function.
-  void setSource(RealFunc* src) { source = src; }
+  void setSource(RealFunc* src) { source.reset(src); }
 
   //! \brief Defines the Cinv stabilization parameter.
   void setCinv(double Cinv_) { Cinv = Cinv_; }
@@ -152,13 +152,13 @@ public:
   Stabilization getStabilization() const { return stab; }
 
   //! \brief Defines the advection field.
-  void setAdvectionField(VecFunc* U) { Uad = U; }
+  void setAdvectionField(VecFunc* U) { Uad.reset(U); }
 
   //! \brief Defines the flux function.
   void setFlux(RealFunc* f) { flux = f; }
 
   //! \brief Defines the reaction field.
-  void setReactionField(RealFunc* f) { reaction = f; }
+  void setReactionField(RealFunc* f) { reaction.reset(f); }
 
   //! \brief Defines the global number of elements.
   void setElements(size_t els) { tauE.resize(els); }
@@ -270,9 +270,9 @@ public:
 
 
 protected:
-  VecFunc*  Uad;      //!< Pointer to advection field
-  RealFunc* reaction; //!< Pointer to the reaction field
-  RealFunc* source;   //!< Pointer to source field
+  std::unique_ptr<VecFunc>  Uad;      //!< Pointer to advection field
+  std::unique_ptr<RealFunc> reaction; //!< Pointer to the reaction field
+  std::unique_ptr<RealFunc> source;   //!< Pointer to source field
   RealFunc* flux;     //!< Pointer to the flux field
   double timeScale = 1.0; //!< Time scale factor
 
