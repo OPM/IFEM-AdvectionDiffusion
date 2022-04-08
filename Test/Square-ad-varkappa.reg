@@ -1,0 +1,19 @@
+Square-ad-varkappa.xinp
+
+Input file: Square-ad-varkappa.xinp
+	Fluid properties:
+		Scaling = Physical dimensions
+			            Density,   rho = 1
+			Thermal diffusivity, kappa = x^2\*y^2
+Number of elements    64
+Number of nodes       121
+Number of dofs        121
+Number of constraints 40
+Number of unknowns    81
+L2-norm            : 0.0813532
+Max temperature    : 0.333333
+>>> Norm summary for AdvectionDiffusion <<<
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.0563436
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.174025
+  L2 norm |T|   = (T,T)^0.5           : 0.0563436
+  H1 norm |T|   = a(T,T)^0.5          : 0.174025

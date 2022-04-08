@@ -89,6 +89,8 @@ protected:
   double Ra; //!< Rayleigh number
   std::string RaFdef; //!< Definition of Rayleigh number as a function
   std::unique_ptr<RealFunc> RaF; //!< Rayleigh number as a function
+  std::string kappaFdef; //!< Definition of kappa as a function
+  std::unique_ptr<RealFunc> kappaF; //!< Scalar thermal diffusivity as a function
   double Pr; //!< Prandtl number
 
   Scaling scaling; //!< Scaling to use.
