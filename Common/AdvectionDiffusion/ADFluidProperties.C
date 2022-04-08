@@ -65,6 +65,13 @@ void FluidProperties::parse(const TiXmlElement* elem)
     RaFdef = utl::getValue(raf,"rayleigh");
     RaF.reset(utl::parseRealFunc(RaFdef, type, false));
   }
+  const TiXmlElement* kappaf = elem->FirstChildElement("kappa");
+  if (kappaf) {
+    type.clear();
+    utl::getAttribute(kappaf,"type",type);
+    kappaFdef = utl::getValue(kappaf,"kappa");
+    kappaF.reset(utl::parseRealFunc(kappaFdef,type,false));
+  }
 }
 
 
@@ -78,7 +85,11 @@ void FluidProperties::printLog() const
              << "\n\t\tScaling = " << name_map.find(scaling)->second;
   if (scaling == PHYSICAL) {
     IFEM::cout << "\n\t\t\t            Density,   rho = " << rho
-               << "\n\t\t\tThermal diffusivity, kappa = " << kappa;
+               << "\n\t\t\tThermal diffusivity, kappa = ";
+    if (kappaF)
+      IFEM::cout << kappaFdef;
+    else
+      IFEM::cout << kappa;
   } else if (scaling == PR_RA) {
     IFEM::cout << "\n\t\t\t Prandtl number, Pr = " << Pr;
     IFEM::cout << "\n\t\t\tRayleigh number, Ra = ";
@@ -86,8 +97,8 @@ void FluidProperties::printLog() const
       IFEM::cout << Ra;
     else
       IFEM::cout << RaFdef;
-    IFEM::cout << std::endl;
   }
+  IFEM::cout << std::endl;
 }
 
 
@@ -104,6 +115,9 @@ double FluidProperties::getDiffusionConstant(const Vec3& X) const
 {
   if (scaling == PR_RA)
     return 1.0;
+
+  if (kappaF)
+    return (*kappaF)(X);
 
   return getDiffusivity();
 }
