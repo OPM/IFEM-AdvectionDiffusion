@@ -290,32 +290,32 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
   const AdvectionDiffusion& hep = static_cast<const AdvectionDiffusion&>(myProblem);
 
   // Evaluate the FE temperature and thermal conductivity at current point
-  double Uh = fe.N.dot(elmInt.vec.front());
+  double Th = fe.N.dot(elmInt.vec.front());
   double kappa = hep.getFluidProperties().getDiffusionConstant(X);
 
   // Evaluate the FE heat flux vector, gradU = dNdX^T * eV
-  Vector gradUh;
-  if (!fe.dNdX.multiply(elmInt.vec.front(),gradUh,true))
+  Vector dTh;
+  if (!fe.dNdX.multiply(elmInt.vec.front(),dTh,true))
     return false;
 
   size_t ip = 0;
-  // Integrate the L2 norm, (U^h, U^h)
-  pnorm[ip++] += Uh*Uh*fe.detJxW;
+  // Integrate the L2 norm, (T^h, T^h)
+  pnorm[ip++] += Th*Th*fe.detJxW;
 
-  // Integrate the energy norm, a(U^h,U^h)
-  pnorm[ip++] += kappa*gradUh.dot(gradUh)*fe.detJxW;
+  // Integrate the energy norm, a(T^h,T^h)
+  pnorm[ip++] += kappa*dTh.dot(dTh)*fe.detJxW;
 
   Vec3 dT;
   if (anasol && anasol->getScalarSecSol()) {
     dT = (*anasol->getScalarSecSol())(X);
     pnorm[ip++] += kappa*dT*dT*fe.detJxW;
-    pnorm[ip++] += kappa*(dT-gradUh)*(dT-gradUh)*fe.detJxW;
+    pnorm[ip++] += kappa*(dT-dTh)*(dT-dTh)*fe.detJxW;
   }
 
   if (anasol && anasol->getScalarSol()) {
     double T = (*anasol->getScalarSol())(X);
     pnorm[ip++] += T*T*fe.detJxW; // L2 norm of analytical solution
-    pnorm[ip++] += (T-Uh)*(T-Uh)*fe.detJxW; // L2 norm of error
+    pnorm[ip++] += (T-Th)*(T-Th)*fe.detJxW; // L2 norm of error
   }
 
   for (const Vector& psol : pnorm.psol)
@@ -332,7 +332,7 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
         if (hep.Uad)
           U = (*hep.Uad)(X);
         double react = hep.reaction ? (*hep.reaction)(X) : 0.0;
-        double res = f + kappa*hess.sum() - U*gradUh - react*Uh;
+        double res = f + kappa*hess.sum() - U*dTh - react*Th;
         double kk;
         if (hep.useModifiedElmSize()) {
           if (hep.getCbar() > 0.0)
@@ -347,16 +347,16 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
           ip += 2;
       }
     } else {
-      Vec3 rGrad;
+      Vec3 dTr;
       for (size_t k = 0; k < hep.nsd; k++)
-        rGrad[k] += psol.dot(fe.N,k,hep.nsd);
+        dTr[k] += psol.dot(fe.N,k,hep.nsd);
 
-      pnorm[ip++] += kappa*rGrad*rGrad*fe.detJxW;
+      pnorm[ip++] += kappa*dTr*dTr*fe.detJxW;
       // Recovery based estimate
-      pnorm[ip++] += kappa*(rGrad-gradUh)*(rGrad-gradUh)*fe.detJxW;
+      pnorm[ip++] += kappa*(dTr-dTh)*(dTr-dTh)*fe.detJxW;
 
       if (anasol && anasol->getScalarSecSol()) {
-        pnorm[ip++] += kappa*(dT-rGrad)*(dT-rGrad)*fe.detJxW;
+        pnorm[ip++] += kappa*(dT-dTr)*(dT-dTr)*fe.detJxW;
         ip++; // effectivity index
       }
     }
