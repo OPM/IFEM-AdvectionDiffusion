@@ -166,6 +166,9 @@ public:
   //! \param scale Time scaling factor
   void setTimeScale(double scale) { AD.setTimeScale(scale); }
 
+  //! \brief Apply post-processing tasks on norms.
+  bool postProcessNorms(Vectors& gNorm, Matrix* eNormp) override;
+
   //! \brief Prints integrated solution norms to the log stream.
   //! \param[in] norms The norm values
   void printNorms (const Vectors& norms, size_t) const override;

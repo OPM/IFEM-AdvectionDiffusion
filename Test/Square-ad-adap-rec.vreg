@@ -26,8 +26,8 @@ Step 1
     Scalar: 'Continuous global L2-projection effectivity index'
 Step 2
   Element block 1
-    856 nodes
-    214 elements
+    628 nodes
+    157 elements
     Displacement: 'Solution'
     Displacement: 'Exact Solution'
     Scalar: 'T'
@@ -50,8 +50,8 @@ Step 2
     Scalar: 'Continuous global L2-projection effectivity index'
 Step 3
   Element block 1
-    3076 nodes
-    769 elements
+    1960 nodes
+    490 elements
     Displacement: 'Solution'
     Displacement: 'Exact Solution'
     Scalar: 'T'
