@@ -21,7 +21,7 @@ Adaptive step 1
 Error estimates based on >>> Continuous global L2-projection <<<
   H1 norm |T^r-T^h|                  : 0.0109273
   H1 norm |T^r-T|                    : 0.00333434
-  Effectivity index eta^rec          : 0.956463
+  Effectivity index eta^T            : 0.956463
 Error estimate a(e,e)^0.5, e=T^r-T^h : 0.0109273
 Relative error (%) : 18.9033
 Effectivity index  : 0.956463
@@ -51,7 +51,7 @@ Projecting secondary solution ...
 Error estimates based on >>> Continuous global L2-projection <<<
   H1 norm |T^r-T^h|                  : 0.00556922
   H1 norm |T^r-T|                    : 0.00122728
-  Effectivity index eta^rec          : 0.976727
+  Effectivity index eta^T            : 0.976727
 Error estimate a(e,e)^0.5, e=T^r-T^h : 0.00556922
 Relative error (%) : 9.81962
 Effectivity index  : 0.976727
@@ -81,7 +81,7 @@ Projecting secondary solution ...
 Error estimates based on >>> Continuous global L2-projection <<<
   H1 norm |T^r-T^h|                  : 0.00282316
   H1 norm |T^r-T|                    : 0.000460157
-  Effectivity index eta^rec          : 0.987173
+  Effectivity index eta^T            : 0.987173
 Error estimate a(e,e)^0.5, e=T^r-T^h : 0.00282316
 Relative error (%) : 5.00224
 Effectivity index  : 0.987173
