@@ -476,8 +476,8 @@ void SIMAD<Dim,Integrand>::printNormGroup (const Vector& rNorm,
     if (rNorm.size() > 3) {
       IFEM::cout << "\n  H1 norm |T^r-T|"
                    << utl::adjustRight(w-17,"") << rNorm[2]
-                   << "\n  Effectivity index eta^rec"
-                   << utl::adjustRight(w-27,"")
+                   << "\n  Effectivity index eta^T"
+                   << utl::adjustRight(w-25,"")
                    << this->getEffectivityIndex(Vectors{fNorm, rNorm},1,2);
     }
   }
