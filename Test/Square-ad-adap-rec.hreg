@@ -40,72 +40,72 @@ Square-ad-adap-rec.xinp -adap
 /1                       Group
 /1/AdvectionDiffusion-1  Group
 /1/AdvectionDiffusion-1/basis Group
-/1/AdvectionDiffusion-1/basis/1 Dataset {29708}
+/1/AdvectionDiffusion-1/basis/1 Dataset {21564}
 /1/AdvectionDiffusion-1/fields Group
 /1/AdvectionDiffusion-1/fields/Continuous\ global\ L2-projection\ T,x Group
-/1/AdvectionDiffusion-1/fields/Continuous\ global\ L2-projection\ T,x/1 Dataset {238}
+/1/AdvectionDiffusion-1/fields/Continuous\ global\ L2-projection\ T,x/1 Dataset {176}
 /1/AdvectionDiffusion-1/fields/Continuous\ global\ L2-projection\ T,y Group
-/1/AdvectionDiffusion-1/fields/Continuous\ global\ L2-projection\ T,y/1 Dataset {238}
+/1/AdvectionDiffusion-1/fields/Continuous\ global\ L2-projection\ T,y/1 Dataset {176}
 /1/AdvectionDiffusion-1/fields/T Group
-/1/AdvectionDiffusion-1/fields/T/1 Dataset {238}
+/1/AdvectionDiffusion-1/fields/T/1 Dataset {176}
 /1/AdvectionDiffusion-1/fields/T,x Group
-/1/AdvectionDiffusion-1/fields/T,x/1 Dataset {238}
+/1/AdvectionDiffusion-1/fields/T,x/1 Dataset {176}
 /1/AdvectionDiffusion-1/fields/T,y Group
-/1/AdvectionDiffusion-1/fields/T,y/1 Dataset {238}
+/1/AdvectionDiffusion-1/fields/T,y/1 Dataset {176}
 /1/AdvectionDiffusion-1/knotspan Group
 /1/AdvectionDiffusion-1/knotspan/(T,T)^0.5 Group
-/1/AdvectionDiffusion-1/knotspan/(T,T)^0.5/1 Dataset {214}
+/1/AdvectionDiffusion-1/knotspan/(T,T)^0.5/1 Dataset {157}
 /1/AdvectionDiffusion-1/knotspan/(T^h,T^h)^0.5 Group
-/1/AdvectionDiffusion-1/knotspan/(T^h,T^h)^0.5/1 Dataset {214}
+/1/AdvectionDiffusion-1/knotspan/(T^h,T^h)^0.5/1 Dataset {157}
 /1/AdvectionDiffusion-1/knotspan/(e,e)^0.5,\ e=T-T^h Group
-/1/AdvectionDiffusion-1/knotspan/(e,e)^0.5,\ e=T-T^h/1 Dataset {214}
+/1/AdvectionDiffusion-1/knotspan/(e,e)^0.5,\ e=T-T^h/1 Dataset {157}
 /1/AdvectionDiffusion-1/knotspan/Continuous\ global\ L2-projection\ a(T^r,T^r)^0.5 Group
-/1/AdvectionDiffusion-1/knotspan/Continuous\ global\ L2-projection\ a(T^r,T^r)^0.5/1 Dataset {214}
+/1/AdvectionDiffusion-1/knotspan/Continuous\ global\ L2-projection\ a(T^r,T^r)^0.5/1 Dataset {157}
 /1/AdvectionDiffusion-1/knotspan/Continuous\ global\ L2-projection\ a(e,e)^0.5,\ e=T-T^r Group
-/1/AdvectionDiffusion-1/knotspan/Continuous\ global\ L2-projection\ a(e,e)^0.5,\ e=T-T^r/1 Dataset {214}
+/1/AdvectionDiffusion-1/knotspan/Continuous\ global\ L2-projection\ a(e,e)^0.5,\ e=T-T^r/1 Dataset {157}
 /1/AdvectionDiffusion-1/knotspan/Continuous\ global\ L2-projection\ a(e,e)^0.5,\ e=T^r-T^h Group
-/1/AdvectionDiffusion-1/knotspan/Continuous\ global\ L2-projection\ a(e,e)^0.5,\ e=T^r-T^h/1 Dataset {214}
+/1/AdvectionDiffusion-1/knotspan/Continuous\ global\ L2-projection\ a(e,e)^0.5,\ e=T^r-T^h/1 Dataset {157}
 /1/AdvectionDiffusion-1/knotspan/Continuous\ global\ L2-projection\ effectivity\ index Group
-/1/AdvectionDiffusion-1/knotspan/Continuous\ global\ L2-projection\ effectivity\ index/1 Dataset {214}
+/1/AdvectionDiffusion-1/knotspan/Continuous\ global\ L2-projection\ effectivity\ index/1 Dataset {157}
 /1/AdvectionDiffusion-1/knotspan/a(T,T)^0.5 Group
-/1/AdvectionDiffusion-1/knotspan/a(T,T)^0.5/1 Dataset {214}
+/1/AdvectionDiffusion-1/knotspan/a(T,T)^0.5/1 Dataset {157}
 /1/AdvectionDiffusion-1/knotspan/a(T^h,T^h)^0.5 Group
-/1/AdvectionDiffusion-1/knotspan/a(T^h,T^h)^0.5/1 Dataset {214}
+/1/AdvectionDiffusion-1/knotspan/a(T^h,T^h)^0.5/1 Dataset {157}
 /1/AdvectionDiffusion-1/knotspan/a(e,e)^0.5,\ e=T-T^h Group
-/1/AdvectionDiffusion-1/knotspan/a(e,e)^0.5,\ e=T-T^h/1 Dataset {214}
+/1/AdvectionDiffusion-1/knotspan/a(e,e)^0.5,\ e=T-T^h/1 Dataset {157}
 /2                       Group
 /2/AdvectionDiffusion-1  Group
 /2/AdvectionDiffusion-1/basis Group
-/2/AdvectionDiffusion-1/basis/1 Dataset {112930}
+/2/AdvectionDiffusion-1/basis/1 Dataset {71107}
 /2/AdvectionDiffusion-1/fields Group
 /2/AdvectionDiffusion-1/fields/Continuous\ global\ L2-projection\ T,x Group
-/2/AdvectionDiffusion-1/fields/Continuous\ global\ L2-projection\ T,x/1 Dataset {802}
+/2/AdvectionDiffusion-1/fields/Continuous\ global\ L2-projection\ T,x/1 Dataset {514}
 /2/AdvectionDiffusion-1/fields/Continuous\ global\ L2-projection\ T,y Group
-/2/AdvectionDiffusion-1/fields/Continuous\ global\ L2-projection\ T,y/1 Dataset {802}
+/2/AdvectionDiffusion-1/fields/Continuous\ global\ L2-projection\ T,y/1 Dataset {514}
 /2/AdvectionDiffusion-1/fields/T Group
-/2/AdvectionDiffusion-1/fields/T/1 Dataset {802}
+/2/AdvectionDiffusion-1/fields/T/1 Dataset {514}
 /2/AdvectionDiffusion-1/fields/T,x Group
-/2/AdvectionDiffusion-1/fields/T,x/1 Dataset {802}
+/2/AdvectionDiffusion-1/fields/T,x/1 Dataset {514}
 /2/AdvectionDiffusion-1/fields/T,y Group
-/2/AdvectionDiffusion-1/fields/T,y/1 Dataset {802}
+/2/AdvectionDiffusion-1/fields/T,y/1 Dataset {514}
 /2/AdvectionDiffusion-1/knotspan Group
 /2/AdvectionDiffusion-1/knotspan/(T,T)^0.5 Group
-/2/AdvectionDiffusion-1/knotspan/(T,T)^0.5/1 Dataset {769}
+/2/AdvectionDiffusion-1/knotspan/(T,T)^0.5/1 Dataset {490}
 /2/AdvectionDiffusion-1/knotspan/(T^h,T^h)^0.5 Group
-/2/AdvectionDiffusion-1/knotspan/(T^h,T^h)^0.5/1 Dataset {769}
+/2/AdvectionDiffusion-1/knotspan/(T^h,T^h)^0.5/1 Dataset {490}
 /2/AdvectionDiffusion-1/knotspan/(e,e)^0.5,\ e=T-T^h Group
-/2/AdvectionDiffusion-1/knotspan/(e,e)^0.5,\ e=T-T^h/1 Dataset {769}
+/2/AdvectionDiffusion-1/knotspan/(e,e)^0.5,\ e=T-T^h/1 Dataset {490}
 /2/AdvectionDiffusion-1/knotspan/Continuous\ global\ L2-projection\ a(T^r,T^r)^0.5 Group
-/2/AdvectionDiffusion-1/knotspan/Continuous\ global\ L2-projection\ a(T^r,T^r)^0.5/1 Dataset {769}
+/2/AdvectionDiffusion-1/knotspan/Continuous\ global\ L2-projection\ a(T^r,T^r)^0.5/1 Dataset {490}
 /2/AdvectionDiffusion-1/knotspan/Continuous\ global\ L2-projection\ a(e,e)^0.5,\ e=T-T^r Group
-/2/AdvectionDiffusion-1/knotspan/Continuous\ global\ L2-projection\ a(e,e)^0.5,\ e=T-T^r/1 Dataset {769}
+/2/AdvectionDiffusion-1/knotspan/Continuous\ global\ L2-projection\ a(e,e)^0.5,\ e=T-T^r/1 Dataset {490}
 /2/AdvectionDiffusion-1/knotspan/Continuous\ global\ L2-projection\ a(e,e)^0.5,\ e=T^r-T^h Group
-/2/AdvectionDiffusion-1/knotspan/Continuous\ global\ L2-projection\ a(e,e)^0.5,\ e=T^r-T^h/1 Dataset {769}
+/2/AdvectionDiffusion-1/knotspan/Continuous\ global\ L2-projection\ a(e,e)^0.5,\ e=T^r-T^h/1 Dataset {490}
 /2/AdvectionDiffusion-1/knotspan/Continuous\ global\ L2-projection\ effectivity\ index Group
-/2/AdvectionDiffusion-1/knotspan/Continuous\ global\ L2-projection\ effectivity\ index/1 Dataset {769}
+/2/AdvectionDiffusion-1/knotspan/Continuous\ global\ L2-projection\ effectivity\ index/1 Dataset {490}
 /2/AdvectionDiffusion-1/knotspan/a(T,T)^0.5 Group
-/2/AdvectionDiffusion-1/knotspan/a(T,T)^0.5/1 Dataset {769}
+/2/AdvectionDiffusion-1/knotspan/a(T,T)^0.5/1 Dataset {490}
 /2/AdvectionDiffusion-1/knotspan/a(T^h,T^h)^0.5 Group
-/2/AdvectionDiffusion-1/knotspan/a(T^h,T^h)^0.5/1 Dataset {769}
+/2/AdvectionDiffusion-1/knotspan/a(T^h,T^h)^0.5/1 Dataset {490}
 /2/AdvectionDiffusion-1/knotspan/a(e,e)^0.5,\ e=T-T^h Group
-/2/AdvectionDiffusion-1/knotspan/a(e,e)^0.5,\ e=T-T^h/1 Dataset {769}
+/2/AdvectionDiffusion-1/knotspan/a(e,e)^0.5,\ e=T-T^h/1 Dataset {490}

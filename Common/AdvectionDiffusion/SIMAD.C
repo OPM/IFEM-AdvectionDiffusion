@@ -403,6 +403,27 @@ SIM::ConvStatus SIMAD<Dim,Integrand>::solveIteration (TimeStep& tp)
 
 
 template<class Dim, class Integrand>
+bool SIMAD<Dim,Integrand>::postProcessNorms (Vectors& gNorm,
+                                             Matrix* eNormp)
+{
+  if (this->opt.project.empty() || !eNormp)
+    return true;
+
+  NormBase* norm = AD.getNormIntegrand(Dim::mySol);
+  size_t ip = norm->getNoFields(1);
+  delete norm;
+
+  Matrix& eNorm = *eNormp;
+  for (size_t i = 1; i <= eNorm.cols(); ++ i) {
+    // we need the squares for multi-patch summations
+    eNorm(ip+2,i) = eNorm(ip+2,i)*eNorm(ip+2,i);
+  }
+
+  return true;
+}
+
+
+template<class Dim, class Integrand>
 void SIMAD<Dim,Integrand>::printNorms (const Vectors& norms, size_t) const
 {
   if (norms.empty()) return;

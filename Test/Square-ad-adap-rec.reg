@@ -10,6 +10,8 @@ Enabled projection(s): Continuous global L2-projection
  >>> Starting adaptive simulation based on
      Continuous global L2-projection error estimates (norm group 1) <<<
 Adaptive step 1
+L2-norm            : 0.0703478
+Max temperature    : 0.333333
 >>> Norm summary for AdvectionDiffusion <<<
   L2 norm |T^h| = (T^h,T^h)^0.5       : 0.0567639
   H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.135588
@@ -25,67 +27,66 @@ Error estimates based on >>> Continuous global L2-projection <<<
 Error estimate a(e,e)^0.5, e=T^r-T^h : 0.0109273
 Relative error (%) : 18.9033
 Effectivity index  : 0.956463
-Root mean square (RMS) of error      : 0.947684
-Min element error                    : 3.08336e-06
-Max element error                    : 0.0042274
-Average element error                : 0.000991428
-Refining 50 basis functions with errors in range \[0.00148772,0.0133136\] 10% of max error (0.00133136)
+Root mean square (RMS) of error      : 1.69368
+Min element error                    : 9.5071e-12
+Max element error                    : 1.78709e-05
+Average element error                : 1.8657e-06
+Refining 28 basis functions with errors in range \[4.82643e-06,4.56083e-05\] 10% of max error (4.56083e-06)
+Refined mesh: 157 elements 176 nodes.
 Adaptive step 2
-Number of elements    214
-Number of nodes       238
-Number of dofs        238
-Number of constraints 55
-Number of unknowns    183
-L2-norm            : 0.0698201
+Number of elements    157
+Number of nodes       176
+Number of dofs        176
+Number of constraints 48
+Number of unknowns    128
+L2-norm            : 0.0811242
 Max temperature    : 0.333333
-Projecting secondary solution ...
-	Continuous global L2-projection
 >>> Norm summary for AdvectionDiffusion <<<
   L2 norm |T^h| = (T^h,T^h)^0.5       : 0.0564411
-  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.135464
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.135465
   L2 norm |T|   = (T,T)^0.5           : 0.0563436
   H1 norm |T|   = a(T,T)^0.5          : 0.135459
-  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 0.000138679
-  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.00570192
-  Exact relative error (%)            : 4.20932
+  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 0.000177886
+  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.00603363
+  Exact relative error (%)            : 4.4542
 Error estimates based on >>> Continuous global L2-projection <<<
-  H1 norm |T^r-T^h|                  : 0.00556922
-  H1 norm |T^r-T|                    : 0.00122728
-  Effectivity index eta^T            : 0.976727
-Error estimate a(e,e)^0.5, e=T^r-T^h : 0.00556922
-Relative error (%) : 9.81962
-Effectivity index  : 0.976727
-Root mean square (RMS) of error      : 0.783647
-Min element error                    : 3.13089e-06
-Max element error                    : 0.00123131
-Average element error                : 0.000299655
-Refining 185 basis functions with errors in range \[0.000423284,0.00415853\] 10% of max error (0.000415853)
+  H1 norm |T^r-T^h|                  : 0.00587499
+  H1 norm |T^r-T|                    : 0.00142047
+  Effectivity index eta^T            : 0.973707
+Error estimate a(e,e)^0.5, e=T^r-T^h : 0.00587499
+Relative error (%) : 10.3531
+Effectivity index  : 0.973707
+Root mean square (RMS) of error      : 1.06609
+Min element error                    : 9.22907e-12
+Max element error                    : 1.51615e-06
+Average element error                : 2.19844e-07
+Refining 101 basis functions with errors in range \[4.50221e-07,4.39342e-06\] 10% of max error (4.39342e-07)
+Refined mesh: 490 elements 514 nodes.
 Adaptive step 3
-Number of elements    769
-Number of nodes       802
-Number of dofs        802
-Number of constraints 95
-Number of unknowns    707
-L2-norm            : 0.0697495
+Number of elements    490
+Number of nodes       514
+Number of dofs        514
+Number of constraints 82
+Number of unknowns    432
+L2-norm            : 0.086774
 Max temperature    : 0.333333
-Projecting secondary solution ...
-	Continuous global L2-projection
 >>> Norm summary for AdvectionDiffusion <<<
-  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.0563673
-  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.135456
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.056368
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.135455
   L2 norm |T|   = (T,T)^0.5           : 0.0563436
   H1 norm |T|   = a(T,T)^0.5          : 0.135459
-  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 3.5641e-05
-  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.00285984
-  Exact relative error (%)            : 2.11122
+  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 6.03245e-05
+  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.00326182
+  Exact relative error (%)            : 2.40797
 Error estimates based on >>> Continuous global L2-projection <<<
-  H1 norm |T^r-T^h|                  : 0.00282316
-  H1 norm |T^r-T|                    : 0.000460157
-  Effectivity index eta^T            : 0.987173
-Error estimate a(e,e)^0.5, e=T^r-T^h : 0.00282316
-Relative error (%) : 5.00224
-Effectivity index  : 0.987173
-Root mean square (RMS) of error      : 0.686885
-Min element error                    : 2.69367e-06
-Max element error                    : 0.000331733
-Average element error                : 8.39163e-05
+  H1 norm |T^r-T^h|                  : 0.00319508
+  H1 norm |T^r-T|                    : 0.000671701
+  Effectivity index eta^T            : 0.97954
+Error estimate a(e,e)^0.5, e=T^r-T^h : 0.00319508
+Relative error (%) : 5.65917
+Effectivity index  : 0.97954
+Root mean square (RMS) of error      : 0.833731
+Min element error                    : 9.062e-12
+Max element error                    : 1.10047e-07
+Average element error                : 2.08338e-08
+   \* Stopping the adaptive cycles as max steps 3 was reached.

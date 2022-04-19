@@ -1,8 +1,5 @@
 Square-ad-adap-res.xinp -adap
 
-Input file: Square-ad-adap-res.xinp
-Equation solver: 2
-Number of Gauss points: 4
 LR-spline basis functions are used
 Number of elements    64
 Number of nodes       81
@@ -31,63 +28,64 @@ Error estimates based on >>> Pure residuals <<<
 Error estimate             |T^h|_res : 0.125968
 Relative error (%) : 91.1701
 Effectivity index  : 6.03921
-Root mean square (RMS) of error      : 0.997473
-Min element error                    : 3.07588e-05
-Max element error                    : 0.0488364
-Average element error                : 0.0111482
-Refining 49 basis functions with errors in range \[0.0175035,0.160098\] 10% of max error (0.0160098)
-Refined mesh: 211 elements 234 nodes.
+Root mean square (RMS) of error      : 1.78483
+Min element error                    : 9.46105e-10
+Max element error                    : 0.00238499
+Average element error                : 0.000247937
+Refining 26 basis functions with errors in range \[0.000680429,0.0065528\] 10% of max error (0.00065528)
+Refined mesh: 148 elements 165 nodes.
 Adaptive step 2
-Number of elements    211
-Number of nodes       234
-Number of dofs        234
-Number of constraints 54
-Number of unknowns    180
-L2-norm            : 0.0704152
+Number of elements    148
+Number of nodes       165
+Number of dofs        165
+Number of constraints 45
+Number of unknowns    120
+L2-norm            : 0.0837822
 Max temperature    : 0.333333
 >>> Norm summary for AdvectionDiffusion <<<
-  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.056442
-  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.24732
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.0564416
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.247316
   L2 norm |T|   = (T,T)^0.5           : 0.0563436
   H1 norm |T|   = a(T,T)^0.5          : 0.247314
-  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 0.000139722
-  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.0104134
-  Exact relative error (%)            : 4.21059
+  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 0.000208672
+  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.011398
+  Exact relative error (%)            : 4.60873
 Error estimates based on >>> Pure residuals <<<
-  Residual norm                      : 0.0631065
-  Effectivity index eta^res          : 6.06015
-Error estimate             |T^h|_res : 0.0631065
-Relative error (%) : 74.5369
-Effectivity index  : 6.06015
-Root mean square (RMS) of error      : 0.818224
-Min element error                    : 3.07588e-05
-Max element error                    : 0.0134167
-Average element error                : 0.00336233
-Refining 181 basis functions with errors in range \[0.00487477,0.0487098\] 10% of max error (0.00487098)
-Refined mesh: 754 elements 788 nodes.
+  Residual norm                      : 0.0674546
+  Effectivity index eta^res          : 5.91811
+Error estimate             |T^h|_res : 0.0674546
+Relative error (%) : 76.6937
+Effectivity index  : 5.91811
+Root mean square (RMS) of error      : 1.11494
+Min element error                    : 9.46105e-10
+Max element error                    : 0.000180008
+Average element error                : 3.07441e-05
+Refining 98 basis functions with errors in range \[6.0148e-05,0.000596129\] 10% of max error (5.96129e-05)
+Refined mesh: 448 elements 471 nodes.
 Adaptive step 3
-Number of elements    754
-Number of nodes       788
-Number of dofs        788
-Number of constraints 96
-Number of unknowns    692
-L2-norm            : 0.0703668
+Number of elements    448
+Number of nodes       471
+Number of dofs        471
+Number of constraints 77
+Number of unknowns    394
+L2-norm            : 0.0906022
 Max temperature    : 0.333333
 >>> Norm summary for AdvectionDiffusion <<<
-  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.0563674
-  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.247307
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.0563679
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.24731
   L2 norm |T|   = (T,T)^0.5           : 0.0563436
   H1 norm |T|   = a(T,T)^0.5          : 0.247314
-  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 3.60383e-05
-  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.00523276
-  Exact relative error (%)            : 2.11584
+  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 6.56649e-05
+  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.00622444
+  Exact relative error (%)            : 2.51682
 Error estimates based on >>> Pure residuals <<<
-  Residual norm                      : 0.0317011
-  Effectivity index eta^res          : 6.0582
-Error estimate             |T^h|_res : 0.0317011
-Relative error (%) : 49.0196
-Effectivity index  : 6.0582
-Root mean square (RMS) of error      : 0.715177
-Min element error                    : 3.07588e-05
-Max element error                    : 0.00351516
-Average element error                : 0.000939048
+  Residual norm                      : 0.0366483
+  Effectivity index eta^res          : 5.88781
+Error estimate             |T^h|_res : 0.0366483
+Relative error (%) : 54.5084
+Effectivity index  : 5.88781
+Root mean square (RMS) of error      : 0.882191
+Min element error                    : 9.46105e-10
+Max element error                    : 1.50024e-05
+Average element error                : 2.99799e-06
+   \* Stopping the adaptive cycles as max steps 3 was reached.

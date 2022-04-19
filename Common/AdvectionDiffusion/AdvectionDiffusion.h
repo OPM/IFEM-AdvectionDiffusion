@@ -174,10 +174,10 @@ public:
   //! \brief Defines which FE quantities are needed by the integrand.
   int getIntegrandType() const override;
 
-  //! \brief Set whether we evaluate residual norm
+  //! \brief Set whether we evaluate residual norm.
   void setResidualNorm(bool on) { residualNorm = on; }
 
-  //! \brief True if we evaluate residual norm
+  //! \brief True if we evaluate residual norm.
   bool doResidualNorm() const { return residualNorm; }
 
   using IntegrandBase::getLocalIntegral;
