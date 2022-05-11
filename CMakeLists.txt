@@ -106,12 +106,11 @@ list(APPEND TEST_APPS AdvectionDiffusion)
 # Unit tests
 IFEM_add_test_app(${PROJECT_SOURCE_DIR}/Test/*.C
                   ${PROJECT_SOURCE_DIR}/Test
-                  AdvectionDiffusion
+                  AdvectionDiffusion 0
                   CommonAD IFEMAppCommon ${IFEM_LIBRARIES})
 
 if(IFEM_COMMON_APP_BUILD)
   set(TEST_APPS ${TEST_APPS} PARENT_SCOPE)
-  set(UNIT_TEST_NUMBER ${UNIT_TEST_NUMBER} PARENT_SCOPE)
 else()
   add_check_target()
 endif()
