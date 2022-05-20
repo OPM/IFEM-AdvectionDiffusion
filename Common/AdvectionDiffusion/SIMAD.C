@@ -309,13 +309,20 @@ bool SIMAD<Dim,Integrand>::solveStep (const TimeStep& tp, bool)
   Vector dummy;
   this->updateDirichlet(tp.time.t,&dummy);
 
+  int msgL = Dim::msgLevel-1;
+  if (!standalone)
+    std::swap(msgL, Dim::msgLevel);
+
   if (!this->assembleSystem(tp.time,solution))
     return false;
 
   if (!this->solveSystem(solution.front(),Dim::msgLevel-1,"temperature "))
     return false;
 
-  if (Dim::msgLevel >= 1)
+  if (!standalone)
+    std::swap(msgL, Dim::msgLevel);
+
+  if (Dim::msgLevel < 2 || !standalone)
   {
     size_t iMax[1];
     double dMax[1];
