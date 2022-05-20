@@ -29,6 +29,7 @@
 
 
 class DataExporter;
+class RealFunc;
 class SIMoutput;
 class TimeStep;
 class TiXmlElement;
@@ -178,6 +179,12 @@ public:
 
   //! \brief Returns a reference to the projection vectors.
   Vectors& getProjections() { return projs; }
+
+  //! \brief Set source function.
+  void setSource(RealFunc* f) { AD.setSource(f); }
+
+  //! \brief Returns a reference to integrand.
+  const Integrand& getIntegrand() const { return AD; }
 
 protected:
   //! \brief Initializes for integration of Neumann terms for a given property.
