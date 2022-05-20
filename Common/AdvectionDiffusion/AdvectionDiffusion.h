@@ -274,6 +274,12 @@ public:
   //! \brief Registers where we can inject a mixed-basis vector field.
   void setNamedFields(const std::string&, Fields*) override;
 
+  //! \brief Returns a const reference to external velocity field.
+  //! \param idx Index of velocity field to obtain
+  const Fields* getVelocityField(size_t idx) const
+  {
+    return idx > 1 ? nullptr : uFields[idx].get();
+  }
 
 protected:
   std::unique_ptr<VecFunc>  Uad;      //!< Pointer to advection field
