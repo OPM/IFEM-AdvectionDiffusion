@@ -38,6 +38,7 @@
 #include <algorithm>
 #include <iostream>
 #include <string>
+#include <type_traits>
 #include <vector>
 
 
@@ -51,6 +52,8 @@ int runSimulatorStationary (char* infile, AD& model, bool printNorms)
   utl::profiler->start("Model input");
 
   Solver<AD> solver(model);
+  if constexpr (std::is_same<Solver<AD>, SIMSolverAdap<AD>>::value)
+    solver.setExporterName("T");
 
   int res = ConfigureSIM(model, infile, typename AD::SetupProps());
   if (res)

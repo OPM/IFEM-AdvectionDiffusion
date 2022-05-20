@@ -397,9 +397,9 @@ void SIMAD<Dim,Integrand>::registerFields (DataExporter& exporter,
   if (Dim::opt.saveNorms)
     results |= DataExporter::NORMS;
 
-  exporter.registerField("u","temperature",DataExporter::SIM,
+  exporter.registerField("T","temperature",DataExporter::SIM,
                          results, prefix);
-  exporter.setFieldValue("u", this, &this->getSolution(0),&projs,&eNorm);
+  exporter.setFieldValue("T", this, &this->getSolution(0),&projs,&eNorm);
 }
 
 
