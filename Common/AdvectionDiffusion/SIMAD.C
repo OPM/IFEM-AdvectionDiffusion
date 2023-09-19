@@ -409,12 +409,11 @@ bool SIMAD<Dim,Integrand>::postProcessNorms (Vectors& gNorm,
   if (this->opt.project.empty() || !eNormp)
     return true;
 
-  NormBase* norm = AD.getNormIntegrand(Dim::mySol);
+  std::unique_ptr<NormBase> norm(AD.getNormIntegrand(Dim::mySol));
   size_t ip = norm->getNoFields(1);
-  delete norm;
 
   Matrix& eNorm = *eNormp;
-  for (size_t i = 1; i <= eNorm.cols(); ++ i) {
+  for (size_t i = 1; i <= eNorm.cols() && ip + 2 <= eNorm.rows(); ++ i) {
     // we need the squares for multi-patch summations
     eNorm(ip+2,i) = eNorm(ip+2,i)*eNorm(ip+2,i);
   }
@@ -428,7 +427,7 @@ void SIMAD<Dim,Integrand>::printNorms (const Vectors& norms, size_t) const
 {
   if (norms.empty()) return;
 
-  NormBase* norm = this->getNormIntegrand();
+  std::unique_ptr<NormBase> norm(this->getNormIntegrand());
   const Vector& n = norms.front();
 
   this->printExactNorms(norms.front());
@@ -439,7 +438,6 @@ void SIMAD<Dim,Integrand>::printNorms (const Vectors& norms, size_t) const
       this->printNormGroup(norms[j],n,prj.second);
 
   IFEM::cout << std::endl;
-  delete norm;
 }
 
 
