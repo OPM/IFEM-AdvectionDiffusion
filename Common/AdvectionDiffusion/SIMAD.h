@@ -32,6 +32,7 @@ class DataExporter;
 class SIMoutput;
 class TimeStep;
 class TiXmlElement;
+class VecFunc;
 
 
 /*!
@@ -51,6 +52,7 @@ public:
     Integrand* integrand = nullptr; //!< Integrand to use
     SIMoutput* share = nullptr; //!< Simulator to share grid with
     bool standalone = false; //!< Simulator runs standalone
+    const VecFunc* anaVel = nullptr; //!< Analytic advection velocity (Boussinesq)
   };
 
   //! \brief Default constructor.
@@ -61,7 +63,9 @@ public:
   //! \brief Constructs from given properties.
   explicit SIMAD(const SetupProps& props) :
     SIMAD(*props.integrand, props.standalone)
-  {}
+  {
+    anaVel = props.anaVel;
+  }
 
   //! \brief The destructor clears the VTF-file pointer, unless stand-alone.
   //! \details This is needed when the VTF-file is assumed to be owned by
@@ -197,11 +201,13 @@ private:
   typename Integrand::Robin robinBC; //!< Robin integrand definition
   Vectors projs; //!< Projection vectors
   Matrix eNorm; //!< Element norms
+  const VecFunc* anaVel = nullptr; //!< Externally provided velocity solution for source
 
   const Vector* extsol = nullptr; //!< Solution vector for adaptive simulators
   bool standalone = false; //!< If \e true, this simulator owns the VTF object
   std::string inputContext; //!< Input context
   int aCode[2] = {0}; //!< Analytical BC code (used by destructor)
+  bool useAnasolSource = false; //!< True to use source function derived from anasol
 };
 
 

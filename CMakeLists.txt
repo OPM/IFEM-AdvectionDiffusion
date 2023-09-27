@@ -20,6 +20,10 @@ include_directories(${IFEM_INCLUDES} ../Common ${PROJECT_SOURCE_DIR} Common/Adve
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
+# Testing
+enable_testing()
+include(IFEMTesting)
+
 add_subdirectory(Common/AdvectionDiffusion)
 
 add_executable(AdvectionDiffusion main_AdvectionDiffusion.C AdvectionDiffusionArgs.C)
@@ -33,10 +37,6 @@ install(TARGETS AdvectionDiffusion DESTINATION bin)
 # For generating the doxy
 set(EXTRA_DOXY_PATHS "${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR}")
 add_doc_target(AdvectionDiffusion AdvectionDiffusion)
-
-# Testing
-enable_testing()
-include(IFEMTesting)
 
 if(MPI_FOUND)
   if(HDF5_FOUND AND CEREAL_FOUND)
@@ -102,12 +102,6 @@ if(NOT MPI_FOUND OR IFEM_SERIAL_TESTS_IN_PARALLEL)
   ifem_add_hdf5_test(Square-ad.hreg AdvectionDiffusion)
 endif()
 list(APPEND TEST_APPS AdvectionDiffusion)
-
-# Unit tests
-IFEM_add_test_app(${PROJECT_SOURCE_DIR}/Test/*.C
-                  ${PROJECT_SOURCE_DIR}/Test
-                  AdvectionDiffusion 0
-                  CommonAD IFEMAppCommon ${IFEM_LIBRARIES})
 
 if(IFEM_COMMON_APP_BUILD)
   set(TEST_APPS ${TEST_APPS} PARENT_SCOPE)

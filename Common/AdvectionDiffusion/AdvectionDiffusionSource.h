@@ -18,6 +18,7 @@
 #include <memory>
 
 
+class AnaSol;
 class Vec3;
 class TiXmlElement;
 
@@ -25,6 +26,37 @@ class TiXmlElement;
 namespace AD {
 
 class FluidProperties;
+
+/*!
+  \brief Class that derives the Advection-Diffusion source function from the analytic solution.
+ */
+
+class AdvectionDiffusionAnaSolSource : public RealFunc
+{
+public:
+  //! \brief Constructor.
+  //! \param aSol Analytic solution to use
+  //! \param U Advecting field
+  //! \param props Fluid properties
+  //! \param rField Reaction field
+  //! \param stationary True for a stationary solution
+  AdvectionDiffusionAnaSolSource(const AnaSol& aSol,
+                                 const VecFunc& U,
+                                 const FluidProperties& props,
+                                 const RealFunc* rField,
+                                 bool stationary);
+
+protected:
+  //! \brief Evaluates the function.
+  double evaluate(const Vec3& X) const override;
+
+  const AnaSol& anaSol; //!< Reference to analytic solution
+  const VecFunc& adVel; //!< Advecting velocity field
+  const FluidProperties& props; //!< Fluid properties
+  const RealFunc* reaction; //!< Reaction field
+  bool stat; //!< True for a stationary solution
+};
+
 
 /*!
   \brief Class that derives the Advection-Diffusion source function from solution components.
@@ -36,13 +68,17 @@ public:
   //! \brief Constructor.
   //! \param elem XML element to parse
   //! \param props Fluid properties
+  //! \param react Reaction field
   AdvectionDiffusionSource(const TiXmlElement* elem,
-                           const FluidProperties& props);
+                           const FluidProperties& props,
+                           const RealFunc* react = nullptr);
 
 protected:
   //! \brief Evaluates the function.
   double evaluate(const Vec3& X) const override;
 
+  std::unique_ptr<RealFunc> T; //!< Temperature T
+  const RealFunc* reaction; //!< Reaction field
   std::unique_ptr<VecFunc> lapT; //!< Laplacian of T
   std::unique_ptr<VecFunc> gradT; //!< Gradient of T
   std::unique_ptr<VecFunc> U; //!< Advection velocity

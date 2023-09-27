@@ -27,4 +27,14 @@ foreach(src ${AD_SOURCES})
   list(APPEND CHECK_SOURCES ${PROJECT_SOURCE_DIR}/${src})
 endforeach()
 
+# Unit tests
+set(TEST_SOURCES ${PROJECT_SOURCE_DIR}/Test/TestAdvectionDiffusionSource.C
+                 ${PROJECT_SOURCE_DIR}/Test/TestFluidProperties.C
+                 ${PROJECT_SOURCE_DIR}/Test/TestSIMAD.C)
+IFEM_add_test_app("${TEST_SOURCES}"
+                  ${PROJECT_SOURCE_DIR}/../../Test
+                  AdvectionDiffusion 0
+                  CommonAD IFEMAppCommon ${IFEM_LIBRARIES})
+
+set(TEST_APPS ${TEST_APPS} PARENT_SCOPE)
 set(CHECK_SOURCES ${CHECK_SOURCES} PARENT_SCOPE)

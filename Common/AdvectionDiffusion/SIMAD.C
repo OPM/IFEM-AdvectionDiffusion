@@ -135,15 +135,19 @@ bool SIMAD<Dim,Integrand>::parse (const TiXmlElement* elem)
       AD.setReactionField(new EvalFunction(value));
       IFEM::cout <<"Reaction field: "<< value << std::endl;
     }
-    else if ((value = utl::getValue(child,"source"))) {
+    else if (strcasecmp(child->Value(),"source") == 0) {
       std::string type;
       utl::getAttribute(child, "type", type);
       if (type == "expression") {
+        const char* value = utl::getValue(child, "source");
         AD.setSource(new EvalFunction(value));
         IFEM::cout <<"Source field: "<< value << std::endl;
       } else if (type == "components") {
         IFEM::cout << "\tSource function:";
         AD.setSource(new AD::AdvectionDiffusionSource(child, AD.getFluidProperties()));
+      } else if (type == "anasol") {
+        IFEM::cout << "\tSource function: derived from analytic solution" << std::endl;
+        useAnasolSource = true;
       }
     }
     else if (strcasecmp(child->Value(),"anasol") == 0) {
@@ -207,6 +211,21 @@ bool SIMAD<Dim,Integrand>::init (const TimeStep&)
 
   if (this->opt.project.find(SIMoptions::NONE) != this->opt.project.end())
     AD.setResidualNorm(true);
+
+  if (useAnasolSource) {
+    using ADSource = AD::AdvectionDiffusionAnaSolSource;
+    if (Dim::mySol && (AD.getAdvectionField() || anaVel)) {
+      const VecFunc& u = AD.getAdvectionField() ?
+                             *AD.getAdvectionField() : *anaVel;
+      AD.setSource(new ADSource(*Dim::mySol,
+                                u,
+                                AD.getFluidProperties(),
+                                AD.getReactionField(),
+                                AD.getTimeMethod() == TimeIntegration::NONE));
+    } else
+      std::cerr << "*** Asked to use source function from analytic solution, but no"
+                    " analytic solution given. No source function added." << std::endl;
+  }
 
   return true;
 }

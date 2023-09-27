@@ -14,6 +14,7 @@
 #include "AdvectionDiffusionSource.h"
 #include "ADFluidProperties.h"
 
+#include "AnaSol.h"
 #include "Functions.h"
 #include "IFEM.h"
 #include "LogStream.h"
@@ -29,16 +30,54 @@
 
 namespace AD {
 
-AdvectionDiffusionSource::AdvectionDiffusionSource(const TiXmlElement* elem,
-                                                   const FluidProperties& prop) :
-  props(prop)
+AdvectionDiffusionAnaSolSource::
+AdvectionDiffusionAnaSolSource (const AnaSol& aSol,
+                                const VecFunc& U,
+                                const FluidProperties& prop,
+                                const RealFunc* rField,
+                                bool stationary) :
+  anaSol(aSol), adVel(U), props(prop), reaction(rField), stat(stationary)
 {
+}
+
+
+double AdvectionDiffusionAnaSolSource::evaluate (const Vec3& X) const
+{
+  const SymmTensor hess = anaSol.getScalarSol()->hessian(X);
+  const Vec3 grad = anaSol.getScalarSol()->gradient(X);
+  const Vec3 u = adVel(X);
+
+  double result = -props.getDiffusivity() * hess.trace() +
+                   props.getMassAdvectionConstant()*(u*grad);
+  if (reaction)
+    result += props.getReactionConstant(X)*(*reaction)(X) * (*anaSol.getScalarSol())(X);
+  if (!stat)
+    result += anaSol.getScalarSol()->timeDerivative(X);
+
+  return result;
+}
+
+
+AdvectionDiffusionSource::AdvectionDiffusionSource (const TiXmlElement* elem,
+                                                    const FluidProperties& prop,
+                                                    const RealFunc* react) :
+  reaction(react), props(prop)
+{
+  const TiXmlElement* tt = elem->FirstChildElement("temperature");
+  if (tt) {
+    std::string type;
+    utl::getAttribute(tt, "type", type);
+    std::string func = utl::getValue(tt, "temperature");
+    IFEM::cout << "\n\t\t         Temperature (" << type << ")";
+    T.reset(utl::parseRealFunc(func, type));
+  }
+
   const TiXmlElement* tg = elem->FirstChildElement("temperature_grad");
   if (tg) {
     std::string type;
     utl::getAttribute(tg, "type", type);
     std::string func = utl::getValue(tg, "temperature_grad");
-    IFEM::cout << "\n\t\tTemperature gradient (" << type << ") = " << func;
+    IFEM::cout << "\n\t\tTemperature gradient (" << type << ")";
     gradT.reset(utl::parseVecFunc(func, type));
   }
 
@@ -47,7 +86,7 @@ AdvectionDiffusionSource::AdvectionDiffusionSource(const TiXmlElement* elem,
     std::string type;
     utl::getAttribute(lap, "type", type);
     std::string func = utl::getValue(lap, "laplacian");
-    IFEM::cout << "\n\t\tLaplacian (" << type << ") = " << func;
+    IFEM::cout << "\n\t\t           Laplacian (" << type << ")";
     lapT.reset(utl::parseVecFunc(func, type));
   }
 
@@ -56,7 +95,7 @@ AdvectionDiffusionSource::AdvectionDiffusionSource(const TiXmlElement* elem,
     std::string type;
     utl::getAttribute(grad, "type", type);
     std::string func = utl::getValue(grad, "velocity");
-    IFEM::cout << "\n\t\tVelocity (" << type <<  ") = " << func;
+    IFEM::cout << "\n\t\t            Velocity (" << type <<  ")";
     U.reset(utl::parseVecFunc(func, type));
   }
 
@@ -66,13 +105,18 @@ AdvectionDiffusionSource::AdvectionDiffusionSource(const TiXmlElement* elem,
 }
 
 
-double AdvectionDiffusionSource::evaluate(const Vec3& X) const
+double AdvectionDiffusionSource::evaluate (const Vec3& X) const
 {
   Vec3 lap = (*lapT)(X);
   Vec3 grad = (*gradT)(X);
   Vec3 u = (*U)(X);
 
-  return -props.getDiffusivity() * lap.sum() + props.getMassAdvectionConstant()*(u*grad);
+  double result = -props.getDiffusivity()*lap.sum() +
+                   props.getMassAdvectionConstant()*(u*grad);
+  if (T && reaction)
+    result += props.getReactionConstant(X)*(*reaction)(X)*(*T)(X);
+
+  return result;
 }
 
 }
