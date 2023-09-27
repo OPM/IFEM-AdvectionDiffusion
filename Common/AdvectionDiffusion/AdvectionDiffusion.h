@@ -154,11 +154,17 @@ public:
   //! \brief Defines the advection field.
   void setAdvectionField(VecFunc* U) { Uad.reset(U); }
 
+  //! \brief Obtain the advection field.
+  const VecFunc* getAdvectionField() { return Uad.get(); }
+
   //! \brief Defines the flux function.
   void setFlux(RealFunc* f) { flux = f; }
 
   //! \brief Defines the reaction field.
   void setReactionField(RealFunc* f) { reaction.reset(f); }
+
+  //! \brief Obtain the reaction field.
+  const RealFunc* getReactionField() { return reaction.get(); }
 
   //! \brief Defines the global number of elements.
   void setElements(size_t els) { tauE.resize(els); }
