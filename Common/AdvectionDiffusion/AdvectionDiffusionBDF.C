@@ -141,7 +141,7 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
   WeakOps::Mass(elMat.A[0], fe, s + reac);
 
   if (timeMethod == TimeIntegration::THETA) {
-    Matrix grad(1,nsd);
+    Vec3 grad;
     Vector g;
     fe.dNdX.multiply(elMat.vec[1], g, true);
     grad = g;
