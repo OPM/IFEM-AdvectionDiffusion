@@ -40,11 +40,10 @@
 
 #include <cmath>
 #include <cstdlib>
-#include <map>
 #include <ostream>
 #include "strings.h"
 #include <vector>
-#include "tinyxml.h"
+#include "tinyxml2.h"
 #include <utility>
 
 
@@ -90,13 +89,13 @@ void SIMAD<Dim,Integrand>::clearProperties ()
 
 
 template<class Dim, class Integrand>
-bool SIMAD<Dim,Integrand>::parse (const TiXmlElement* elem)
+bool SIMAD<Dim,Integrand>::parse (const tinyxml2::XMLElement* elem)
 {
   if (strcasecmp(elem->Value(),inputContext.c_str()))
     return this->Dim::parse(elem);
 
   const char* value;
-  const TiXmlElement* child = elem->FirstChildElement();
+  const tinyxml2::XMLElement* child = elem->FirstChildElement();
   for (; child; child = child->NextSiblingElement())
 
     if (strcasecmp(child->Value(),"stabilization") == 0) {
