@@ -19,14 +19,14 @@
 #include "ExprFunctions.h"
 #include "Functions.h"
 #include "Vec3.h"
-#include <tinyxml.h>
+#include <tinyxml2.h>
 
 #include "gtest/gtest.h"
 
 
 TEST(TestAdvectionDiffusionComponentSource, Parse2D)
 {
-  TiXmlDocument doc;
+  tinyxml2::XMLDocument doc;
   doc.Parse("<source type=\"components\">"
             "<laplacian type=\"expression\">"
             "  -4*sin(2*x)*sin(y) | -sin(2*x)*sin(y)"
@@ -59,7 +59,7 @@ TEST(TestAdvectionDiffusionComponentSource, Parse2D)
 
 TEST(TestAdvectionDiffusionComponentSource, Parse2DReaction)
 {
-  TiXmlDocument doc;
+  tinyxml2::XMLDocument doc;
   doc.Parse("<source type=\"components\">"
             "<laplacian type=\"expression\">"
             "  -4*sin(2*x)*sin(y) | -sin(2*x)*sin(y)"
@@ -95,7 +95,7 @@ TEST(TestAdvectionDiffusionComponentSource, Parse2DReaction)
 
 TEST(TestAdvectionDiffusionComponentSource, Parse3D)
 {
-  TiXmlDocument doc;
+  tinyxml2::XMLDocument doc;
   doc.Parse("<source type=\"components\">"
             "<laplacian type=\"expression\">"
             "  -4*sin(2*x)*sin(y)*cos(z) | -sin(2*x)*sin(y)*cos(z) | -sin(2*x)*sin(y)*cos(z)"
@@ -133,7 +133,7 @@ TEST(TestAdvectionDiffusionComponentSource, Parse3D)
 
 TEST(TestAdvectionDiffusionComponentSource, Parse3DReaction)
 {
-  TiXmlDocument doc;
+  tinyxml2::XMLDocument doc;
   doc.Parse("<source type=\"components\">"
             "<laplacian type=\"expression\">"
             "  -4*sin(2*x)*sin(y)*cos(z) | -sin(2*x)*sin(y)*cos(z) | -sin(2*x)*sin(y)*cos(z)"
@@ -174,7 +174,7 @@ TEST(TestAdvectionDiffusionComponentSource, Parse3DReaction)
 
 TEST(TestAdvectionDiffusionAnaSolSource, Parse2D)
 {
-  TiXmlDocument doc;
+  tinyxml2::XMLDocument doc;
   doc.Parse("<anasol type=\"expression\" autodiff=\"true\">"
             "<primary>sin(2*x)*sin(y)</primary>"
             "</anasol>");
@@ -204,7 +204,7 @@ TEST(TestAdvectionDiffusionAnaSolSource, Parse2D)
 
 TEST(TestAdvectionDiffusionAnaSolSource, Parse2DReaction)
 {
-  TiXmlDocument doc;
+  tinyxml2::XMLDocument doc;
   doc.Parse("<anasol type=\"expression\" autodiff=\"true\">"
             "<primary>sin(2*x)*sin(y)</primary>"
             "</anasol>");
@@ -236,7 +236,7 @@ TEST(TestAdvectionDiffusionAnaSolSource, Parse2DReaction)
 
 TEST(TestAdvectionDiffusionAnaSolSource, Parse2DUnsteady)
 {
-  TiXmlDocument doc;
+  tinyxml2::XMLDocument doc;
   doc.Parse("<anasol type=\"expression\" autodiff=\"true\">"
             "<primary>sin(2*x)*sin(y)*sin(t)</primary>"
             "</anasol>");
@@ -269,7 +269,7 @@ TEST(TestAdvectionDiffusionAnaSolSource, Parse2DUnsteady)
 
 TEST(TestAdvectionDiffusionAnaSolSource, Parse3D)
 {
-  TiXmlDocument doc;
+  tinyxml2::XMLDocument doc;
   doc.Parse("<anasol type=\"expression\" autodiff=\"true\">"
             "<primary>sin(2*x)*sin(y)*cos(z)</primary>"
             "</anasol>");
@@ -304,7 +304,7 @@ TEST(TestAdvectionDiffusionAnaSolSource, Parse3D)
 
 TEST(TestAdvectionDiffusionAnaSolSource, Parse3DReaction)
 {
-  TiXmlDocument doc;
+  tinyxml2::XMLDocument doc;
   doc.Parse("<anasol type=\"expression\" autodiff=\"true\">"
             "<primary>sin(2*x)*sin(y)*cos(z)</primary>"
             "</anasol>");
@@ -341,7 +341,7 @@ TEST(TestAdvectionDiffusionAnaSolSource, Parse3DReaction)
 
 TEST(TestAdvectionDiffusionAnaSolSource, Parse3DUnsteady)
 {
-  TiXmlDocument doc;
+  tinyxml2::XMLDocument doc;
   doc.Parse("<anasol type=\"expression\" autodiff=\"true\">"
             "<primary>sin(2*x)*sin(y)*cos(z)*cos(t)</primary>"
             "</anasol>");

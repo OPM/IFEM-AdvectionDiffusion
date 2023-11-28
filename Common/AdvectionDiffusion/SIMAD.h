@@ -32,8 +32,8 @@ class DataExporter;
 class RealFunc;
 class SIMoutput;
 class TimeStep;
-class TiXmlElement;
 class VecFunc;
+namespace tinyxml2 { class XMLElement; }
 
 
 /*!
@@ -78,7 +78,7 @@ public:
 
   using Dim::parse;
   //! \brief Parses a data section from an XML element.
-  bool parse(const TiXmlElement* elem) override;
+  bool parse(const tinyxml2::XMLElement* elem) override;
 
   //! \brief Returns the name of this simulator (for use in the HDF5 export).
   std::string getName() const override { return "AdvectionDiffusion"; }

@@ -13,7 +13,7 @@
 
 #include "AdvectionDiffusionArgs.h"
 #include "Utilities.h"
-#include "tinyxml.h"
+#include "tinyxml2.h"
 
 #include <cstring>
 #include <string>
@@ -36,7 +36,7 @@ bool AdvectionDiffusionArgs::parseArg (const char* argv)
 }
 
 
-bool AdvectionDiffusionArgs::parse (const TiXmlElement* elem)
+bool AdvectionDiffusionArgs::parse (const tinyxml2::XMLElement* elem)
 {
   if (!strcasecmp(elem->Value(),"timestepping")) {
     std::string type;

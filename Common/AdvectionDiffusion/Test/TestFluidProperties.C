@@ -11,14 +11,14 @@
 //==============================================================================
 
 #include "ADFluidProperties.h"
-#include <tinyxml.h>
+#include <tinyxml2.h>
 
 #include "gtest/gtest.h"
 
 
 TEST(TestFluidProperties, ADPhysical)
 {
-  TiXmlDocument doc;
+  tinyxml2::XMLDocument doc;
   doc.Parse("<fluidproperties rho=\"2.0\" kappa=\"3.0\" C=\"4.0\"/>");
   AD::FluidProperties props;
   props.parse(doc.RootElement());
@@ -31,7 +31,7 @@ TEST(TestFluidProperties, ADPhysical)
 
 TEST(TestFluidProperties, PrRa)
 {
-  TiXmlDocument doc;
+  tinyxml2::XMLDocument doc;
   doc.Parse("<fluidproperties type=\"Pr/Ra\" Pr=\"2.0\" Ra=\"3.0\"/>");
   AD::FluidProperties props;
   props.parse(doc.RootElement());

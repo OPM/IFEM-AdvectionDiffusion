@@ -19,7 +19,7 @@
 #include "TimeIntUtils.h"
 
 
-class TiXmlElement;
+namespace tinyxml2 { class XMLElement; }
 
 
 /*!
@@ -41,7 +41,7 @@ public:
 
 protected:
   //! \brief Parse an element from the input file
-  bool parse(const TiXmlElement* elem) override;
+  bool parse(const tinyxml2::XMLElement* elem) override;
 };
 
 #endif

@@ -24,9 +24,8 @@
 #include <cassert>
 #include <map>
 #include <ostream>
-#include "tinyxml.h"
+#include "tinyxml2.h"
 #include <utility>
-#include <vector>
 
 
 namespace AD {
@@ -42,7 +41,7 @@ FluidProperties::~FluidProperties()
 }
 
 
-void FluidProperties::parse(const TiXmlElement* elem)
+void FluidProperties::parse (const tinyxml2::XMLElement* elem)
 {
   // Type of scaling to use
   std::string type;
@@ -58,14 +57,14 @@ void FluidProperties::parse(const TiXmlElement* elem)
   utl::getAttribute(elem,"kappa",kappa);
   utl::getAttribute(elem,"Ra",Ra);
   utl::getAttribute(elem,"Pr",Pr);
-  const TiXmlElement* raf = elem->FirstChildElement("rayleigh");
+  const tinyxml2::XMLElement* raf = elem->FirstChildElement("rayleigh");
   if (raf) {
     type.clear();
     utl::getAttribute(raf,"type",type);
     RaFdef = utl::getValue(raf,"rayleigh");
     RaF.reset(utl::parseRealFunc(RaFdef, type, false));
   }
-  const TiXmlElement* kappaf = elem->FirstChildElement("kappa");
+  const tinyxml2::XMLElement* kappaf = elem->FirstChildElement("kappa");
   if (kappaf) {
     type.clear();
     utl::getAttribute(kappaf,"type",type);

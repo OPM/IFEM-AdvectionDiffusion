@@ -18,8 +18,8 @@
 #include <string>
 
 class RealFunc;
-class TiXmlElement;
 class Vec3;
+namespace tinyxml2 { class XMLElement; }
 
 namespace AD {
 
@@ -42,8 +42,8 @@ public:
   //! \brief Destructor.
   ~FluidProperties();
 
-  //! \brief Parses material parementers from an XML element.
-  void parse(const TiXmlElement*);
+  //! \brief Parses material parameters from an XML element.
+  void parse(const tinyxml2::XMLElement*);
 
   //! \brief Prints out fluid properties to the log stream.
   void printLog() const;

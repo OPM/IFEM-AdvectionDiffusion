@@ -20,7 +20,7 @@
 
 class AnaSol;
 class Vec3;
-class TiXmlElement;
+namespace tinyxml2 { class XMLElement; }
 
 
 namespace AD {
@@ -69,7 +69,7 @@ public:
   //! \param elem XML element to parse
   //! \param props Fluid properties
   //! \param react Reaction field
-  AdvectionDiffusionSource(const TiXmlElement* elem,
+  AdvectionDiffusionSource(const tinyxml2::XMLElement* elem,
                            const FluidProperties& props,
                            const RealFunc* react = nullptr);
 

@@ -24,8 +24,7 @@
 
 #include <ostream>
 #include <string>
-#include <vector>
-#include <tinyxml.h>
+#include <tinyxml2.h>
 
 
 namespace AD {
@@ -58,12 +57,12 @@ double AdvectionDiffusionAnaSolSource::evaluate (const Vec3& X) const
 }
 
 
-AdvectionDiffusionSource::AdvectionDiffusionSource (const TiXmlElement* elem,
+AdvectionDiffusionSource::AdvectionDiffusionSource (const tinyxml2::XMLElement* elem,
                                                     const FluidProperties& prop,
                                                     const RealFunc* react) :
   reaction(react), props(prop)
 {
-  const TiXmlElement* tt = elem->FirstChildElement("temperature");
+  const tinyxml2::XMLElement* tt = elem->FirstChildElement("temperature");
   if (tt) {
     std::string type;
     utl::getAttribute(tt, "type", type);
@@ -72,7 +71,7 @@ AdvectionDiffusionSource::AdvectionDiffusionSource (const TiXmlElement* elem,
     T.reset(utl::parseRealFunc(func, type));
   }
 
-  const TiXmlElement* tg = elem->FirstChildElement("temperature_grad");
+  const tinyxml2::XMLElement* tg = elem->FirstChildElement("temperature_grad");
   if (tg) {
     std::string type;
     utl::getAttribute(tg, "type", type);
@@ -81,7 +80,7 @@ AdvectionDiffusionSource::AdvectionDiffusionSource (const TiXmlElement* elem,
     gradT.reset(utl::parseVecFunc(func, type));
   }
 
-  const TiXmlElement* lap = elem->FirstChildElement("laplacian");
+  const tinyxml2::XMLElement* lap = elem->FirstChildElement("laplacian");
   if (lap) {
     std::string type;
     utl::getAttribute(lap, "type", type);
@@ -90,7 +89,7 @@ AdvectionDiffusionSource::AdvectionDiffusionSource (const TiXmlElement* elem,
     lapT.reset(utl::parseVecFunc(func, type));
   }
 
-  const TiXmlElement* grad = elem->FirstChildElement("velocity");
+  const tinyxml2::XMLElement* grad = elem->FirstChildElement("velocity");
   if (grad) {
     std::string type;
     utl::getAttribute(grad, "type", type);
