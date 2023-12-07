@@ -10,8 +10,8 @@ Input file: Cube-robin.xinp
 Advection field: 2|0|0
 Source field: -4\*x + 2
 	Analytical solution: Expression
-	Primary=1-x\*x
-	Secondary=-2\*x | 0.0 | 0.0
+	Primary: 1-x\*x
+	Secondary: -2\*x | 0.0 | 0.0
 Number of elements    64
 Number of nodes       216
 Number of dofs        216
