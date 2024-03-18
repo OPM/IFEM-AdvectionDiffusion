@@ -80,7 +80,7 @@ bool AdvectionDiffusionImplicit::evalInt (LocalIntegral& elmInt,
     WeakOps::Source(elMat.b[0], fe, Tp); // Diagonal term
   }
 
-  ResidualOps::Laplacian(elMat.b[0], fe, dTdX, -timeScale*props.getDiffusionConstant(X)); // Diffusion
+  ResidualOps::Laplacian(elMat.b[0], fe, dTdX, timeScale*props.getDiffusionConstant(X)); // Diffusion
   WeakOps::Source(elMat.b[0], fe, -(vel*dTdX)*timeScale*props.getMassAdvectionConstant()); //Advection
 
   return true;
