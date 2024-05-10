@@ -1,0 +1,68 @@
+Square-ad-adap-anasource.xinp -adap
+
+LR-spline basis functions are used
+Number of elements    64
+Number of nodes       81
+Number of dofs        81
+Number of constraints 32
+Number of unknowns    49
+	Refinement percentage: 2 type=6 (eps = 1e-06)
+	Refinement scheme: 2
+ >>> Starting adaptive simulation based on exact errors <<<
+Adaptive step 1
+L2-norm            : 0.0703498
+Max temperature    : 0.333333
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.056767
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.247538
+  L2 norm |T|   = (T,T)^0.5           : 0.0563436
+  H1 norm |T|   = a(T,T)^0.5          : 0.247314
+  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 0.000572013
+  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.0208584
+  Exact relative error (%)            : 8.43399
+Root mean square (RMS) of error      : 0.965235
+Min element error                    : 1.9328e-05
+Max element error                    : 0.00808375
+Average element error                : 0.00187596
+Refining 2 basis functions with errors in range \[0.0216706,0.026113\] 2.46914% of all basis functions
+Refined mesh: 82 elements 99 nodes.
+Adaptive step 2
+Number of elements    82
+Number of nodes       99
+Number of dofs        99
+Number of constraints 37
+Number of unknowns    62
+L2-norm            : 0.0981449
+Max temperature    : 0.333333
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.0565475
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.247233
+  L2 norm |T|   = (T,T)^0.5           : 0.0563436
+  H1 norm |T|   = a(T,T)^0.5          : 0.247314
+  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 0.000399883
+  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.0165975
+  Exact relative error (%)            : 6.7111
+Root mean square (RMS) of error      : 0.705618
+Min element error                    : 1.88098e-05
+Max element error                    : 0.00478938
+Average element error                : 0.00149759
+Refining 2 basis functions with errors in range \[0.0152287,0.0158918\] 2.0202% of all basis functions
+Refined mesh: 94 elements 111 nodes.
+Adaptive step 3
+Number of elements    94
+Number of nodes       111
+Number of dofs        111
+Number of constraints 39
+Number of unknowns    72
+L2-norm            : 0.0991636
+Max temperature    : 0.333333
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.0564701
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.247341
+  L2 norm |T|   = (T,T)^0.5           : 0.0563436
+  H1 norm |T|   = a(T,T)^0.5          : 0.247314
+  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 0.000328673
+  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.0150395
+  Exact relative error (%)            : 6.08115
+Root mean square (RMS) of error      : 0.659209
+Min element error                    : 1.89782e-05
+Max element error                    : 0.00453544
+Average element error                : 0.00129512
+   \* Stopping the adaptive cycles as max steps 3 was reached.

@@ -121,7 +121,7 @@ bool SIMAD<Dim,Integrand>::parse (const tinyxml2::XMLElement* elem)
       AD.getFluidProperties().parse(child);
       AD.getFluidProperties().printLog();
     }
-    else if ((value = utl::getValue(child,"advectionfield"))) {
+    else if ((value = utl::getValue(child,"advectionfield")) && !this->isRefined) {
       std::string variables;
       utl::getAttribute(child,"variables",variables);
       AD.setAdvectionField(new VecFuncExpr(value,variables));
@@ -130,7 +130,7 @@ bool SIMAD<Dim,Integrand>::parse (const tinyxml2::XMLElement* elem)
         IFEM::cout <<" (variables: "<< variables <<")";
       IFEM::cout << std::endl;
     }
-    else if ((value = utl::getValue(child,"reactionfield"))) {
+    else if ((value = utl::getValue(child,"reactionfield")) && !this->isRefined) {
       AD.setReactionField(new EvalFunction(value));
       IFEM::cout <<"Reaction field: "<< value << std::endl;
     }
