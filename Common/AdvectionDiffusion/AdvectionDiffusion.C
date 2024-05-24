@@ -129,8 +129,8 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
         else if (stab == MS) {
           double Lav=0, Lu=0;
           for (size_t k = 1;k <= nsd;k++) {
-            Lav += -U[k-1]*fe.dNdX(i,k)-props.getDiffusivity()*fe.d2NdX2(i,k,k);
-            Lu += U[k-1]*fe.dNdX(j,k)-props.getDiffusivity()*fe.d2NdX2(j,k,k);
+            Lav += -U[k-1]*fe.dNdX(i,k)-props.getDiffusionConstant(X)*fe.d2NdX2(i,k,k);
+            Lu += U[k-1]*fe.dNdX(j,k)-props.getDiffusionConstant(X)*fe.d2NdX2(j,k,k);
             elMat.Cv(k) += U[k-1]*fe.detJxW;
           }
           Lav += react*fe.N(i);

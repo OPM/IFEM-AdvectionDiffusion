@@ -46,7 +46,7 @@ double AdvectionDiffusionAnaSolSource::evaluate (const Vec3& X) const
   const Vec3 grad = anaSol.getScalarSol()->gradient(X);
   const Vec3 u = adVel(X);
 
-  double result = -props.getDiffusivity() * hess.trace() +
+  double result = -props.getDiffusionConstant(X) * hess.trace() +
                    props.getMassAdvectionConstant()*(u*grad);
   if (reaction)
     result += props.getReactionConstant(X)*(*reaction)(X) * (*anaSol.getScalarSol())(X);
@@ -110,7 +110,7 @@ double AdvectionDiffusionSource::evaluate (const Vec3& X) const
   Vec3 grad = (*gradT)(X);
   Vec3 u = (*U)(X);
 
-  double result = -props.getDiffusivity()*lap.sum() +
+  double result = -props.getDiffusionConstant(X)*lap.sum() +
                    props.getMassAdvectionConstant()*(u*grad);
   if (T && reaction)
     result += props.getReactionConstant(X)*(*reaction)(X)*(*T)(X);
