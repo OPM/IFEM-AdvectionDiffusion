@@ -281,6 +281,9 @@ public:
     return idx > 1 ? nullptr : uFields[idx].get();
   }
 
+  //! \brief Evaluates current advection velocity in a point.
+  Vec3 getAdvectionVelocity(const FiniteElement& fe, const Vec3& X) const;
+
 protected:
   std::unique_ptr<VecFunc>  Uad;      //!< Pointer to advection field
   std::unique_ptr<RealFunc> reaction; //!< Pointer to the reaction field
