@@ -329,32 +329,28 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
 
   for (const Vector& psol : pnorm.psol)
     if (psol.empty()) { // residual
-      Vec3 hess;
+      double hess = 0.0;
       if (this->getIntegrandType() & Integrand::SECOND_DERIVATIVES) {
-        for (size_t k = 1; k <= hep.getNoSpaceDim(); k++)
-          for (size_t j = 1; j <= fe.N.size(); j++) {
-            if (this->getIntegrandType() & Integrand::SECOND_DERIVATIVES)
-              hess[k-1] += fe.d2NdX2(j,k,k)*pnorm.vec.front()(j);
-        }
-        double f = hep.source ? (*hep.source)(X) : 0.0;
-        Vec3 U;
-        if (hep.Uad)
-          U = (*hep.Uad)(X);
-        double react = hep.reaction ? (*hep.reaction)(X) : 0.0;
-        double res = f + kappa*hess.sum() - U*dTh - react*Th;
-        double kk;
-        if (hep.useModifiedElmSize()) {
-          if (hep.getCbar() > 0.0)
-            kk = std::min(fe.h/sqrt(kappa), 1.0/sqrt(hep.getCbar()));
-          else
-            kk = fe.h/sqrt(kappa);
-        } else
-          kk = fe.h;
-        ip++; // unused
-        pnorm[ip++] += kk*kk*res*res*fe.detJxW;
-        if (anasol && anasol->getScalarSecSol())
-          ip += 2;
+        const Vector& Tc = pnorm.vec.front();
+        for (size_t j = 1; j <= fe.N.size(); j++)
+          hess += fe.d2NdX2.trace(j) * Tc(j);
       }
+      double f = hep.source ? (*hep.source)(X) : 0.0;
+      Vec3 U = hep.getAdvectionVelocity(fe, X);
+      double react = hep.reaction ? (*hep.reaction)(X) : 0.0;
+      double res = f + kappa*hess - U*dTh - react*Th;
+      double kk;
+      if (hep.useModifiedElmSize()) {
+        if (hep.getCbar() > 0.0)
+          kk = std::min(fe.h/sqrt(kappa), 1.0/sqrt(hep.getCbar()));
+        else
+          kk = fe.h/sqrt(kappa);
+      } else
+        kk = fe.h;
+      ip++; // unused
+      pnorm[ip++] += kk*kk*res*res*fe.detJxW;
+      if (anasol && anasol->getScalarSecSol())
+        ip += 2;
     } else {
       Vec3 dTr;
       for (size_t k = 0; k < hep.nsd; k++)
