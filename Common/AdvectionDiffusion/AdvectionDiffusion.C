@@ -457,9 +457,9 @@ std::string AdvectionDiffusionNorm::getName (size_t i, size_t j,
   };
 
   static const char* res[] = {
-    "",
+    "dummy1",
     "|T^h|_res",
-    "",
+    "dummy2",
     "effectivity index"
   };
 
