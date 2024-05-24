@@ -80,66 +80,26 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
   elMat.iEl = fe.iel;
   elMat.hk = fe.h;
 
-  double f = source ? (*source)(X) : 0.0;
+  const double f = source ? (*source)(X) : 0.0;
 
   if (!elMat.A.empty()) {
     // evaluate reaction field
-    double react = reaction ? (*reaction)(X) : 0.0;
+    const double react = reaction ? (*reaction)(X) : 0.0;
 
     // evaluate advection field
-    Vec3 U = this->getAdvectionVelocity(fe, X);
+    const Vec3 U = this->getAdvectionVelocity(fe, X);
 
     WeakOps::Laplacian(elMat.A[0], fe, props.getDiffusionConstant(X));
-    WeakOps::Mass(elMat.A[0], fe, react);
+    if (reaction)
+      WeakOps::Mass(elMat.A[0], fe, react);
     WeakOps::Advection(elMat.A[0], fe, U, props.getMassAdvectionConstant(), advForm);
 
-    // loop over test functions (i) and basis functions (j)
-    for (size_t i = 1; i <= fe.N.size(); i++)
-      for (size_t j = 1; j <= fe.N.size(); j++)
-        if (stab == SUPG) {
-          double convV=0, Lu=0;
-          for (size_t k = 1;k <= nsd;k++) {
-            convV += U[k-1]*fe.dNdX(i,k);
-            Lu += U[k-1]*fe.dNdX(j,k)-props.getDiffusionConstant(X)*fe.d2NdX2(j,k,k);
-            elMat.Cv(k) += U[k-1]*fe.detJxW;
-          }
-          Lu += react*fe.N(j);
-          elMat.Cv(nsd+1) += fe.detJxW;
-          elMat.eMs(i,j) += convV*Lu*fe.detJxW;
-          if (source && j == 1)
-            elMat.eSs(i) += convV*f*fe.detJxW;
-        }
-
-        else if (stab == GLS) {
-          double Lv=0, Lu=0;
-          for (size_t k = 1;k <= nsd;k++) {
-            Lv += U[k-1]*fe.dNdX(i,k)-props.getDiffusionConstant(X)*fe.d2NdX2(i,k,k);
-            Lu += U[k-1]*fe.dNdX(j,k)-props.getDiffusionConstant(X)*fe.d2NdX2(j,k,k);
-            elMat.Cv(k) += U[k-1]*fe.detJxW;
-          }
-          Lv += react*fe.N(i);
-          Lu += react*fe.N(j);
-          elMat.Cv(nsd+1) += fe.detJxW;
-          elMat.eMs(i,j) += Lv*Lu*fe.detJxW;
-
-          if (source && j == 1)
-            elMat.eSs(i) += Lv*f*fe.detJxW;
-        }
-
-        else if (stab == MS) {
-          double Lav=0, Lu=0;
-          for (size_t k = 1;k <= nsd;k++) {
-            Lav += -U[k-1]*fe.dNdX(i,k)-props.getDiffusionConstant(X)*fe.d2NdX2(i,k,k);
-            Lu += U[k-1]*fe.dNdX(j,k)-props.getDiffusionConstant(X)*fe.d2NdX2(j,k,k);
-            elMat.Cv(k) += U[k-1]*fe.detJxW;
-          }
-          Lav += react*fe.N(i);
-          Lu +=  react*fe.N(j);
-          elMat.Cv(nsd+1) += fe.detJxW;
-          elMat.eMs(i,j) += -Lav*Lu*fe.detJxW;
-          if (source && j == 1)
-            elMat.eSs(i) += -Lav*f*fe.detJxW;
-        }
+    switch (stab) {
+      case SUPG: addSUPG(elMat, fe, X, f, react, U); break;
+      case  GLS: addGLS (elMat, fe, X, f, react, U); break;
+      case   MS: addMS  (elMat, fe, X, f, react, U); break;
+      case NONE: break;
+    }
   }
 
   // Integrate source, if defined
@@ -147,6 +107,81 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
     WeakOps::Source(elMat.b.front(), fe, f);
 
   return true;
+}
+
+
+void AdvectionDiffusion::addSUPG (ElementInfo& elMat,
+                                  const FiniteElement& fe,
+                                  const Vec3& X,
+                                  const double f,
+                                  const double react,
+                                  const Vec3& U) const
+{
+    for (size_t i = 1; i <= fe.N.size(); i++)
+      for (size_t j = 1; j <= fe.N.size(); j++) {
+        double convV = 0, Lu = 0;
+        for (size_t k = 1;k <= nsd;k++) {
+          convV += U[k-1]*fe.dNdX(i,k);
+          Lu += U[k-1]*fe.dNdX(j,k)-props.getDiffusionConstant(X)*fe.d2NdX2(j,k,k);
+          elMat.Cv(k) += U[k-1]*fe.detJxW;
+        }
+        Lu += react*fe.N(j);
+        elMat.Cv(nsd+1) += fe.detJxW;
+        elMat.eMs(i,j) += convV*Lu*fe.detJxW;
+        if (source && j == 1)
+          elMat.eSs(i) += convV*f*fe.detJxW;
+      }
+}
+
+
+void AdvectionDiffusion::addGLS (ElementInfo& elMat,
+                                 const FiniteElement& fe,
+                                 const Vec3& X,
+                                 const double f,
+                                 const double react,
+                                 const Vec3& U) const
+{
+  for (size_t i = 1; i <= fe.N.size(); i++)
+    for (size_t j = 1; j <= fe.N.size(); j++) {
+      double Lv = 0, Lu = 0;
+      for (size_t k = 1;k <= nsd;k++) {
+        Lv += U[k-1]*fe.dNdX(i,k)-props.getDiffusionConstant(X)*fe.d2NdX2(i,k,k);
+        Lu += U[k-1]*fe.dNdX(j,k)-props.getDiffusionConstant(X)*fe.d2NdX2(j,k,k);
+        elMat.Cv(k) += U[k-1]*fe.detJxW;
+      }
+      Lv += react*fe.N(i);
+      Lu += react*fe.N(j);
+      elMat.Cv(nsd+1) += fe.detJxW;
+      elMat.eMs(i,j) += Lv*Lu*fe.detJxW;
+
+      if (source && j == 1)
+        elMat.eSs(i) += Lv*f*fe.detJxW;
+    }
+}
+
+
+void AdvectionDiffusion::addMS (ElementInfo& elMat,
+                                const FiniteElement& fe,
+                                const Vec3& X,
+                                const double f,
+                                const double react,
+                                const Vec3& U) const
+{
+  for (size_t i = 1; i <= fe.N.size(); i++)
+    for (size_t j = 1; j <= fe.N.size(); j++) {
+      double Lav = 0, Lu = 0;
+      for (size_t k = 1;k <= nsd;k++) {
+        Lav += -U[k-1]*fe.dNdX(i,k)-props.getDiffusionConstant(X)*fe.d2NdX2(i,k,k);
+        Lu += U[k-1]*fe.dNdX(j,k)-props.getDiffusionConstant(X)*fe.d2NdX2(j,k,k);
+        elMat.Cv(k) += U[k-1]*fe.detJxW;
+      }
+      Lav += react*fe.N(i);
+      Lu +=  react*fe.N(j);
+      elMat.Cv(nsd+1) += fe.detJxW;
+      elMat.eMs(i,j) += -Lav*Lu*fe.detJxW;
+      if (source && j == 1)
+        elMat.eSs(i) += -Lav*f*fe.detJxW;
+    }
 }
 
 

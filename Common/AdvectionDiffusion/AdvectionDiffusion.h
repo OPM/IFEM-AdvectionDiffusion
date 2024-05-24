@@ -285,6 +285,48 @@ public:
   Vec3 getAdvectionVelocity(const FiniteElement& fe, const Vec3& X) const;
 
 protected:
+  //! \brief Add SUPG stabilization terms to element matrices.
+  //! \param elMat Element matrices
+  //! \param[in] fe Finite element data of current integration point
+  //! \param[in] X Cartesian coordinates of current integration point
+  //! \param[in] f Source function evaluated in current integration point
+  //! \param[in] react Reaction field evaluated in current integration point
+  //! \param[in] U Advection velocity evaluated in current integration point
+  void addSUPG(ElementInfo& elMat,
+               const FiniteElement& fe,
+               const Vec3& X,
+               const double f,
+               const double react,
+               const Vec3& U) const;
+
+  //! \brief Add GLS stabilization terms to element matrices.
+  //! \param elMat Element matrices
+  //! \param[in] fe Finite element data of current integration point
+  //! \param[in] X Cartesian coordinates of current integration point
+  //! \param[in] f Source function evaluated in current integration point
+  //! \param[in] react Reaction field evaluated in current integration point
+  //! \param[in] U Advection velocity evaluated in current integration point
+  void addGLS(ElementInfo& elMat,
+              const FiniteElement& fe,
+              const Vec3& X,
+              const double f,
+              const double react,
+              const Vec3& U) const;
+
+  //! \brief Add MS stabilization terms to element matrices.
+  //! \param elMat Element matrices
+  //! \param[in] fe Finite element data of current integration point
+  //! \param[in] X Cartesian coordinates of current integration point
+  //! \param[in] f Source function evaluated in current integration point
+  //! \param[in] react Reaction field evaluated in current integration point
+  //! \param[in] U Advection velocity evaluated in current integration point
+  void addMS(ElementInfo& elMat,
+             const FiniteElement& fe,
+             const Vec3& X,
+             const double f,
+             const double react,
+             const Vec3& U) const;
+
   std::unique_ptr<VecFunc>  Uad;      //!< Pointer to advection field
   std::unique_ptr<RealFunc> reaction; //!< Pointer to the reaction field
   std::unique_ptr<RealFunc> source;   //!< Pointer to source field
