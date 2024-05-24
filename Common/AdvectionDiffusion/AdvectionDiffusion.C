@@ -87,13 +87,7 @@ bool AdvectionDiffusion::evalInt (LocalIntegral& elmInt,
     double react = reaction ? (*reaction)(X) : 0.0;
 
     // evaluate advection field
-    Vec3 U;
-    if (uFields[0]) {
-      Vector u;
-      uFields[0]->valueFE(fe, u);
-      U = u;
-    } else if (Uad)
-      U = (*Uad)(X);
+    Vec3 U = this->getAdvectionVelocity(fe, X);
 
     WeakOps::Laplacian(elMat.A[0], fe, props.getDiffusionConstant(X));
     WeakOps::Mass(elMat.A[0], fe, react);
@@ -247,6 +241,21 @@ void AdvectionDiffusion::setNamedFields (const std::string& name, Fields* field)
     uFields[0].reset(field);
   else
     uFields[1].reset(field);
+}
+
+
+Vec3 AdvectionDiffusion::getAdvectionVelocity (const FiniteElement& fe,
+                                               const Vec3& X) const
+{
+  Vec3 U;
+  if (uFields[0]) {
+    Vector u;
+    uFields[0]->valueFE(fe, u);
+    U = u;
+  } else if (Uad)
+    U = (*Uad)(X);
+
+ return U;
 }
 
 
