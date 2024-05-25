@@ -16,10 +16,10 @@
             uy=1/3*pow(x,3)*2*y;
             v=-1/3*pow(x,2)*pow(y,3);
             uxx=2*x*pow(y,2);
-	    uyy=2/3*pow(x,3);
-	    kappa=x^2*y^2;
-	    dkdx = 2*x*y^2;
-	    dkdy = x^2*2*y;
+            uyy=2/3*pow(x,3);
+            kappa=x^2*y^2;
+            dkdx = 2*x*y^2;
+            dkdy = x^2*2*y;
             -kappa*(uxx+uyy) - dkdx*ux - dkdy*uy + u*ux + v*uy
     </source>
     <advectionfield>

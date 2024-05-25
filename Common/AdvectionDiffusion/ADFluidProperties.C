@@ -69,7 +69,10 @@ void FluidProperties::parse (const tinyxml2::XMLElement* elem)
     type.clear();
     utl::getAttribute(kappaf,"type",type);
     kappaFdef = utl::getValue(kappaf,"kappa");
-    kappaF.reset(utl::parseRealFunc(kappaFdef,type,false));
+    if (type == "expression")
+      kappaF.reset(utl::parseExprRealFunc(kappaFdef.c_str(),true));
+    else
+      kappaF.reset(utl::parseRealFunc(kappaFdef,type,false));
   }
 }
 

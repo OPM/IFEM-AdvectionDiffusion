@@ -48,7 +48,7 @@ public:
 
 protected:
   //! \brief Evaluates the function.
-  double evaluate(const Vec3& X) const override;
+  Real evaluate(const Vec3& X) const override;
 
   const AnaSol& anaSol; //!< Reference to analytic solution
   const VecFunc& adVel; //!< Advecting velocity field
@@ -75,7 +75,7 @@ public:
 
 protected:
   //! \brief Evaluates the function.
-  double evaluate(const Vec3& X) const override;
+  Real evaluate(const Vec3& X) const override;
 
   std::unique_ptr<RealFunc> T; //!< Temperature T
   const RealFunc* reaction; //!< Reaction field

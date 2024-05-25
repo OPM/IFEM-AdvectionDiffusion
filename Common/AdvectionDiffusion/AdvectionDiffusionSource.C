@@ -40,18 +40,24 @@ AdvectionDiffusionAnaSolSource (const AnaSol& aSol,
 }
 
 
-double AdvectionDiffusionAnaSolSource::evaluate (const Vec3& X) const
+Real AdvectionDiffusionAnaSolSource::evaluate (const Vec3& X) const
 {
-  const SymmTensor hess = anaSol.getScalarSol()->hessian(X);
-  const Vec3 grad = anaSol.getScalarSol()->gradient(X);
-  const Vec3 u = adVel(X);
+  const RealFunc& T = *anaSol.getScalarSol();
+  const Vec3 dT = T.gradient(X);
+  const SymmTensor d2T = T.hessian(X);
 
-  double result = -props.getDiffusionConstant(X) * hess.trace() +
-                   props.getMassAdvectionConstant()*(u*grad);
+  Real result = -props.getDiffusionConstant(X) * d2T.trace();
+  if (props.kappaFunc())
+    result -= dT*props.kappaFunc()->gradient(X);
+
+  const Vec3 u = adVel(X);
+  result += props.getMassAdvectionConstant()*(u*dT);
+
   if (reaction)
-    result += props.getReactionConstant(X)*(*reaction)(X) * (*anaSol.getScalarSol())(X);
+    result += props.getReactionConstant(X)*(*reaction)(X) * T(X);
+
   if (!stat)
-    result += anaSol.getScalarSol()->timeDerivative(X);
+    result += T.timeDerivative(X);
 
   return result;
 }
@@ -104,14 +110,14 @@ AdvectionDiffusionSource::AdvectionDiffusionSource (const tinyxml2::XMLElement* 
 }
 
 
-double AdvectionDiffusionSource::evaluate (const Vec3& X) const
+Real AdvectionDiffusionSource::evaluate (const Vec3& X) const
 {
   Vec3 lap = (*lapT)(X);
   Vec3 grad = (*gradT)(X);
   Vec3 u = (*U)(X);
 
-  double result = -props.getDiffusionConstant(X)*lap.sum() +
-                   props.getMassAdvectionConstant()*(u*grad);
+  Real result = -props.getDiffusionConstant(X)*lap.sum() +
+                 props.getMassAdvectionConstant()*(u*grad);
   if (T && reaction)
     result += props.getReactionConstant(X)*(*reaction)(X)*(*T)(X);
 
