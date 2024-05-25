@@ -79,6 +79,10 @@ public:
   //! \param[in] T Temperature
   double getThermalExpansion(double T) const;
 
+  //! \brief Returns kappa function.
+  const RealFunc* kappaFunc() const
+  { return kappaF.get(); }
+
 protected:
   // Physical properties (constant)
   double rho;   //!< Mass density
