@@ -40,11 +40,13 @@ public:
   //! \param props Fluid properties
   //! \param rField Reaction field
   //! \param stationary True for a stationary solution
+  //! \param idx Index of scalar solution to use (Boussinesq)
   AdvectionDiffusionAnaSolSource(const AnaSol& aSol,
                                  const VecFunc& U,
                                  const FluidProperties& props,
                                  const RealFunc* rField,
-                                 bool stationary);
+                                 bool stationary,
+                                 int idx = 0);
 
 protected:
   //! \brief Evaluates the function.
@@ -55,6 +57,7 @@ protected:
   const FluidProperties& props; //!< Fluid properties
   const RealFunc* reaction; //!< Reaction field
   bool stat; //!< True for a stationary solution
+  int scalarIdx = 0; //!< Index of scalar solution
 };
 
 
