@@ -83,6 +83,9 @@ public:
   const RealFunc* kappaFunc() const
   { return kappaF.get(); }
 
+  //! \brief Returns a new copy of kappa function.
+  RealFunc* newKappaFunc() const;
+
 protected:
   // Physical properties (constant)
   double rho;   //!< Mass density
@@ -90,10 +93,16 @@ protected:
   double alpha; //!< Thermal expansion coefficient
   double C;     //!< Heat capacity
 
+  //! \brief Struct holding a function definition.
+  struct FuncDef {
+    std::string type; //!< Type of the function
+    std::string def; //!< Textual definition of the function
+  };
+
   double Ra; //!< Rayleigh number
-  std::string RaFdef; //!< Definition of Rayleigh number as a function
+  FuncDef RaFdef; //!< Definition of Rayleigh number as a function
   std::unique_ptr<RealFunc> RaF; //!< Rayleigh number as a function
-  std::string kappaFdef; //!< Definition of kappa as a function
+  FuncDef kappaFdef; //!< Definition of kappa as a function
   std::unique_ptr<RealFunc> kappaF; //!< Scalar thermal diffusivity as a function
   double Pr; //!< Prandtl number
 
