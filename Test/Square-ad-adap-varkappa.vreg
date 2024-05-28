@@ -1,0 +1,68 @@
+Square-ad-adap-varkappa.xinp -adap
+
+Step 1
+  Element block 1
+    256 nodes
+    64 elements
+    Displacement: 'Solution'
+    Displacement: 'Exact Solution'
+    Scalar: 'T'
+    Scalar: 'Exact T'
+    Scalar: 'FE T,x'
+    Scalar: 'FE T,y'
+    Scalar: 'Exact T,x'
+    Scalar: 'Exact T,y'
+    Scalar: '(T^h,T^h)^0.5'
+    Scalar: 'a(T^h,T^h)^0.5'
+    Scalar: 'a(T,T)^0.5'
+    Scalar: 'a(e,e)^0.5, e=T-T^h'
+    Scalar: '(T,T)^0.5'
+    Scalar: '(e,e)^0.5, e=T-T^h'
+    Scalar: 'Pure residuals h^2 |(f_T^h)|'
+    Scalar: 'Pure residuals |T^h|_res'
+    Scalar: 'Pure residuals h^2 |div kappa grad T^h|_L2'
+    Scalar: 'Pure residuals effectivity index'
+Step 2
+  Element block 1
+    364 nodes
+    91 elements
+    Displacement: 'Solution'
+    Displacement: 'Exact Solution'
+    Scalar: 'T'
+    Scalar: 'Exact T'
+    Scalar: 'FE T,x'
+    Scalar: 'FE T,y'
+    Scalar: 'Exact T,x'
+    Scalar: 'Exact T,y'
+    Scalar: '(T^h,T^h)^0.5'
+    Scalar: 'a(T^h,T^h)^0.5'
+    Scalar: 'a(T,T)^0.5'
+    Scalar: 'a(e,e)^0.5, e=T-T^h'
+    Scalar: '(T,T)^0.5'
+    Scalar: '(e,e)^0.5, e=T-T^h'
+    Scalar: 'Pure residuals h^2 |(f_T^h)|'
+    Scalar: 'Pure residuals |T^h|_res'
+    Scalar: 'Pure residuals h^2 |div kappa grad T^h|_L2'
+    Scalar: 'Pure residuals effectivity index'
+Step 3
+  Element block 1
+    508 nodes
+    127 elements
+    Displacement: 'Solution'
+    Displacement: 'Exact Solution'
+    Scalar: 'T'
+    Scalar: 'Exact T'
+    Scalar: 'FE T,x'
+    Scalar: 'FE T,y'
+    Scalar: 'Exact T,x'
+    Scalar: 'Exact T,y'
+    Scalar: '(T^h,T^h)^0.5'
+    Scalar: 'a(T^h,T^h)^0.5'
+    Scalar: 'a(T,T)^0.5'
+    Scalar: 'a(e,e)^0.5, e=T-T^h'
+    Scalar: '(T,T)^0.5'
+    Scalar: '(e,e)^0.5, e=T-T^h'
+    Scalar: 'Pure residuals h^2 |(f_T^h)|'
+    Scalar: 'Pure residuals |T^h|_res'
+    Scalar: 'Pure residuals h^2 |div kappa grad T^h|_L2'
+    Scalar: 'Pure residuals effectivity index'
