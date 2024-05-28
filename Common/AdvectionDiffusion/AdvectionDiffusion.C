@@ -370,10 +370,13 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
         for (size_t j = 1; j <= fe.N.size(); j++)
           hess += fe.d2NdX2.trace(j) * Tc(j);
       }
+      hess *= kappa;
       double f = hep.source ? (*hep.source)(X) : 0.0;
       Vec3 U = hep.getAdvectionVelocity(fe, X);
       double react = hep.reaction ? (*hep.reaction)(X) : 0.0;
-      double res = f + kappa*hess - U*dTh - react*Th;
+      if (hep.getFluidProperties().kappaFunc())
+        hess += dT*hep.getFluidProperties().kappaFunc()->gradient(X);
+      double res = f + hess - U*dTh - react*Th;
       double kk;
       if (hep.useModifiedElmSize()) {
         if (hep.getCbar() > 0.0)
