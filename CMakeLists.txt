@@ -103,6 +103,7 @@ if(NOT MPI_FOUND OR IFEM_SERIAL_TESTS_IN_PARALLEL)
   endif()
 
   ifem_add_vtf_test(Square-ad.vreg AdvectionDiffusion)
+  ifem_add_vtf_test(Square-robin.vreg AdvectionDiffusion)
   ifem_add_hdf5_test(Square-ad.hreg AdvectionDiffusion)
 endif()
 list(APPEND TEST_APPS AdvectionDiffusion)
