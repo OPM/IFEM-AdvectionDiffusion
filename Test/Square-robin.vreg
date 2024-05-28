@@ -1,0 +1,12 @@
+Square-robin.xinp
+
+Step 1
+  Element block 1
+    25 nodes
+    16 elements
+    Scalar: 'T'
+    Scalar: 'Exact T'
+    Scalar: 'FE T,x'
+    Scalar: 'FE T,y'
+    Scalar: 'Exact T,x'
+    Scalar: 'Exact T,y'

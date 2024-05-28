@@ -358,18 +358,18 @@ bool SIMAD<Dim,Integrand>::saveStep (const TimeStep& tp, int& nBlock)
   if (tp.step%Dim::opt.saveInc > 0 || Dim::opt.format < 0)
     return true;
 
-  TimeIntegration::Method method = AD.getTimeMethod();
-  int iDump = tp.step/Dim::opt.saveInc +
-      (method == TimeIntegration::NONE ? 0 : 1);
+  const TimeIntegration::Method method = AD.getTimeMethod();
+  int iDump = method == TimeIntegration::NONE ? 1 :
+              tp.step / Dim::opt.saveInc + 1;
   if (!this->writeGlvS(this->getSolution(0),iDump,nBlock,
                        tp.time.t,"temperature",70))
     return false;
   else if (!standalone)
     return true;
 
-  double param2 = method==TimeIntegration::NONE ? iDump : tp.time.t;
+  double param2 = method == TimeIntegration::NONE ? iDump : tp.time.t;
   return this->writeGlvStep(iDump, param2,
-                            method==TimeIntegration::NONE ? 1 : 0);
+                            method == TimeIntegration::NONE ? 1 : 0);
 }
 
 
