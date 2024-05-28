@@ -120,6 +120,8 @@ bool SIMAD<Dim,Integrand>::parse (const tinyxml2::XMLElement* elem)
     else if (!strcasecmp(child->Value(),"fluidproperties")) {
       AD.getFluidProperties().parse(child);
       AD.getFluidProperties().printLog();
+      if (AD.getFluidProperties().kappaFunc())
+        this->addAddFunc("kappa", AD.getFluidProperties().newKappaFunc());
     }
     else if ((value = utl::getValue(child,"advectionfield")) && !this->isRefined) {
       std::string variables;

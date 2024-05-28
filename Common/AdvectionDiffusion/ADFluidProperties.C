@@ -59,20 +59,15 @@ void FluidProperties::parse (const tinyxml2::XMLElement* elem)
   utl::getAttribute(elem,"Pr",Pr);
   const tinyxml2::XMLElement* raf = elem->FirstChildElement("rayleigh");
   if (raf) {
-    type.clear();
-    utl::getAttribute(raf,"type",type);
-    RaFdef = utl::getValue(raf,"rayleigh");
-    RaF.reset(utl::parseRealFunc(RaFdef, type, false));
+    utl::getAttribute(raf,"type",RaFdef.type);
+    RaFdef.def = utl::getValue(raf,"rayleigh");
+    RaF.reset(utl::parseRealFunc(RaFdef.def, RaFdef.type, false));
   }
   const tinyxml2::XMLElement* kappaf = elem->FirstChildElement("kappa");
   if (kappaf) {
-    type.clear();
-    utl::getAttribute(kappaf,"type",type);
-    kappaFdef = utl::getValue(kappaf,"kappa");
-    if (type == "expression")
-      kappaF.reset(utl::parseExprRealFunc(kappaFdef.c_str(),true));
-    else
-      kappaF.reset(utl::parseRealFunc(kappaFdef,type,false));
+    utl::getAttribute(kappaf,"type",kappaFdef.type);
+    kappaFdef.def = utl::getValue(kappaf,"kappa");
+    kappaF.reset(this->newKappaFunc());
   }
 }
 
@@ -89,16 +84,16 @@ void FluidProperties::printLog() const
     IFEM::cout << "\n\t\t\t            Density,   rho = " << rho
                << "\n\t\t\tThermal diffusivity, kappa = ";
     if (kappaF)
-      IFEM::cout << kappaFdef;
+      IFEM::cout << kappaFdef.def;
     else
       IFEM::cout << kappa;
   } else if (scaling == PR_RA) {
     IFEM::cout << "\n\t\t\t Prandtl number, Pr = " << Pr;
     IFEM::cout << "\n\t\t\tRayleigh number, Ra = ";
-    if (RaFdef.empty())
+    if (RaFdef.def.empty())
       IFEM::cout << Ra;
     else
-      IFEM::cout << RaFdef;
+      IFEM::cout << RaFdef.def;
   }
   IFEM::cout << std::endl;
 }
@@ -138,6 +133,15 @@ double FluidProperties::getThermalExpansion(double T) const
 
   assert(scaling == PHYSICAL);
   return rho*alpha*T;
+}
+
+
+RealFunc* FluidProperties::newKappaFunc() const
+{
+  if (kappaFdef.type == "expression")
+    return utl::parseExprRealFunc(kappaFdef.def,true);
+  else
+    return utl::parseRealFunc(kappaFdef.def,kappaFdef.type,false);
 }
 
 }
