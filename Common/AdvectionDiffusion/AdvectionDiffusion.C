@@ -385,10 +385,11 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
           kk = fe.h/sqrt(kappa);
       } else
         kk = fe.h;
-      ip++; // unused
+      pnorm[ip++] += kk*kk*f*f*fe.detJxW;
       pnorm[ip++] += kk*kk*res*res*fe.detJxW;
+      pnorm[ip++] += kk*kk*hess*hess*fe.detJxW;
       if (anasol && anasol->getScalarSecSol())
-        ip += 2;
+        ++ip; // effectivity index
     } else {
       Vec3 dTr;
       for (size_t k = 0; k < hep.nsd; k++)
@@ -400,7 +401,7 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
 
       if (anasol && anasol->getScalarSecSol()) {
         pnorm[ip++] += kappa*(dT-dTr)*(dT-dTr)*fe.detJxW;
-        ip++; // effectivity index
+        ++ip; // effectivity index
       }
     }
 
@@ -435,8 +436,10 @@ size_t AdvectionDiffusionNorm::getNoFields (int group) const
     return this->NormBase::getNoFields();
   else if (group == 1)
     return anasol ? 6 : 2;
-  else
-    return anasol ? 4 : 2;
+  else {
+    const AdvectionDiffusion& hep = static_cast<const AdvectionDiffusion&>(myProblem);
+    return anasol ? 4 : (hep.doResidualNorm() ? 3 : 2);
+  }
 }
 
 
@@ -456,22 +459,25 @@ std::string AdvectionDiffusionNorm::getName (size_t i, size_t j,
     "a(T^r,T^r)^0.5",
     "a(e,e)^0.5, e=T^r-T^h",
     "a(e,e)^0.5, e=T-T^r",
-    "effectivity index"
+    "effectivity index",
   };
 
   static const char* res[] = {
-    "dummy1",
+    "h^2 |(f_T^h)|",
     "|T^h|_res",
-    "dummy2",
-    "effectivity index"
+    "h^2 |kappa nabla^2 T^h|_L2",
+    "effectivity index",
+    "h^2 |div kappa grad T^h|_L2",
   };
 
   const AdvectionDiffusion& hep = static_cast<const AdvectionDiffusion&>(myProblem);
   const char** n = s;
   if (i > 1) {
-    if (hep.doResidualNorm())
+    if (hep.doResidualNorm()) {
       n = res;
-    else
+      if (j == 3 && hep.getFluidProperties().kappaFunc())
+        j = 5;
+    } else
       n = rec;
   }
 
