@@ -1,0 +1,87 @@
+Square-ad-adap-varkappa.xinp -adap
+
+LR-spline basis functions are used
+		Scaling = Physical dimensions
+			            Density,   rho = 1
+			Thermal diffusivity, kappa = exp(x+y)
+	Analytical solution: Expression
+Number of elements    64
+Number of nodes       100
+Number of dofs        100
+Number of constraints 36
+Number of unknowns    64
+Pure residual error estimates enabled
+ >>> Starting adaptive simulation based on
+     Pure residuals error estimates (norm group 1) <<<
+Adaptive step 1
+L2-norm            : 0.0768098
+Max temperature    : 0.333333
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.0563445
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.570819
+  L2 norm |T|   = (T,T)^0.5           : 0.0563436
+  H1 norm |T|   = a(T,T)^0.5          : 0.570815
+  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 1.00743e-05
+  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.00104271
+  Exact relative error (%)            : 0.182671
+  Residual norm                      : 0.0238932
+  Effectivity index eta^res          : 22.9145
+Error estimate             |T^h|_res : 0.0238932
+Relative error (%) : 39.0404
+Effectivity index  : 22.9145
+Root mean square (RMS) of error      : 1.85363
+Min element error                    : 1.56521e-10
+Max element error                    : 8.62267e-05
+Average element error                : 8.92009e-06
+Refining 2 basis functions with errors in range \[0.000294862,0.000331098\] 2% of all basis functions
+Refined mesh: 91 elements 127 nodes.
+Adaptive step 2
+Number of elements    91
+Number of nodes       127
+Number of dofs        127
+Number of constraints 42
+Number of unknowns    85
+L2-norm            : 0.104172
+Max temperature    : 0.333333
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.0563438
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.570815
+  L2 norm |T|   = (T,T)^0.5           : 0.0563436
+  H1 norm |T|   = a(T,T)^0.5          : 0.570815
+  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 8.75085e-06
+  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.000820054
+  Exact relative error (%)            : 0.143664
+  Residual norm                      : 0.0162682
+  Effectivity index eta^res          : 19.838
+Error estimate             |T^h|_res : 0.0162682
+Relative error (%) : 27.74
+Effectivity index  : 19.838
+Root mean square (RMS) of error      : 2.29514
+Min element error                    : 1.56483e-10
+Max element error                    : 4.09046e-05
+Average element error                : 2.90829e-06
+Refining 3 basis functions with errors in range \[0.000121752,0.000156801\] 2.3622% of all basis functions
+Refined mesh: 127 elements 163 nodes.
+Adaptive step 3
+Number of elements    127
+Number of nodes       163
+Number of dofs        163
+Number of constraints 46
+Number of unknowns    117
+L2-norm            : 0.0930129
+Max temperature    : 0.333333
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.0563437
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.570815
+  L2 norm |T|   = (T,T)^0.5           : 0.0563436
+  H1 norm |T|   = a(T,T)^0.5          : 0.570815
+  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 5.70369e-06
+  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 0.000515343
+  Exact relative error (%)            : 0.090282
+  Residual norm                      : 0.0094285
+  Effectivity index eta^res          : 18.2956
+Error estimate             |T^h|_res : 0.0094285
+Relative error (%) : 16.5044
+Effectivity index  : 18.2956
+Root mean square (RMS) of error      : 2.25201
+Min element error                    : 1.56165e-10
+Max element error                    : 1.49837e-05
+Average element error                : 6.99973e-07
+   \* Stopping the adaptive cycles as max steps 3 was reached.
