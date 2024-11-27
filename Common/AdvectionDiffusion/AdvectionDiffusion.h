@@ -100,7 +100,7 @@ public:
   //! \brief The default constructor initializes all pointers to zero.
   //! \param[in] n Number of spatial dimensions
   //! \param[in] s Stabilization option
-  AdvectionDiffusion(unsigned short int n = 3, Stabilization s = NONE);
+  explicit AdvectionDiffusion(unsigned short int n = 3, Stabilization s = NONE);
 
   //! \brief Class representing the Advection-Diffusion element matrices.
   class ElementInfo : public ElmMats

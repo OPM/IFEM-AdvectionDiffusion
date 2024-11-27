@@ -44,12 +44,9 @@ public:
   //! \param[in] method The time integration method to use
   //! \param[in] itg_type The integrand type to use
   //! \param[in] form Integrand formulation
-  AdvectionDiffusionExplicit(unsigned short int n = 3,
-                             TimeIntegration::Method method = TimeIntegration::EULER,
-                             int itg_type = STANDARD, int form = 0);
-
-  //! \brief Empty destructor.
-  virtual ~AdvectionDiffusionExplicit() {}
+  explicit AdvectionDiffusionExplicit(unsigned short int n,
+                                      TimeIntegration::Method method,
+                                      int itg_type = STANDARD, int form = 0);
 
   using AdvectionDiffusion::finalizeElement;
   //! \brief Finalizes the element quantities after the numerical integration.
