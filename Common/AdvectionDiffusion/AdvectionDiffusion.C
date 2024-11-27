@@ -43,9 +43,7 @@ AdvectionDiffusion::AdvectionDiffusion (unsigned short int n,
 }
 
 
-AdvectionDiffusion::~AdvectionDiffusion()
-{
-}
+AdvectionDiffusion::~AdvectionDiffusion() = default;
 
 
 int AdvectionDiffusion::getIntegrandType () const

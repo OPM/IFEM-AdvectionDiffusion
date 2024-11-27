@@ -47,12 +47,9 @@ public:
   //! \param[in] method The time integration method to use
   //! \param[in] itg_type The integrand type to use
   //! \param[in] useALE If \e true, use ALE formulation
-  AdvectionDiffusionBDF(unsigned short int n = 3,
-                        TimeIntegration::Method method = TimeIntegration::BE,
-                        int itg_type = STANDARD, bool useALE = false);
-
-  //! \brief Empty destructor.
-  virtual ~AdvectionDiffusionBDF() {}
+  explicit AdvectionDiffusionBDF(unsigned short int n,
+                                 TimeIntegration::Method method,
+                                 int itg_type = STANDARD, bool useALE = false);
 
   using AdvectionDiffusion::initElement;
   //! \brief Initializes current element for numerical integration.
