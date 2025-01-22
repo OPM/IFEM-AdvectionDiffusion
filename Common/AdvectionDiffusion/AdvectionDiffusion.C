@@ -115,20 +115,22 @@ void AdvectionDiffusion::addSUPG (ElementInfo& elMat,
                                   const double react,
                                   const Vec3& U) const
 {
-    for (size_t i = 1; i <= fe.N.size(); i++)
-      for (size_t j = 1; j <= fe.N.size(); j++) {
-        double convV = 0, Lu = 0;
-        for (size_t k = 1;k <= nsd;k++) {
-          convV += U[k-1]*fe.dNdX(i,k);
-          Lu += U[k-1]*fe.dNdX(j,k)-props.getDiffusionConstant(X)*fe.d2NdX2(j,k,k);
-          elMat.Cv(k) += U[k-1]*fe.detJxW;
-        }
-        Lu += react*fe.N(j);
-        elMat.Cv(nsd+1) += fe.detJxW;
-        elMat.eMs(i,j) += convV*Lu*fe.detJxW;
-        if (source && j == 1)
-          elMat.eSs(i) += convV*f*fe.detJxW;
+  const double kappa = props.getDiffusionConstant(X);
+
+  for (size_t i = 1; i <= fe.N.size(); i++)
+    for (size_t j = 1; j <= fe.N.size(); j++) {
+      double convV = 0, Lu = 0.0;
+      for (size_t k = 1; k <= nsd; k++) {
+        convV += U(k)*fe.dNdX(i,k);
+        Lu += U(k)*fe.dNdX(j,k) - kappa*fe.d2NdX2(j,k,k);
+        elMat.Cv(k) += U(k)*fe.detJxW;
       }
+      Lu += react*fe.N(j);
+      elMat.Cv(nsd+1) += fe.detJxW;
+      elMat.eMs(i,j) += convV*Lu*fe.detJxW;
+      if (source && j == 1)
+        elMat.eSs(i) += convV*f*fe.detJxW;
+    }
 }
 
 
@@ -139,12 +141,14 @@ void AdvectionDiffusion::addGLS (ElementInfo& elMat,
                                  const double react,
                                  const Vec3& U) const
 {
+  const double kappa = props.getDiffusionConstant(X);
+
   for (size_t i = 1; i <= fe.N.size(); i++)
     for (size_t j = 1; j <= fe.N.size(); j++) {
-      double Lv = 0, Lu = 0;
-      for (size_t k = 1;k <= nsd;k++) {
-        Lv += U[k-1]*fe.dNdX(i,k)-props.getDiffusionConstant(X)*fe.d2NdX2(i,k,k);
-        Lu += U[k-1]*fe.dNdX(j,k)-props.getDiffusionConstant(X)*fe.d2NdX2(j,k,k);
+      double Lv = 0.0, Lu = 0.0;
+      for (size_t k = 1; k <= nsd; k++) {
+        Lv += U(k)*fe.dNdX(i,k) - kappa*fe.d2NdX2(i,k,k);
+        Lu += U(k)*fe.dNdX(j,k) - kappa*fe.d2NdX2(j,k,k);
         elMat.Cv(k) += U[k-1]*fe.detJxW;
       }
       Lv += react*fe.N(i);
@@ -165,20 +169,22 @@ void AdvectionDiffusion::addMS (ElementInfo& elMat,
                                 const double react,
                                 const Vec3& U) const
 {
+  const double kappa = props.getDiffusionConstant(X);
+
   for (size_t i = 1; i <= fe.N.size(); i++)
     for (size_t j = 1; j <= fe.N.size(); j++) {
-      double Lav = 0, Lu = 0;
-      for (size_t k = 1;k <= nsd;k++) {
-        Lav += -U[k-1]*fe.dNdX(i,k)-props.getDiffusionConstant(X)*fe.d2NdX2(i,k,k);
-        Lu += U[k-1]*fe.dNdX(j,k)-props.getDiffusionConstant(X)*fe.d2NdX2(j,k,k);
+      double Lav = 0.0, Lu = 0.0;
+      for (size_t k = 1; k <= nsd; k++) {
+        Lav += -U(k)*fe.dNdX(i,k) - kappa*fe.d2NdX2(i,k,k);
+        Lu  +=  U(k)*fe.dNdX(j,k) - kappa*fe.d2NdX2(j,k,k);
         elMat.Cv(k) += U[k-1]*fe.detJxW;
       }
       Lav += react*fe.N(i);
-      Lu +=  react*fe.N(j);
+      Lu  += react*fe.N(j);
       elMat.Cv(nsd+1) += fe.detJxW;
-      elMat.eMs(i,j) += -Lav*Lu*fe.detJxW;
+      elMat.eMs(i,j)  -= Lav*Lu*fe.detJxW;
       if (source && j == 1)
-        elMat.eSs(i) += -Lav*f*fe.detJxW;
+        elMat.eSs(i)  -= Lav*f*fe.detJxW;
     }
 }
 
@@ -280,15 +286,15 @@ void AdvectionDiffusion::setNamedFields (const std::string& name, Fields* field)
 Vec3 AdvectionDiffusion::getAdvectionVelocity (const FiniteElement& fe,
                                                const Vec3& X) const
 {
-  Vec3 U;
   if (uFields[0]) {
     Vector u;
     uFields[0]->valueFE(fe, u);
-    U = u;
-  } else if (Uad)
-    U = (*Uad)(X);
+    return Vec3(u);
+  }
+  else if (Uad)
+    return (*Uad)(X);
 
- return U;
+  return Vec3();
 }
 
 
@@ -300,8 +306,9 @@ double AdvectionDiffusion::ElementInfo::getTau(double kappa,
 
   // find mean element advection velocity
   double vel = 0.0;
+  double Cvb = Cv(Cv.size());
   for (size_t k = 1; k < Cv.size(); k++)
-    vel += pow(Cv(k)/Cv.back(),2.0);
+    vel += pow(Cv(k)/Cvb,2.0);
   vel = sqrt(vel);
 
   double Xi = std::min(mk*vel*hk/(2.0*kappa),1.0);
@@ -336,18 +343,18 @@ bool AdvectionDiffusionNorm::evalInt (LocalIntegral& elmInt,
   double kappa = hep.getFluidProperties().getDiffusionConstant(X);
 
   // Evaluate the FE heat flux vector, gradU = dNdX^T * eV
-  Vector dTh;
-  if (!fe.dNdX.multiply(elmInt.vec.front(),dTh,true))
+  RealArray gradT;
+  if (!fe.dNdX.multiply(elmInt.vec.front(),gradT,true))
     return false;
 
   size_t ip = 0;
   // Integrate the L2 norm, (T^h, T^h)
   pnorm[ip++] += Th*Th*fe.detJxW;
 
+  Vec3 dT, dTh(gradT);
   // Integrate the energy norm, a(T^h,T^h)
-  pnorm[ip++] += kappa*dTh.dot(dTh)*fe.detJxW;
+  pnorm[ip++] += kappa*dTh*dTh*fe.detJxW;
 
-  Vec3 dT;
   if (anasol && anasol->getScalarSecSol()) {
     dT = (*anasol->getScalarSecSol())(X);
     pnorm[ip++] += kappa*dT*dT*fe.detJxW;
@@ -417,12 +424,8 @@ bool AdvectionDiffusionNorm::finalizeElement (LocalIntegral& elmInt)
   // with e^r = u^r - u^h  and  e = u - u^h
   size_t g = 2;
   for (size_t ip = this->getNoFields(1); ip < pnorm.size(); ip += 4)
-  {
-    size_t gsize = this->getNoFields(g++);
-    if (gsize != 4)
-      continue;
-    pnorm[ip+3] = pnorm[ip+1] / pnorm[3];
-  }
+    if (this->getNoFields(g++) == 4)
+      pnorm[ip+3] = pnorm[ip+1] / pnorm[3];
 
   return true;
 }
@@ -434,10 +437,11 @@ size_t AdvectionDiffusionNorm::getNoFields (int group) const
     return this->NormBase::getNoFields();
   else if (group == 1)
     return anasol ? 6 : 2;
-  else {
-    const AdvectionDiffusion& hep = static_cast<const AdvectionDiffusion&>(myProblem);
-    return anasol ? 4 : (hep.doResidualNorm() ? 3 : 2);
-  }
+  else if (anasol)
+    return 4;
+
+  const AdvectionDiffusion& hep = static_cast<const AdvectionDiffusion&>(myProblem);
+  return hep.doResidualNorm() ? 3 : 2;
 }
 
 

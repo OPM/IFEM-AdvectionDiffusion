@@ -32,10 +32,6 @@
 #include <memory>
 
 
-class AnaSol;
-class NormBase;
-
-
 AdvectionDiffusionBDF::AdvectionDiffusionBDF (unsigned short int n,
                                               TimeIntegration::Method method,
                                               int itg_type, bool useALE)
@@ -84,20 +80,20 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
 {
   ElementInfo& elMat = static_cast<ElementInfo&>(elmInt);
 
-  std::vector<Vec3> U(2);
   Vec4 Xt(static_cast<const Vec4&>(X));
   if (timeMethod == TimeIntegration::THETA)
     Xt.t -= time.dt;
-  if (Uad) {
-    U[0] = (*Uad)(X);
-    U[1] = (*Uad)(Xt);
-   } else if (uFields[0]) {
-     for (int i = 0; i < 2; ++i) {
-       Vector u;
-       uFields[i]->valueFE(fe, u);
-       U[i] = u;
-     }
-   } else {
+
+  std::array<Vec3,2> U;
+  if (Uad)
+    U = { (*Uad)(X), (*Uad)(Xt) };
+  else if (uFields[0])
+    for (int i = 0; i < 2; ++i) {
+      Vector u;
+      uFields[i]->valueFE(fe, u);
+      U[i] = Vec3(u);
+    }
+  else {
     std::vector<Vec3> tmp(bdf.getOrder());
     for (int j=0; j<bdf.getOrder();++j)
       for (size_t i=0;i<nsd;++i)
@@ -106,14 +102,10 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
   }
 
   if (ALEformulation)
-    for (size_t i=1;i<=nsd;++i)
-      U[0][i-1] -= elMat.vec[primsol.size()+velocity.size()].dot(fe.N,i-1,nsd);
+    for (size_t i=0;i<nsd;++i)
+      U[0][i] -= elMat.vec[primsol.size()+velocity.size()].dot(fe.N,i,nsd);
 
-  double react = 0;
-  if (reaction)
-    react = (*reaction)(X);
-
-  double theta=0;
+  double theta = 0.0;
   for (int t=0;t<bdf.getOrder();++t) {
     double val = fe.N.dot(elMat.vec[t+1]);
     theta += -props.getMassAdvectionConstant()*bdf[1+t]/time.dt*val;
@@ -132,21 +124,20 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
       theta += (*source)(X);
   }
 
-  double timeCoef = timeMethod == TimeIntegration::THETA ? 0.5 : 1;
+  double timeCoef = timeMethod == TimeIntegration::THETA ? 0.5 : 1.0;
   double mu = props.getDiffusionConstant(X)*timeCoef;
-  double reac = react*props.getReactionConstant(X)*timeCoef;
   double s = props.getMassAdvectionConstant()*bdf[0]/time.dt;
+  double r = reaction ? props.getReactionConstant(X)*(*reaction)(X) : 0.0;
 
   WeakOps::Laplacian(elMat.A[0], fe, mu);
-  WeakOps::Mass(elMat.A[0], fe, s + reac);
+  WeakOps::Mass(elMat.A[0], fe, s + r*timeCoef);
 
   if (timeMethod == TimeIntegration::THETA) {
-    Vec3 grad;
-    Vector g;
+    RealArray g;
     fe.dNdX.multiply(elMat.vec[1], g, true);
-    grad = g;
+    Vec3 grad(g);
     ResidualOps::Laplacian(elMat.b[0], fe, grad, mu);
-    theta -= 0.5*props.getMassAdvectionConstant()*U[1]*g;
+    theta -= 0.5*props.getMassAdvectionConstant()*U[1]*grad;
     if (reaction)
       theta -= 0.5*props.getReactionConstant(X)*(*reaction)(Xt);
   }
@@ -179,8 +170,8 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
         // Diffusion
         double laplace = -fe.d2NdX2.trace(j);
         elMat.eMs(i,j) += (props.getDiffusionConstant(X)*laplace+advect+
-                           (props.getMassAdvectionConstant()*bdf[0]/time.dt+
-                            props.getReactionConstant(X)*react)*fe.N(j))*convI;
+                           (props.getMassAdvectionConstant()*bdf[0]/time.dt+r)*
+                            fe.N(j))*convI;
       }
     }
     if (stab == SUPG)
@@ -207,10 +198,7 @@ bool AdvectionDiffusionBDF::finalizeElement (LocalIntegral& A)
 
 NormBase* AdvectionDiffusionBDF::getNormIntegrand (AnaSol* asol) const
 {
-  if (asol)
-    return new AdvectionDiffusionNorm(*const_cast<AdvectionDiffusionBDF*>(this),asol);
-  else
-    return new AdvectionDiffusionNorm(*const_cast<AdvectionDiffusionBDF*>(this));
+  return new AdvectionDiffusionNorm(*const_cast<AdvectionDiffusionBDF*>(this),asol);
 }
 
 
