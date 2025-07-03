@@ -16,20 +16,6 @@
 
 #include "AdvectionDiffusion.h"
 #include "BDF.h"
-#include "Integrand.h"
-#include "MatVec.h"
-#include "SIMenums.h"
-#include "TimeIntUtils.h"
-
-#include <vector>
-
-
-class AnaSol;
-class FiniteElement;
-class LocalIntegral;
-class NormBase;
-class Vec3;
-struct TimeDomain;
 
 
 /*!
@@ -89,10 +75,6 @@ public:
   //! returned pointer value.
   //! \param[in] asol Pointer to analytical solution (optional)
   NormBase* getNormIntegrand(AnaSol* asol = 0) const override;
-
-  //! \brief Defines the solution mode before the element assembly is started.
-  //! \param[in] mode The solution mode to use
-  void setMode(SIM::SolutionMode mode) override;
 
   //! \brief Returns time integration method used.
   TimeIntegration::Method getTimeMethod() const override { return timeMethod; }

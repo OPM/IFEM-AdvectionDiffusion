@@ -15,29 +15,23 @@
 
 #include "AnaSol.h"
 #include "ElmNorm.h"
-#include "FiniteElement.h"
-#include "Function.h"
 #include "Fields.h"
-#include "Integrand.h"
-#include "LocalIntegral.h"
-#include "Vec3.h"
+#include "FiniteElement.h"
 #include "Vec3Oper.h"
 
 #include <algorithm>
 #include <cmath>
 #include <ext/alloc_traits.h>
 #include <iostream>
-#include <vector>
 
 
 AdvectionDiffusion::AdvectionDiffusion (unsigned short int n,
                                         AdvectionDiffusion::Stabilization s)
-  : IntegrandBase(n), order(1), stab(s), Cinv(5.0), residualNorm(false)
+  : IntegrandBase(n), flux(nullptr), timeScale(1.0), order(1), stab(s),
+    Cinv(5.0), Cbar(0.0), residualNorm(false), useModified(false)
 {
   primsol.resize(1);
-  flux = nullptr;
 
-  velocity.resize(2);
   registerVector("velocity1", &velocity[0]);
   registerVector("velocity2", &velocity[1]);
 }
@@ -244,13 +238,6 @@ std::string AdvectionDiffusion::getField2Name (size_t i,
 }
 
 
-void AdvectionDiffusion::setMode (SIM::SolutionMode mode)
-{
-  m_mode = mode;
-  primsol.resize(1);
-}
-
-
 bool AdvectionDiffusion::finalizeElement (LocalIntegral& A)
 {
   if (stab == NONE)
@@ -278,7 +265,7 @@ void AdvectionDiffusion::setNamedFields (const std::string& name, Fields* field)
 {
   if (name == "velocity1")
     uFields[0].reset(field);
-  else
+  else if (name == "velocity2")
     uFields[1].reset(field);
 }
 
@@ -298,8 +285,8 @@ Vec3 AdvectionDiffusion::getAdvectionVelocity (const FiniteElement& fe,
 }
 
 
-double AdvectionDiffusion::ElementInfo::getTau(double kappa,
-                                               double Cinv, int p) const
+double AdvectionDiffusion::ElementInfo::getTau (double kappa,
+                                                double Cinv, int p) const
 {
   // eqns (211)-(214)
   double mk = std::min(1.0/(3.0*p*p), 2.0/Cinv);
@@ -323,11 +310,11 @@ NormBase* AdvectionDiffusion::getNormIntegrand (AnaSol* asol) const
 }
 
 
-AdvectionDiffusionNorm::AdvectionDiffusionNorm(AdvectionDiffusion& p, AnaSol* a) :
-  NormBase(p)
+AdvectionDiffusionNorm::AdvectionDiffusionNorm (AdvectionDiffusion& p,
+                                                AnaSol* a)
+  : NormBase(p), anasol(a)
 {
   nrcmp = myProblem.getNoFields(2);
-  anasol = a;
 }
 
 
@@ -497,17 +484,10 @@ int AdvectionDiffusionNorm::getIntegrandType () const
 }
 
 
-AdvectionDiffusion::Robin::Robin(unsigned short int n, const AdvectionDiffusion& itg) :
-  IntegrandBase(n),
-  integrand(itg)
+bool AdvectionDiffusion::Robin::evalBou (LocalIntegral& elmInt,
+                                         const FiniteElement& fe, const Vec3& X,
+                                         const Vec3& normal) const
 {
-}
-
-
-bool AdvectionDiffusion::Robin::evalBou(LocalIntegral& elmInt, const FiniteElement& fe,
-                                        const Vec3& X, const Vec3& normal) const
-{
-  ElmMats& elMat = static_cast<ElmMats&>(elmInt);
   if (integrand.getAdvForm() != WeakOperators::CONSERVATIVE) {
     std::cerr << "Robin boundary conditions only implemented for conservative form." << std::endl;
     return false;
@@ -517,6 +497,7 @@ bool AdvectionDiffusion::Robin::evalBou(LocalIntegral& elmInt, const FiniteEleme
   if (g)
     ax[1] = (*g)(X);
 
+  ElmMats& elMat = static_cast<ElmMats&>(elmInt);
   elMat.A[0].outer_product(fe.N, fe.N, true, fe.detJxW * ax[0]); // mass
   elMat.b[0].add(fe.N, fe.detJxW * ax[1]); // source
 

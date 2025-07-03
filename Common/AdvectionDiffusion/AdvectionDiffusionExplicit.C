@@ -13,21 +13,6 @@
 //==============================================================================
 
 #include "AdvectionDiffusionExplicit.h"
-#include "ADFluidProperties.h"
-
-#include "ElmMats.h"
-#include "Function.h"
-#include "MatVec.h"
-#include "Vec3.h"
-
-#include <ext/alloc_traits.h>
-#include <memory>
-#include <vector>
-
-
-class FiniteElement;
-class LocalIntegral;
-class NormBase;
 
 
 AdvectionDiffusionExplicit::AdvectionDiffusionExplicit (unsigned short int n,
@@ -87,14 +72,4 @@ NormBase* AdvectionDiffusionExplicit::getNormIntegrand (AnaSol* asol) const
     return new AdvectionDiffusionNorm(*const_cast<AdvectionDiffusionExplicit*>(this),asol);
   else
     return new AdvectionDiffusionNorm(*const_cast<AdvectionDiffusionExplicit*>(this));
-}
-
-
-void AdvectionDiffusionExplicit::setMode (SIM::SolutionMode mode)
-{
-  m_mode = mode;
-  if (mode == SIM::STATIC)
-    primsol.clear();
-  else
-    primsol.resize(1 + TimeIntegration::Steps(timeMethod));
 }

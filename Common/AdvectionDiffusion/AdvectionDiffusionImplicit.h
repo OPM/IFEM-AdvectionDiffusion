@@ -17,18 +17,6 @@
 
 #include "AdvectionDiffusion.h"
 
-#include "Integrand.h"
-#include "SIMenums.h"
-#include "TimeIntUtils.h"
-
-
-class AnaSol;
-class FiniteElement;
-class LocalIntegral;
-class NormBase;
-struct TimeDomain;
-class Vec3;
-
 
 /*!
   \brief Class representing the integrand of Advection-Diffusion problem
@@ -44,8 +32,8 @@ public:
   //! \param[in] itg_type The integrand type to use
   //! \param[in] form Integrand formulation
   explicit AdvectionDiffusionImplicit(unsigned short int n,
-                             TimeIntegration::Method method,
-                             int itg_type = STANDARD, int form = 0);
+                                      TimeIntegration::Method method,
+                                      int itg_type = STANDARD, int form = 0);
 
   using AdvectionDiffusion::evalInt;
   //! \brief Evaluates the integrand at an interior point.
@@ -64,10 +52,6 @@ public:
   //! returned pointer value.
   //! \param[in] asol Pointer to analytical solution (optional)
   NormBase* getNormIntegrand(AnaSol* asol = 0) const override;
-
-  //! \brief Defines the solution mode before the element assembly is started.
-  //! \param[in] mode The solution mode to use
-  void setMode(SIM::SolutionMode mode) override;
 
 protected:
   TimeIntegration::Method timeMethod; //!< Time stepping method used

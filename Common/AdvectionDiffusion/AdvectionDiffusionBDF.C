@@ -13,23 +13,16 @@
 //==============================================================================
 
 #include "AdvectionDiffusionBDF.h"
-#include "ADFluidProperties.h"
 
-#include "FiniteElement.h"
 #include "Fields.h"
-#include "Function.h"
-#include "LocalIntegral.h"
+#include "FiniteElement.h"
 #include "StabilizationUtils.h"
 #include "TimeDomain.h"
 #include "Utilities.h"
-#include "Vec3.h"
 #include "Vec3Oper.h"
 
-#include <array>
-#include <cstddef>
 #include <ext/alloc_traits.h>
 #include <iostream>
-#include <memory>
 
 
 AdvectionDiffusionBDF::AdvectionDiffusionBDF (unsigned short int n,
@@ -48,8 +41,7 @@ AdvectionDiffusionBDF::AdvectionDiffusionBDF (unsigned short int n,
 bool AdvectionDiffusionBDF::initElement (const std::vector<int>& MNPC,
                                          LocalIntegral& A)
 {
-  size_t nvec   = primsol.size() + velocity.size();
-  size_t nfield = nvec;
+  size_t nfield = primsol.size() + velocity.size();
   if (ALEformulation)
     nfield++;
 
@@ -57,11 +49,11 @@ bool AdvectionDiffusionBDF::initElement (const std::vector<int>& MNPC,
   int ierr = 0;
   for (size_t i = 0; i < primsol.size() && ierr == 0; i++) {
     ierr = utl::gather(MNPC,1,primsol[i],A.vec[i]);
-    if (!Uad && i < velocity.size() && !uFields[0])
-      ierr = utl::gather(MNPC,nsd,velocity[i],A.vec[i+primsol.size()]);
+    if (!Uad && !uFields[0] && i < velocity.size() && ierr == 0)
+      ierr = utl::gather(MNPC,nsd,velocity[i],A.vec[primsol.size()+i]);
   }
 
-  if (ALEformulation)
+  if (ALEformulation && ierr == 0)
     ierr = utl::gather(MNPC,nsd,ux,A.vec[primsol.size()+velocity.size()]);
 
   if (ierr == 0)
@@ -88,7 +80,7 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
   if (Uad)
     U = { (*Uad)(X), (*Uad)(Xt) };
   else if (uFields[0])
-    for (int i = 0; i < 2; ++i) {
+    for (int i = 0; i < 2 && uFields[i]; ++i) {
       Vector u;
       uFields[i]->valueFE(fe, u);
       U[i] = Vec3(u);
@@ -199,16 +191,4 @@ bool AdvectionDiffusionBDF::finalizeElement (LocalIntegral& A)
 NormBase* AdvectionDiffusionBDF::getNormIntegrand (AnaSol* asol) const
 {
   return new AdvectionDiffusionNorm(*const_cast<AdvectionDiffusionBDF*>(this),asol);
-}
-
-
-void AdvectionDiffusionBDF::setMode (SIM::SolutionMode mode)
-{
-  m_mode = mode;
-  if (mode >= SIM::RECOVERY)
-    primsol.resize(1);
-  else if (mode == SIM::STATIC)
-    primsol.clear();
-  else
-    primsol.resize(1+bdf.getActualOrder());
 }

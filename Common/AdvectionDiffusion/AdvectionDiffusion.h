@@ -18,24 +18,13 @@
 
 #include "ElmMats.h"
 #include "EqualOrderOperators.h"
-#include "Functions.h"
+#include "Function.h"
 #include "IntegrandBase.h"
-#include "MatVec.h"
-#include "SIMenums.h"
 #include "TimeIntUtils.h"
 
 #include <array>
 #include <cstddef>
 #include <memory>
-#include <string>
-
-
-class AnaSol;
-class Fields;
-class FiniteElement;
-class LocalIntegral;
-class Vec3;
-class VecFunc;
 
 
 /*!
@@ -55,12 +44,11 @@ public:
   class Robin : public IntegrandBase
   {
   public:
-    //! \brief Default constructor.
+    //! \brief The constructor forwards to the parent class constructor.
     //! \param[in] n Number of spatial dimensions
     //! \param[in] itg Main integrand instance
-    Robin(unsigned short int n, const AdvectionDiffusion& itg);
-    //! \brief Empty destructor.
-    virtual ~Robin() {}
+    Robin(unsigned short int n, const AdvectionDiffusion& itg)
+      : IntegrandBase(n), integrand(itg) {}
 
     //! \brief Returns that this integrand has no interior contributions.
     bool hasInteriorTerms() const override { return false; }
@@ -108,8 +96,6 @@ public:
   public:
     //! \brief Default constructor.
     explicit ElementInfo(bool lhs = true) : ElmMats(lhs), hk(0.0), iEl(0) {}
-    //! \brief Empty destructor.
-    virtual ~ElementInfo() {}
 
     //! \brief Returns the stabilization parameter.
     double getTau(double kappa, double Cinv, int p) const;
@@ -135,25 +121,21 @@ public:
 
   //! \brief Defines the Cbar element size parameter.
   void setCbar(double Cbar_) { Cbar = Cbar_; }
-
   //! \brief Returns the current Cbar value.
   double getCbar() const { return Cbar; }
 
   //! \brief Defines whether or not to use modified element size in residual estimator.
   void setModified(bool use) { useModified = use; }
-
   //! \brief Returns whether or not to use modified element size in residual estimator.
   bool useModifiedElmSize() const { return useModified; }
 
   //! \brief Defines the stabilization type.
   void setStabilization(Stabilization s) { stab = s; }
-
   //! \brief Obtain the current stabilization type.
   Stabilization getStabilization() const { return stab; }
 
   //! \brief Defines the advection field.
   void setAdvectionField(VecFunc* U) { Uad.reset(U); }
-
   //! \brief Obtain the advection field.
   const VecFunc* getAdvectionField() { return Uad.get(); }
 
@@ -162,7 +144,6 @@ public:
 
   //! \brief Defines the reaction field.
   void setReactionField(RealFunc* f) { reaction.reset(f); }
-
   //! \brief Obtain the reaction field.
   const RealFunc* getReactionField() { return reaction.get(); }
 
@@ -174,6 +155,7 @@ public:
 
   //! \brief Returns a previously calculated tau value for the given element.
   //! \brief param[in] e The element number
+  //!
   //! \details Used with norm calculations
   double getElementTau(size_t e) const { return e > tauE.size() ? 0 : tauE(e); }
 
@@ -182,7 +164,6 @@ public:
 
   //! \brief Set whether we evaluate residual norm.
   void setResidualNorm(bool on) { residualNorm = on; }
-
   //! \brief True if we evaluate residual norm.
   bool doResidualNorm() const { return residualNorm; }
 
@@ -250,22 +231,15 @@ public:
   //! \brief Returns a const reference to the fluid properties.
   const AD::FluidProperties& getFluidProperties() const { return props; }
 
-  //! \brief Defines the solution mode before the element assembly is started.
-  //! \param[in] mode The solution mode to use
-  void setMode(SIM::SolutionMode mode) override;
-
   //! \brief Set time scaling factor from ODE solver.
   //! \param scale Time scaling factor
   void setTimeScale(double scale) { timeScale = scale; }
 
   //! \brief Set advection formulation.
   //! \param form Formulation to use.
-  void setAdvectionForm(WeakOperators::ConvectionForm form)
-  { advForm = form; };
-
+  void setAdvectionForm(WeakOperators::ConvectionForm form) { advForm = form; }
   //! \brief Returns used advection form.
-  WeakOperators::ConvectionForm getAdvForm() const
-  { return advForm; }
+  WeakOperators::ConvectionForm getAdvForm() const { return advForm; }
 
   //! \brief Returns time integration method used.
   virtual TimeIntegration::Method getTimeMethod() const
@@ -330,8 +304,8 @@ protected:
   std::unique_ptr<VecFunc>  Uad;      //!< Pointer to advection field
   std::unique_ptr<RealFunc> reaction; //!< Pointer to the reaction field
   std::unique_ptr<RealFunc> source;   //!< Pointer to source field
-  RealFunc* flux;     //!< Pointer to the flux field
-  double timeScale = 1.0; //!< Time scale factor
+  RealFunc* flux; //!< Pointer to the flux field
+  double timeScale; //!< Time scale factor
 
   Vector tauE;  //!< Stored tau values - need for norm integration
   int    order; //!< Basis order
@@ -340,12 +314,12 @@ protected:
 
   Stabilization stab; //!< The type of stabilization used
   double        Cinv; //!< Stabilization parameter
-  double        Cbar = 0.0; //!< Used in element size calculations
+  double        Cbar; //!< Used in element size calculations
   bool  residualNorm; //!< If \e true, we will evaluate residual norm
-  bool useModified = false; //!< If \e true use modified element size in residual estimate
+  bool   useModified; //!< If \e true, use modified element size in residual estimate
   WeakOperators::ConvectionForm advForm = WeakOperators::CONVECTIVE; //!< Advection formulation to use
 
-  Vectors velocity; //!< The advecting velocity field
+  std::array<Vector,2> velocity; //!< The advecting velocity field
   std::array<std::unique_ptr<Fields>,2> uFields; //!< Externally provided velocity fields
 
   friend class AdvectionDiffusionNorm;
@@ -363,8 +337,6 @@ public:
   //! \param[in] p The heat equation problem to evaluate norms for
   //! \param[in] a The analytical aolution (optional)
   explicit AdvectionDiffusionNorm(AdvectionDiffusion& p, AnaSol* a = nullptr);
-  //! \brief Empty destructor.
-  virtual ~AdvectionDiffusionNorm() {}
 
   using NormBase::evalInt;
   //! \brief Evaluates the integrand at an interior point.

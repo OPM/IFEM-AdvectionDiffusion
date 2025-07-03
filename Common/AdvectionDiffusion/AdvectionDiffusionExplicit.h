@@ -16,19 +16,6 @@
 
 #include "AdvectionDiffusion.h"
 
-#include "Integrand.h"
-#include "SIMenums.h"
-#include "TimeIntUtils.h"
-
-#include <cstddef>
-
-
-class AnaSol;
-class FiniteElement;
-class LocalIntegral;
-class NormBase;
-class Vec3;
-
 
 /*!
   \brief Class representing the integrand of a time-dependent
@@ -82,10 +69,6 @@ public:
   //! returned pointer value.
   //! \param[in] asol Pointer to analytical solution (optional)
   NormBase* getNormIntegrand(AnaSol* asol = 0) const override;
-
-  //! \brief Defines the solution mode before the element assembly is started.
-  //! \param[in] mode The solution mode to use
-  void setMode(SIM::SolutionMode mode) override;
 
 protected:
   TimeIntegration::Method timeMethod; //!< Time stepping method used
