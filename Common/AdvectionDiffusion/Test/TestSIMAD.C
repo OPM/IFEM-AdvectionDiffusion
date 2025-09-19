@@ -18,21 +18,23 @@
 #include "SIM2D.h"
 #include "TimeIntUtils.h"
 
-#include <string>
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 
-#include "gtest/gtest.h"
+using Catch::Matchers::WithinRel;
 
-TEST(TestSIMAD, Parse)
+
+TEST_CASE("TestSIMAD.Parse")
 {
   AdvectionDiffusionBDF integrand(2, TimeIntegration::BDF2, 0);
   SIMAD<SIM2D,AdvectionDiffusionBDF> sim(integrand, true);
-  EXPECT_TRUE(sim.read("Lshape.xinp"));
+  REQUIRE(sim.read("Lshape.xinp"));
 
   const AdvectionDiffusionBDF& ad =
         static_cast<const AdvectionDiffusionBDF&>(*sim.getProblem());
 
-  ASSERT_FLOAT_EQ(ad.getCinv(), 1.0);
-  ASSERT_FLOAT_EQ(ad.getFluidProperties().getDiffusivity(), 1e-6);
-  ASSERT_FLOAT_EQ(ad.getFluidProperties().getPrandtlNumber(), 0.5);
-  EXPECT_EQ(ad.getStabilization(), AdvectionDiffusion::MS);
+  REQUIRE_THAT(ad.getCinv(), WithinRel(1.0));
+  REQUIRE_THAT(ad.getFluidProperties().getDiffusivity(), WithinRel(1e-6));
+  REQUIRE_THAT(ad.getFluidProperties().getPrandtlNumber(), WithinRel(0.5));
+  REQUIRE(ad.getStabilization() == AdvectionDiffusion::MS);
 }

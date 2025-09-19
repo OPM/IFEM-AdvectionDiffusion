@@ -21,10 +21,13 @@
 #include "Vec3.h"
 #include <tinyxml2.h>
 
-#include "gtest/gtest.h"
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+
+using Catch::Matchers::WithinRel;
 
 
-TEST(TestAdvectionDiffusionComponentSource, Parse2D)
+TEST_CASE("TestAdvectionDiffusionComponentSource.Parse2D")
 {
   tinyxml2::XMLDocument doc;
   doc.Parse("<source type=\"components\">"
@@ -52,12 +55,12 @@ TEST(TestAdvectionDiffusionComponentSource, Parse2D)
   for (const double x : {1.0, 2.0})
     for (const double y : {3.0, 4.0}) {
       Vec3 X(x,y);
-      EXPECT_DOUBLE_EQ(source(X), -1.0*(Txx(X) + Tyy(X)) + u(X)*Tx(X) + v(X)*Ty(X));
+      REQUIRE_THAT(source(X), WithinRel(-1.0*(Txx(X) + Tyy(X)) + u(X)*Tx(X) + v(X)*Ty(X)));
     }
 }
 
 
-TEST(TestAdvectionDiffusionComponentSource, Parse2DReaction)
+TEST_CASE("TestAdvectionDiffusionComponentSource.ParseReaction2D")
 {
   tinyxml2::XMLDocument doc;
   doc.Parse("<source type=\"components\">"
@@ -88,12 +91,12 @@ TEST(TestAdvectionDiffusionComponentSource, Parse2DReaction)
   for (const double x : {1.0, 2.0})
     for (const double y : {3.0, 4.0}) {
       Vec3 X(x,y);
-      EXPECT_DOUBLE_EQ(source(X), -1.0*(Txx(X) + Tyy(X)) + u(X)*Tx(X) + v(X)*Ty(X) + T(X));
+      REQUIRE_THAT(source(X), WithinRel(-1.0*(Txx(X) + Tyy(X)) + u(X)*Tx(X) + v(X)*Ty(X) + T(X)));
     }
 }
 
 
-TEST(TestAdvectionDiffusionComponentSource, Parse3D)
+TEST_CASE("TestAdvectionDiffusionComponentSource.Parse3D")
 {
   tinyxml2::XMLDocument doc;
   doc.Parse("<source type=\"components\">"
@@ -125,13 +128,13 @@ TEST(TestAdvectionDiffusionComponentSource, Parse3D)
     for (const double y : {3.0, 4.0})
       for (const double z : {0.5, 0.6}) {
         Vec3 X(x,y,z);
-        EXPECT_DOUBLE_EQ(source(X), -1.0*(Txx(X) + Tyy(X) + Tzz(X)) +
-                                        u(X)*Tx(X) + v(X)*Ty(X) + w(X)*Tz(X));
+        REQUIRE_THAT(source(X), WithinRel(-1.0*(Txx(X) + Tyy(X) + Tzz(X)) +
+                                                u(X)*Tx(X) + v(X)*Ty(X) + w(X)*Tz(X)));
       }
 }
 
 
-TEST(TestAdvectionDiffusionComponentSource, Parse3DReaction)
+TEST_CASE("TestAdvectionDiffusionComponentSource.ParseReaction3D")
 {
   tinyxml2::XMLDocument doc;
   doc.Parse("<source type=\"components\">"
@@ -166,13 +169,13 @@ TEST(TestAdvectionDiffusionComponentSource, Parse3DReaction)
     for (const double y : {3.0, 4.0})
       for (const double z : {0.5, 0.6}) {
         Vec3 X(x,y,z);
-        EXPECT_NEAR(source(X), -1.0*(Txx(X) + Tyy(X) + Tzz(X)) +
-                               u(X)*Tx(X) + v(X)*Ty(X) + w(X)*Tz(X) + T(X), 1e-12);
+        REQUIRE_THAT(source(X), WithinRel(-1.0*(Txx(X) + Tyy(X) + Tzz(X)) +
+                                                u(X)*Tx(X) + v(X)*Ty(X) + w(X)*Tz(X) + T(X)));
       }
 }
 
 
-TEST(TestAdvectionDiffusionAnaSolSource, Parse2D)
+TEST_CASE("TestAdvectionDiffusionAnaSolSource.Parse2D")
 {
   tinyxml2::XMLDocument doc;
   doc.Parse("<anasol type=\"expression\" autodiff=\"true\">"
@@ -183,8 +186,8 @@ TEST(TestAdvectionDiffusionAnaSolSource, Parse2D)
   AnaSol aSol(doc.RootElement(), true);
   aSol.setupSecondarySolutions();
   VecFuncExpr U("x*y | sin(x)*cos(y)");
-  EXPECT_TRUE(aSol.getScalarSol() != nullptr);
-  EXPECT_TRUE(aSol.getScalarSecSol() != nullptr);
+  REQUIRE(aSol.getScalarSol() != nullptr);
+  REQUIRE(aSol.getScalarSecSol() != nullptr);
   AD::AdvectionDiffusionAnaSolSource source(aSol,U,props,nullptr,true);
 
   auto Tx  = [](const Vec3& X) { return 2*cos(2*X.x)*sin(X.y); };
@@ -197,12 +200,12 @@ TEST(TestAdvectionDiffusionAnaSolSource, Parse2D)
   for (const double x : {1.0, 2.0})
     for (const double y : {3.0, 4.0}) {
       Vec3 X(x,y);
-      EXPECT_DOUBLE_EQ(source(X), -1.0*(Txx(X) + Tyy(X)) + u(X)*Tx(X) + v(X)*Ty(X));
+      REQUIRE_THAT(source(X), WithinRel(-1.0*(Txx(X) + Tyy(X)) + u(X)*Tx(X) + v(X)*Ty(X)));
     }
 }
 
 
-TEST(TestAdvectionDiffusionAnaSolSource, Parse2DReaction)
+TEST_CASE("TestAdvectionDiffusionAnaSolSource.ParseReaction2D")
 {
   tinyxml2::XMLDocument doc;
   doc.Parse("<anasol type=\"expression\" autodiff=\"true\">"
@@ -214,8 +217,8 @@ TEST(TestAdvectionDiffusionAnaSolSource, Parse2DReaction)
   aSol.setupSecondarySolutions();
   VecFuncExpr U("x*y | sin(x)*cos(y)");
   ConstFunc react(0.5);
-  EXPECT_TRUE(aSol.getScalarSol() != nullptr);
-  EXPECT_TRUE(aSol.getScalarSecSol() != nullptr);
+  REQUIRE(aSol.getScalarSol() != nullptr);
+  REQUIRE(aSol.getScalarSecSol() != nullptr);
   AD::AdvectionDiffusionAnaSolSource source(aSol,U,props,&react,true);
 
   auto T   = [](const Vec3& X) { return 0.5*sin(2*X.x)*sin(X.y); };
@@ -229,12 +232,12 @@ TEST(TestAdvectionDiffusionAnaSolSource, Parse2DReaction)
   for (const double x : {1.0, 2.0})
     for (const double y : {3.0, 4.0}) {
       Vec3 X(x,y);
-      EXPECT_DOUBLE_EQ(source(X), -1.0*(Txx(X) + Tyy(X)) + u(X)*Tx(X) + v(X)*Ty(X) + T(X));
+      REQUIRE_THAT(source(X), WithinRel(-1.0*(Txx(X) + Tyy(X)) + u(X)*Tx(X) + v(X)*Ty(X) + T(X)));
     }
 }
 
 
-TEST(TestAdvectionDiffusionAnaSolSource, Parse2DUnsteady)
+TEST_CASE("TestAdvectionDiffusionAnaSolSource.ParseUnsteady2D")
 {
   tinyxml2::XMLDocument doc;
   doc.Parse("<anasol type=\"expression\" autodiff=\"true\">"
@@ -245,8 +248,8 @@ TEST(TestAdvectionDiffusionAnaSolSource, Parse2DUnsteady)
   AnaSol aSol(doc.RootElement(), true);
   aSol.setupSecondarySolutions();
   VecFuncExpr U("x*y*cos(t) | sin(x)*cos(y)*exp(t)");
-  EXPECT_TRUE(aSol.getScalarSol() != nullptr);
-  EXPECT_TRUE(aSol.getScalarSecSol() != nullptr);
+  REQUIRE(aSol.getScalarSol() != nullptr);
+  REQUIRE(aSol.getScalarSecSol() != nullptr);
   AD::AdvectionDiffusionAnaSolSource source(aSol,U,props,nullptr,false);
 
   auto Tt  = [](const Vec4& X) { return sin(2*X.x)*sin(X.y)*cos(X.t); };
@@ -261,13 +264,13 @@ TEST(TestAdvectionDiffusionAnaSolSource, Parse2DUnsteady)
     for (const double x : {1.0, 2.0})
       for (const double y : {3.0, 4.0}) {
         Vec4 X(x,y,0,t);
-          EXPECT_DOUBLE_EQ(source(X), -1.0*(Txx(X) + Tyy(X)) +
-                                      u(X)*Tx(X) + v(X)*Ty(X) + Tt(X));
+          REQUIRE_THAT(source(X), WithinRel(-1.0*(Txx(X) + Tyy(X)) +
+                                                  u(X)*Tx(X) + v(X)*Ty(X) + Tt(X)));
       }
 }
 
 
-TEST(TestAdvectionDiffusionAnaSolSource, Parse3D)
+TEST_CASE("TestAdvectionDiffusionAnaSolSource.Parse3D")
 {
   tinyxml2::XMLDocument doc;
   doc.Parse("<anasol type=\"expression\" autodiff=\"true\">"
@@ -278,8 +281,8 @@ TEST(TestAdvectionDiffusionAnaSolSource, Parse3D)
   AnaSol aSol(doc.RootElement(), true);
   aSol.setupSecondarySolutions();
   VecFuncExpr U("x*y*exp(z) | sin(x)*cos(y)*sin(z) | x*y*z");
-  EXPECT_TRUE(aSol.getScalarSol() != nullptr);
-  EXPECT_TRUE(aSol.getScalarSecSol() != nullptr);
+  REQUIRE(aSol.getScalarSol() != nullptr);
+  REQUIRE(aSol.getScalarSecSol() != nullptr);
   AD::AdvectionDiffusionAnaSolSource source(aSol,U,props,nullptr,true);
 
   auto Tx  = [](const Vec3& X) { return 2*cos(2*X.x)*sin(X.y)*cos(X.z); };
@@ -296,13 +299,13 @@ TEST(TestAdvectionDiffusionAnaSolSource, Parse3D)
     for (const double y : {3.0, 4.0})
       for (const double z : {0.5, 0.6}) {
         Vec3 X(x,y,z);
-        EXPECT_DOUBLE_EQ(source(X), -1.0*(Txx(X) + Tyy(X) + Tzz(X)) +
-                                        u(X)*Tx(X) + v(X)*Ty(X) + w(X)*Tz(X));
+        REQUIRE_THAT(source(X), WithinRel(-1.0*(Txx(X) + Tyy(X) + Tzz(X)) +
+                                                u(X)*Tx(X) + v(X)*Ty(X) + w(X)*Tz(X)));
       }
 }
 
 
-TEST(TestAdvectionDiffusionAnaSolSource, Parse3DReaction)
+TEST_CASE("TestAdvectionDiffusionAnaSolSource.ParseReaction3D")
 {
   tinyxml2::XMLDocument doc;
   doc.Parse("<anasol type=\"expression\" autodiff=\"true\">"
@@ -314,8 +317,8 @@ TEST(TestAdvectionDiffusionAnaSolSource, Parse3DReaction)
   aSol.setupSecondarySolutions();
   VecFuncExpr U("x*y*exp(z) | sin(x)*cos(y)*sin(z) | x*y*z");
   EvalFunction react("x*y*z");
-  EXPECT_TRUE(aSol.getScalarSol() != nullptr);
-  EXPECT_TRUE(aSol.getScalarSecSol() != nullptr);
+  REQUIRE(aSol.getScalarSol() != nullptr);
+  REQUIRE(aSol.getScalarSecSol() != nullptr);
   AD::AdvectionDiffusionAnaSolSource source(aSol,U,props,&react,true);
 
   auto T   = [](const Vec3& X) { return X.x*X.y*X.z*sin(2*X.x)*sin(X.y)*cos(X.z); };
@@ -333,13 +336,13 @@ TEST(TestAdvectionDiffusionAnaSolSource, Parse3DReaction)
     for (const double y : {3.0, 4.0})
       for (const double z : {0.5, 0.6}) {
         Vec3 X(x,y,z);
-        EXPECT_NEAR(source(X), -1.0*(Txx(X) + Tyy(X) + Tzz(X)) +
-                               u(X)*Tx(X) + v(X)*Ty(X) + w(X)*Tz(X) + T(X), 1e-12);
+        REQUIRE_THAT(source(X), WithinRel(-1.0*(Txx(X) + Tyy(X) + Tzz(X)) +
+                                                u(X)*Tx(X) + v(X)*Ty(X) + w(X)*Tz(X) + T(X)));
       }
 }
 
 
-TEST(TestAdvectionDiffusionAnaSolSource, Parse3DUnsteady)
+TEST_CASE("TestAdvectionDiffusionAnaSolSource.ParseUnsteady3D")
 {
   tinyxml2::XMLDocument doc;
   doc.Parse("<anasol type=\"expression\" autodiff=\"true\">"
@@ -350,8 +353,8 @@ TEST(TestAdvectionDiffusionAnaSolSource, Parse3DUnsteady)
   AnaSol aSol(doc.RootElement(), true);
   aSol.setupSecondarySolutions();
   VecFuncExpr U("x*y*exp(z)*t | sin(x)*cos(y)*sin(z)*t*t | x*y*z*sin(t)");
-  EXPECT_TRUE(aSol.getScalarSol() != nullptr);
-  EXPECT_TRUE(aSol.getScalarSecSol() != nullptr);
+  REQUIRE(aSol.getScalarSol() != nullptr);
+  REQUIRE(aSol.getScalarSecSol() != nullptr);
   AD::AdvectionDiffusionAnaSolSource source(aSol,U,props,nullptr,false);
 
   auto Tt  = [](const Vec4& X) { return -sin(2*X.x)*sin(X.y)*cos(X.z)*sin(X.t); };
@@ -370,7 +373,7 @@ TEST(TestAdvectionDiffusionAnaSolSource, Parse3DUnsteady)
       for (const double y : {3.0, 4.0})
         for (const double z : {0.5, 0.6}) {
           Vec4 X(x,y,z,t);
-          EXPECT_DOUBLE_EQ(source(X), -1.0*(Txx(X) + Tyy(X) + Tzz(X)) +
-                                          u(X)*Tx(X) + v(X)*Ty(X) + w(X)*Tz(X) + Tt(X));
+          REQUIRE_THAT(source(X), WithinRel(-1.0*(Txx(X) + Tyy(X) + Tzz(X)) +
+                                                  u(X)*Tx(X) + v(X)*Ty(X) + w(X)*Tz(X) + Tt(X)));
         }
 }

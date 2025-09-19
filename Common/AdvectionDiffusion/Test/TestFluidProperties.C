@@ -13,29 +13,32 @@
 #include "ADFluidProperties.h"
 #include <tinyxml2.h>
 
-#include "gtest/gtest.h"
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+
+using Catch::Matchers::WithinRel;
 
 
-TEST(TestFluidProperties, ADPhysical)
+TEST_CASE("TestADFluidProperties.Physical")
 {
   tinyxml2::XMLDocument doc;
   doc.Parse("<fluidproperties rho=\"2.0\" kappa=\"3.0\" C=\"4.0\"/>");
   AD::FluidProperties props;
   props.parse(doc.RootElement());
 
-  EXPECT_FLOAT_EQ(props.getMassDensity(), 2.0);
-  EXPECT_FLOAT_EQ(props.getDiffusivity(), 3.0);
-  EXPECT_FLOAT_EQ(props.getHeatCapacity(), 4.0);
+  REQUIRE_THAT(props.getMassDensity(), WithinRel(2.0));
+  REQUIRE_THAT(props.getDiffusivity(), WithinRel(3.0));
+  REQUIRE_THAT(props.getHeatCapacity(), WithinRel(4.0));
 }
 
 
-TEST(TestFluidProperties, PrRa)
+TEST_CASE("TestADFluidProperties.PrRa")
 {
   tinyxml2::XMLDocument doc;
   doc.Parse("<fluidproperties type=\"Pr/Ra\" Pr=\"2.0\" Ra=\"3.0\"/>");
   AD::FluidProperties props;
   props.parse(doc.RootElement());
 
-  EXPECT_FLOAT_EQ(props.getPrandtlNumber(), 2.0);
-  EXPECT_FLOAT_EQ(props.getRayleighNumber(), 3.0);
+  REQUIRE_THAT(props.getPrandtlNumber(), WithinRel(2.0));
+  REQUIRE_THAT(props.getRayleighNumber(), WithinRel(3.0));
 }
