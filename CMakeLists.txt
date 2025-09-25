@@ -1,115 +1,188 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.22)
 
-project(AdvectionDiffusion)
+project(AdvectionDiffusion LANGUAGES C CXX)
 
-# Add local modules
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
-                      ${PROJECT_SOURCE_DIR}/../../cmake/Modules
-                      $ENV{HOME}/cmake/Modules)
+if(NOT TARGET IFEM)
+  if(IFEM_AS_SUBMODULE)
+    add_subdirectory(../.. IFEM)
+    set(IFEM_PATH ${PROJECT_SOURCE_DIR}/../..)
+  else()
+    get_filename_component(BUILD_DIR ${PROJECT_BINARY_DIR} NAME)
+    set(IFEM_DIR ${PROJECT_SOURCE_DIR}/../../${BUILD_DIR})
+    find_package(IFEM REQUIRED)
+  endif()
+endif()
 
-# Required packages
-IF (NOT IFEM_CONFIGURED)
-  find_package(IFEM REQUIRED)
-  include_directories(${IFEM_INCLUDE_DIRS})
-  add_definitions(${IFEM_DEFINITIONS})
-ENDIF(NOT IFEM_CONFIGURED)
+if(NOT TARGET CommonAD)
+  add_subdirectory(Common/AdvectionDiffusion)
+endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${IFEM_CXX_FLAGS}")
+ifem_add_application(
+  NAME
+    AdvectionDiffusion
+  SOURCES
+    main_AdvectionDiffusion.C
+    AdvectionDiffusionArgs.C
+  HEADERS
+    AdvectionDiffusionArgs.h
+  LIBRARIES
+    CommonAD
+)
 
-include_directories(${IFEM_INCLUDES} ../Common ${PROJECT_SOURCE_DIR} Common/AdvectionDiffusion)
-
-set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
-
-# Testing
 enable_testing()
-include(IFEMTesting)
 
-add_subdirectory(Common/AdvectionDiffusion)
+ifem_add_hdf5_test(
+  TARGET
+    AdvectionDiffusion
+  CONDITIONS
+    LRSpline_FOUND
+  TEST_FILES
+    MPI/Square-2-LR-bdf2.hreg
+  PARALLEL
+    2
+)
 
-add_executable(AdvectionDiffusion main_AdvectionDiffusion.C AdvectionDiffusionArgs.C)
-list(APPEND CHECK_SOURCES ${AD_SOURCES} main_AdvectionDiffusion.C)
+ifem_add_hdf5_test(
+  TARGET
+    AdvectionDiffusion
+  CONDITIONS
+    LRSpline_FOUND
+  TEST_FILES
+    Square-ad-adap-rec.hreg
+)
 
-target_link_libraries(AdvectionDiffusion CommonAD IFEMAppCommon ${IFEM_LIBRARIES})
+ifem_add_hdf5_test(
+  TARGET
+    AdvectionDiffusion
+  TEST_FILES
+    Square-ad.hreg
+)
 
-# Installation
-install(TARGETS AdvectionDiffusion DESTINATION bin)
+ifem_add_vtf_test(
+  TARGET
+    AdvectionDiffusion
+  CONDITIONS
+    LRSpline_FOUND
+  TEST_FILES
+    Square-ad-adap-rec.vreg
+    Square-ad-adap-varkappa.vreg
+)
 
-# For generating the doxy
-set(EXTRA_DOXY_PATHS "${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR}")
-add_doc_target(AdvectionDiffusion AdvectionDiffusion)
+ifem_add_vtf_test(
+  TARGET
+    AdvectionDiffusion
+  TEST_FILES
+    Square-ad.vreg
+    Square-robin.vreg
+)
 
-if(MPI_FOUND)
-  if(HDF5_FOUND AND CEREAL_FOUND)
-    ifem_add_restart_test(MPI/Square-ad-restart.reg AdvectionDiffusion 5 4)
-  endif()
-  if(LRSpline_FOUND)
-    ifem_add_test(MPI/Square-2-LR-bdf2.reg AdvectionDiffusion 2)
-    ifem_add_test(MPI/Square-ad-adap.reg AdvectionDiffusion 4)
-    ifem_add_hdf5_test(MPI/Square-2-LR-bdf2.hreg AdvectionDiffusion 2)
-  endif()
-endif()
-if(NOT MPI_FOUND OR IFEM_SERIAL_TESTS_IN_PARALLEL)
-  set(TESTFILES    Lshape.reg
-                   Square-abd1-ad-bdf2.reg
-                   Square-abd1-ad-be.reg
-                   Square-abd1-ad-bs.reg
-                   Square-abd1-ad-cn.reg
-                   Square-abd1-ad-euler.reg
-                   Square-abd1-ad-heuneuler.reg
-                   Square-abd1-ad-heun.reg
-                   Square-abd1-ad-rk3.reg
-                   Square-abd1-ad-rk4.reg
-                   Square-abd2-ad-ab1.reg
-                   Square-abd2-ad-ab2.reg
-                   Square-abd2-ad-ab3.reg
-                   Square-abd2-ad-ab4.reg
-                   Square-abd2-ad-ab5.reg
-                   Square-abd2-ad-am1.reg
-                   Square-abd2-ad-am2.reg
-                   Square-abd2-ad-am3.reg
-                   Square-abd2-ad-am4.reg
-                   Square-abd2-ad-bdf2.reg
-                   Square-abd2-ad-be.reg
-                   Square-abd2-ad-bs.reg
-                   Square-abd2-ad-cn.reg
-                   Square-abd2-ad-euler.reg
-                   Square-abd2-ad-heuneuler.reg
-                   Square-abd2-ad-heun.reg
-                   Square-abd2-ad-rk3.reg
-                   Square-abd2-ad-rk4.reg
-                   Square-ad.reg
-                   Square-ad-varkappa.reg
-                   Square-ad-varkappa-autodiff.reg
-                   Square-robin.reg
-                   Cube-robin.reg)
-  if(LRSpline_FOUND)
-    list(APPEND TESTFILES Square-2-LR-bdf2.reg)
-    list(APPEND TESTFILES Square-ad-adap.reg)
-    list(APPEND TESTFILES Square-ad-adap-anasource.reg)
-    list(APPEND TESTFILES Square-ad-adap-rec.reg)
-    list(APPEND TESTFILES Square-ad-adap-rec-noana.reg)
-    list(APPEND TESTFILES Square-ad-adap-res.reg)
-    list(APPEND TESTFILES Square-ad-adap-varkappa.reg)
-    list(APPEND TESTFILES Square-ad-adap-res-noana.reg)
-    ifem_add_vtf_test(Square-ad-adap-rec.vreg AdvectionDiffusion)
-    ifem_add_vtf_test(Square-ad-adap-varkappa.vreg AdvectionDiffusion)
-    ifem_add_hdf5_test(Square-ad-adap-rec.hreg AdvectionDiffusion)
-  endif()
-  foreach(TESTFILE ${TESTFILES})
-    ifem_add_test(${TESTFILE} AdvectionDiffusion)
-  endforeach()
-  if(HDF5_FOUND AND CEREAL_FOUND)
-    ifem_add_restart_test(Square-abd2-ad-restart.reg AdvectionDiffusion 5)
-  endif()
+ifem_add_restart_test(
+  TARGET
+    AdvectionDiffusion
+  TEST_FILES
+    MPI/Square-ad-restart.reg
+  RESTART_LEVEL
+    5
+  PARALLEL
+    4
+)
 
-  ifem_add_vtf_test(Square-ad.vreg AdvectionDiffusion)
-  ifem_add_vtf_test(Square-robin.vreg AdvectionDiffusion)
-  ifem_add_hdf5_test(Square-ad.hreg AdvectionDiffusion)
-endif()
-list(APPEND TEST_APPS AdvectionDiffusion)
+ifem_add_restart_test(
+  TARGET
+    AdvectionDiffusion
+  TEST_FILES
+    Square-abd2-ad-restart.reg
+  RESTART_LEVEL
+    5
+)
+
+ifem_add_regression_test(
+  TARGET
+    AdvectionDiffusion
+  CONDITIONS
+    LRSpline_FOUND
+  TEST_FILES
+    MPI/Square-2-LR-bdf2.reg
+  PARALLEL
+    2
+)
+
+ifem_add_regression_test(
+  TARGET
+    AdvectionDiffusion
+  CONDITIONS
+    LRSpline_FOUND
+    Zoltan_FOUND
+  TEST_FILES
+    MPI/Square-ad-adap.reg
+  PARALLEL
+    4
+)
+
+ifem_add_regression_test(
+  TARGET
+    AdvectionDiffusion
+  TEST_FILES
+    Cube-robin.reg
+    Lshape.reg
+    Square-abd1-ad-bdf2.reg
+    Square-abd1-ad-be.reg
+    Square-abd1-ad-bs.reg
+    Square-abd1-ad-cn.reg
+    Square-abd1-ad-euler.reg
+    Square-abd1-ad-heuneuler.reg
+    Square-abd1-ad-heun.reg
+    Square-abd1-ad-rk3.reg
+    Square-abd1-ad-rk4.reg
+    Square-abd2-ad-ab1.reg
+    Square-abd2-ad-ab2.reg
+    Square-abd2-ad-ab3.reg
+    Square-abd2-ad-ab4.reg
+    Square-abd2-ad-ab5.reg
+    Square-abd2-ad-am1.reg
+    Square-abd2-ad-am2.reg
+    Square-abd2-ad-am3.reg
+    Square-abd2-ad-am4.reg
+    Square-abd2-ad-bdf2.reg
+    Square-abd2-ad-be.reg
+    Square-abd2-ad-bs.reg
+    Square-abd2-ad-cn.reg
+    Square-abd2-ad-euler.reg
+    Square-abd2-ad-heuneuler.reg
+    Square-abd2-ad-heun.reg
+    Square-abd2-ad-rk3.reg
+    Square-abd2-ad-rk4.reg
+    Square-ad.reg
+    Square-ad-varkappa.reg
+    Square-ad-varkappa-autodiff.reg
+    Square-robin.reg
+)
+
+ifem_add_regression_test(
+  TARGET
+    AdvectionDiffusion
+  CONDITIONS
+    LRSpline_FOUND
+  TEST_FILES
+    Square-2-LR-bdf2.reg
+    Square-ad-adap.reg
+    Square-ad-adap-anasource.reg
+    Square-ad-adap-rec.reg
+    Square-ad-adap-rec-noana.reg
+    Square-ad-adap-res.reg
+    Square-ad-adap-varkappa.reg
+    Square-ad-adap-res-noana.reg
+)
 
 if(IFEM_COMMON_APP_BUILD)
   set(TEST_APPS ${TEST_APPS} PARENT_SCOPE)
 else()
-  add_check_target()
+  ifem_add_check_target()
 endif()
+
+# For generating the doxy
+ifem_add_doc_target(TARGET AdvectionDiffusion)
+
+# Installation
+include(GNUInstallDirs)
+install(TARGETS AdvectionDiffusion DESTINATION bin)
