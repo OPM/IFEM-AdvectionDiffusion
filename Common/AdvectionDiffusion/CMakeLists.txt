@@ -1,40 +1,43 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.22)
 
-project(CommonAD)
+project(CommonAD LANGUAGES C CXX)
 
-set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
-
-include_directories(../../../Common)
-
-set(AD_SOURCES AdvectionDiffusion.C
-               AdvectionDiffusionBDF.C
-               AdvectionDiffusionExplicit.C
-               AdvectionDiffusionImplicit.C
-               AdvectionDiffusionSource.C
-               ADFluidProperties.C
-               AdvectionDiffusion.h
-               AdvectionDiffusionBDF.h
-               AdvectionDiffusionExplicit.h
-               AdvectionDiffusionImplicit.h
-               AdvectionDiffusionSource.h
-               ADFluidProperties.h
-               SIMAD.C
-               SIMAD.h)
-
-add_library(CommonAD STATIC ${AD_SOURCES})
-
-foreach(src ${AD_SOURCES})
-  list(APPEND CHECK_SOURCES ${PROJECT_SOURCE_DIR}/${src})
-endforeach()
+ifem_add_library(
+  NAME
+    CommonAD
+  SOURCES
+    AdvectionDiffusion.C
+    AdvectionDiffusionBDF.C
+    AdvectionDiffusionExplicit.C
+    AdvectionDiffusionImplicit.C
+    AdvectionDiffusionSource.C
+    ADFluidProperties.C
+    SIMAD.C
+  HEADERS
+    AdvectionDiffusion.h
+    AdvectionDiffusionBDF.h
+    AdvectionDiffusionExplicit.h
+    AdvectionDiffusionImplicit.h
+    AdvectionDiffusionSource.h
+    ADFluidProperties.h
+    SIMAD.h
+  LIBRARIES
+    IFEMAppCommon
+    IFEM
+)
 
 # Unit tests
-set(TEST_SOURCES ${PROJECT_SOURCE_DIR}/Test/TestAdvectionDiffusionSource.C
-                 ${PROJECT_SOURCE_DIR}/Test/TestFluidProperties.C
-                 ${PROJECT_SOURCE_DIR}/Test/TestSIMAD.C)
-IFEM_add_test_app(SOURCES ${TEST_SOURCES}
-                  WORKDIR ${PROJECT_SOURCE_DIR}/../../Test
-                  NAME AdvectionDiffusion
-                  LIBRARIES CommonAD IFEMAppCommon ${IFEM_LIBRARIES})
+ifem_add_test_app(
+  SOURCES
+    ${PROJECT_SOURCE_DIR}/Test/TestAdvectionDiffusionSource.C
+    ${PROJECT_SOURCE_DIR}/Test/TestFluidProperties.C
+    ${PROJECT_SOURCE_DIR}/Test/TestSIMAD.C
+    WORKDIR
+      ${PROJECT_SOURCE_DIR}/../../Test
+    NAME
+      AdvectionDiffusion
+    LIBRARIES
+      CommonAD
+)
 
 set(TEST_APPS ${TEST_APPS} PARENT_SCOPE)
-set(CHECK_SOURCES ${CHECK_SOURCES} PARENT_SCOPE)
