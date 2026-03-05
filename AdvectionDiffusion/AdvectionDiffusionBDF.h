@@ -67,7 +67,7 @@ public:
   }
 
   //! \brief Advances the time stepping scheme.
-  void advanceStep() override { bdf.advanceStep(); }
+  bool advanceStep() override { return bdf.advanceStep(); }
 
   //! \brief Returns a pointer to an Integrand for solution norm evaluation.
   //! \note The Integrand object is allocated dynamically and has to be deleted

@@ -223,9 +223,6 @@ public:
   //! \param[in] asol Pointer to analytical solution (optional)
   NormBase* getNormIntegrand(AnaSol* asol) const override;
 
-  //! \brief Advances the integrand one time step forward.
-  virtual void advanceStep() {}
-
   //! \brief Returns a reference to the fluid properties.
   AD::FluidProperties& getFluidProperties() { return props; }
   //! \brief Returns a const reference to the fluid properties.
