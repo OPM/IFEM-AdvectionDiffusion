@@ -163,8 +163,7 @@ public:
   void printSolutionSummary(const Vector& solution, int printSol, const char*,
                             std::streamsize outPrec = 0) override
   {
-    this->SIMMultiPatchModelGen<Dim>::printSolutionSummary(solution, printSol,
-                                                           "temperature ", outPrec);
+    this->Dim::printSolutionSummary(solution, printSol, "temperature", outPrec);
   }
 
   //! \brief Set time scaling factor from ODE solver.
@@ -212,6 +211,7 @@ private:
 
   const Vector* extsol = nullptr; //!< Solution vector for adaptive simulators
   bool standalone = false; //!< If \e true, this simulator owns the VTF object
+  bool stationary = false; //!< If \e true, this is a stationary simulator
   std::string inputContext; //!< Input context
   int aCode[2] = {0}; //!< Analytical BC code (used by destructor)
   bool useAnasolSource = false; //!< True to use source function derived from anasol

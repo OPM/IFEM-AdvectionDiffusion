@@ -55,8 +55,11 @@ SIMAD<Dim,Integrand>::SIMAD (Integrand& ad, bool alone) :
   inputContext("advectiondiffusion")
 {
   standalone = alone;
+  stationary = AD.getTimeMethod() == TimeIntegration::NONE;
   Dim::myProblem = &AD;
   Dim::myHeading = "Advection-Diffusion solver";
+  if (!stationary)
+    Dim::msgLevel = 1; // prints primary solution summary only
 }
 
 
@@ -215,15 +218,14 @@ bool SIMAD<Dim,Integrand>::init (const TimeStep&)
 
   if (useAnasolSource) {
     using ADSource = AD::AdvectionDiffusionAnaSolSource;
-    if (Dim::mySol && (AD.getAdvectionField() || anaVel)) {
-      const VecFunc& u = AD.getAdvectionField() ?
-                             *AD.getAdvectionField() : *anaVel;
-      AD.setSource(new ADSource(*Dim::mySol,
-                                u,
+    if (Dim::mySol && AD.getAdvectionField())
+      anaVel = AD.getAdvectionField();
+    if (Dim::mySol && anaVel)
+      AD.setSource(new ADSource(*Dim::mySol, *anaVel,
                                 AD.getFluidProperties(),
                                 AD.getReactionField(),
-                                AD.getTimeMethod() == TimeIntegration::NONE));
-    } else
+                                stationary));
+    else
       std::cerr << "*** Asked to use source function from analytic solution, but no"
                     " analytic solution given. No source function added." << std::endl;
   }
@@ -294,7 +296,6 @@ bool SIMAD<Dim,Integrand>::advanceStep (TimeStep&)
   this->pushSolution(); // Update solution vectors between time steps
   AD.advanceStep();
   return true;
-
 }
 
 
@@ -307,30 +308,26 @@ bool SIMAD<Dim,Integrand>::solveStep (const TimeStep& tp, bool)
   if (Dim::msgLevel >= 0 && standalone && tp.multiSteps())
     IFEM::cout <<"\n  step = "<< tp.step <<"  time = "<< tp.time.t << std::endl;
 
-  Vector dummy;
-  this->updateDirichlet(tp.time.t,&dummy);
-
-  int msgL = Dim::msgLevel-1;
-  if (!standalone)
-    std::swap(msgL, Dim::msgLevel);
+  if (!this->initDirichlet(tp.time.t))
+    return false;
 
   if (!this->assembleSystem(tp.time,solution))
     return false;
 
-  if (!this->solveSystem(solution.front(),Dim::msgLevel-1,"temperature "))
+  const int printSol = tp.multiSteps() && Dim::msgLevel > 0 ? 0 : Dim::msgLevel;
+  if (!this->solveSystem(solution.front(),printSol,"temperature"))
     return false;
+  else if (printSol == 0)
+    this->printSolutionSummary(solution.front(),0,"temperature");
 
   if (!standalone)
-    std::swap(msgL, Dim::msgLevel);
-
-  if (Dim::msgLevel < 2 || !standalone)
   {
     size_t iMax[1];
     double dMax[1];
     double normL2 = this->solutionNorms(solution.front(),dMax,iMax,1);
     IFEM::cout <<"\n  Temperature summary:  L2-norm        : "<< normL2
-              <<"\n                       Max temperature : "<< dMax[0]
-             << std::endl;
+               <<"\n                       Max temperature : "<< dMax[0]
+               << std::endl;
   }
 
   return true;
@@ -360,18 +357,15 @@ bool SIMAD<Dim,Integrand>::saveStep (const TimeStep& tp, int& nBlock)
   if (tp.step%Dim::opt.saveInc > 0 || Dim::opt.format < 0)
     return true;
 
-  const TimeIntegration::Method method = AD.getTimeMethod();
-  int iDump = method == TimeIntegration::NONE ? 1 :
-              tp.step / Dim::opt.saveInc + 1;
+  int iDump = stationary ? 1 : tp.step / Dim::opt.saveInc + 1;
   if (!this->writeGlvS(this->getSolution(0),iDump,nBlock,
                        tp.time.t,"temperature",70))
     return false;
   else if (!standalone)
     return true;
 
-  double param2 = method == TimeIntegration::NONE ? iDump : tp.time.t;
-  return this->writeGlvStep(iDump, param2,
-                            method == TimeIntegration::NONE ? 1 : 0);
+  double param2 = stationary ? iDump : tp.time.t;
+  return this->writeGlvStep(iDump, param2, stationary ? 1 : 0);
 }
 
 
