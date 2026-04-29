@@ -12,10 +12,6 @@ Square-ad-adap-rec.xinp -adap
 /0/AdvectionDiffusion-1/fields/Continuous\ global\ L2-projection\ T,y/1 Dataset {81}
 /0/AdvectionDiffusion-1/fields/T Group
 /0/AdvectionDiffusion-1/fields/T/1 Dataset {81}
-/0/AdvectionDiffusion-1/fields/T,x Group
-/0/AdvectionDiffusion-1/fields/T,x/1 Dataset {81}
-/0/AdvectionDiffusion-1/fields/T,y Group
-/0/AdvectionDiffusion-1/fields/T,y/1 Dataset {81}
 /0/AdvectionDiffusion-1/knotspan Group
 /0/AdvectionDiffusion-1/knotspan/(T,T)^0.5 Group
 /0/AdvectionDiffusion-1/knotspan/(T,T)^0.5/1 Dataset {64}
@@ -48,10 +44,6 @@ Square-ad-adap-rec.xinp -adap
 /1/AdvectionDiffusion-1/fields/Continuous\ global\ L2-projection\ T,y/1 Dataset {176}
 /1/AdvectionDiffusion-1/fields/T Group
 /1/AdvectionDiffusion-1/fields/T/1 Dataset {176}
-/1/AdvectionDiffusion-1/fields/T,x Group
-/1/AdvectionDiffusion-1/fields/T,x/1 Dataset {176}
-/1/AdvectionDiffusion-1/fields/T,y Group
-/1/AdvectionDiffusion-1/fields/T,y/1 Dataset {176}
 /1/AdvectionDiffusion-1/knotspan Group
 /1/AdvectionDiffusion-1/knotspan/(T,T)^0.5 Group
 /1/AdvectionDiffusion-1/knotspan/(T,T)^0.5/1 Dataset {157}
@@ -84,10 +76,6 @@ Square-ad-adap-rec.xinp -adap
 /2/AdvectionDiffusion-1/fields/Continuous\ global\ L2-projection\ T,y/1 Dataset {514}
 /2/AdvectionDiffusion-1/fields/T Group
 /2/AdvectionDiffusion-1/fields/T/1 Dataset {514}
-/2/AdvectionDiffusion-1/fields/T,x Group
-/2/AdvectionDiffusion-1/fields/T,x/1 Dataset {514}
-/2/AdvectionDiffusion-1/fields/T,y Group
-/2/AdvectionDiffusion-1/fields/T,y/1 Dataset {514}
 /2/AdvectionDiffusion-1/knotspan Group
 /2/AdvectionDiffusion-1/knotspan/(T,T)^0.5 Group
 /2/AdvectionDiffusion-1/knotspan/(T,T)^0.5/1 Dataset {490}
