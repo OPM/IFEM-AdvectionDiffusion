@@ -1,10 +1,12 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(CommonAD LANGUAGES C CXX)
+project(ADLib LANGUAGES C CXX)
 
 ifem_add_library(
   NAME
-    CommonAD
+    ADR
+  ALIAS
+    AppLibrary::AdvectionDiffusion
   SOURCES
     AdvectionDiffusion.C
     AdvectionDiffusionBDF.C
@@ -22,7 +24,7 @@ ifem_add_library(
     ADFluidProperties.h
     SIMAD.h
   LIBRARIES
-    IFEMAppCommon
+    AppLibrary::Common
     IFEM
 )
 
@@ -37,7 +39,7 @@ ifem_add_test_app(
     NAME
       AdvectionDiffusion
     LIBRARIES
-      CommonAD
+      AppLibrary::AdvectionDiffusion
 )
 
 set(TEST_APPS ${TEST_APPS} PARENT_SCOPE)
