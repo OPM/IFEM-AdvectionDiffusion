@@ -13,8 +13,8 @@ if(NOT TARGET IFEM)
   endif()
 endif()
 
-if(NOT TARGET CommonAD)
-  add_subdirectory(Common/AdvectionDiffusion)
+if(NOT TARGET IFEM::AdvectionDiffusion)
+  add_subdirectory(AdvectionDiffusion)
 endif()
 
 ifem_add_application(
@@ -26,7 +26,7 @@ ifem_add_application(
   HEADERS
     AdvectionDiffusionArgs.h
   LIBRARIES
-    CommonAD
+    IFEM::AdvectionDiffusion
 )
 
 enable_testing()
