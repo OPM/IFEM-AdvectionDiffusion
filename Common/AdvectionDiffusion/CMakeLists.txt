@@ -22,7 +22,7 @@ ifem_add_library(
     ADFluidProperties.h
     SIMAD.h
   LIBRARIES
-    IFEMAppCommon
+    IFEM::AppUtils
     IFEM
 )
 
