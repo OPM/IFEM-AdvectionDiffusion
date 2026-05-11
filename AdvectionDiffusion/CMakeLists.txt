@@ -7,6 +7,8 @@ ifem_add_library(
     ADR
   ALIAS
     IFEM::AdvectionDiffusion
+  ARCHIVE_NAME
+    AdvectionDiffusion
   SOURCES
     AdvectionDiffusion.C
     AdvectionDiffusionBDF.C
@@ -26,11 +28,6 @@ ifem_add_library(
   LIBRARIES
     IFEM::AppUtils
     IFEM
-)
-set_target_properties(ADR
-  PROPERTIES
-  ARCHIVE_OUTPUT_NAME
-    AdvectionDiffusion
 )
 
 # Unit tests
