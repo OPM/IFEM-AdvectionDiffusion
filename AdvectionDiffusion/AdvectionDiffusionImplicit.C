@@ -46,6 +46,9 @@ bool AdvectionDiffusionImplicit::evalInt (LocalIntegral& elmInt,
   if (Uad)
     vel = (*Uad)(X);
 
+  // Evaluate reaction coefficient field (if present).
+  const double react = reaction ? props.getReactionConstant(X)*(*reaction)(X) : 0.0;
+
   // Integrate source, if defined
   if (source)
     WeakOps::Source(elMat.b[0], fe, (*source)(X) * timeScale);
@@ -53,6 +56,8 @@ bool AdvectionDiffusionImplicit::evalInt (LocalIntegral& elmInt,
   if (!elMat.rhsOnly) {
     WeakOps::Mass(elMat.A[0], fe, 1.0); // Diagonal term
     WeakOps::Laplacian(elMat.A[0], fe, timeScale * props.getDiffusionConstant(X)); // Diffusion
+    if (reaction)
+      WeakOps::Mass(elMat.A[0], fe, timeScale * react); // Reaction
 
     // Integrate advection, if defined
     if (Uad)
@@ -67,6 +72,8 @@ bool AdvectionDiffusionImplicit::evalInt (LocalIntegral& elmInt,
 
   ResidualOps::Laplacian(elMat.b[0], fe, dTdX, timeScale*props.getDiffusionConstant(X)); // Diffusion
   WeakOps::Source(elMat.b[0], fe, -(vel*dTdX)*timeScale*props.getMassAdvectionConstant()); //Advection
+  if (reaction)
+    WeakOps::Source(elMat.b[0], fe, -react*T*timeScale); // Reaction
 
   return true;
 }
