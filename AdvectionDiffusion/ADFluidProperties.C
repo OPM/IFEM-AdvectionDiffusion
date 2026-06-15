@@ -122,7 +122,10 @@ double FluidProperties::getDiffusionConstant(const Vec3& X) const
 
 double FluidProperties::getReactionConstant(const Vec3& X) const
 {
-  return 1.0;
+  if (scaling == PR_RA)
+    return 1.0;
+
+  return getHeatCapacity();
 }
 
 
