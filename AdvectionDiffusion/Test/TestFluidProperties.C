@@ -13,6 +13,8 @@
 #include "ADFluidProperties.h"
 #include <tinyxml2.h>
 
+#include "Vec3.h"
+
 #include "Catch2Support.h"
 
 
@@ -26,6 +28,7 @@ TEST_CASE("TestADFluidProperties.Physical")
   REQUIRE_THAT(props.getMassDensity(), WithinRel(2.0));
   REQUIRE_THAT(props.getDiffusivity(), WithinRel(3.0));
   REQUIRE_THAT(props.getHeatCapacity(), WithinRel(4.0));
+  REQUIRE_THAT(props.getReactionConstant(Vec3()), WithinRel(4.0));
 }
 
 
@@ -38,4 +41,5 @@ TEST_CASE("TestADFluidProperties.PrRa")
 
   REQUIRE_THAT(props.getPrandtlNumber(), WithinRel(2.0));
   REQUIRE_THAT(props.getRayleighNumber(), WithinRel(3.0));
+  REQUIRE_THAT(props.getReactionConstant(Vec3()), WithinRel(1.0));
 }
