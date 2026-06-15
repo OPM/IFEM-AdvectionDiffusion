@@ -241,6 +241,21 @@ public:
   //! \brief Returns used advection form.
   WeakOperators::ConvectionForm getAdvForm() const { return advForm; }
 
+  //! \brief Returns true if explicit operator reuse is safe.
+  //! \details Reusing the operator is only valid if all operator coefficients
+  //! are time-independent. External velocity fields are conservatively treated
+  //! as time-dependent.
+  bool canReuseLinearOperator() const
+  {
+    if (uFields[0] || uFields[1])
+      return false;
+    if (Uad && !Uad->isConstant())
+      return false;
+    if (reaction && !reaction->isConstant())
+      return false;
+    return true;
+  }
+
   //! \brief Returns time integration method used.
   virtual TimeIntegration::Method getTimeMethod() const
   { return TimeIntegration::NONE; }
