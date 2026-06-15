@@ -156,14 +156,14 @@ int runSimulator(char* infile, const AdvectionDiffusionArgs& args)
     if (args.timeMethod >= TimeIntegration::AB1 &&
         args.timeMethod <= TimeIntegration::AB5) {
       TimeIntegration::SIMExplicitLMM<ADSIM> sim(model, args.timeMethod, true, "temperature");
-      sim.setLinear(true);
+      sim.setLinear(integrand.canReuseLinearOperator());
       return runSimulatorTransientImpl(infile, sim, model);
     } else if (args.timeMethod >= TimeIntegration::HEUNEULER) {
       TimeIntegration::SIMExplicitRKE<ADSIM> sim(model, args.timeMethod, args.errTol);
       return runSimulatorTransientImpl(infile, sim, model);
     } else {
       TimeIntegration::SIMExplicitRK<ADSIM> sim(model, args.timeMethod);
-      sim.setLinear(true);
+      sim.setLinear(integrand.canReuseLinearOperator());
       return runSimulatorTransientImpl(infile, sim, model);
     }
   }
