@@ -157,6 +157,7 @@ ifem_add_regression_test(
     Square-ad-varkappa-autodiff.reg
     Square-robin.reg
     Square-abd2-ad-react-am2.reg
+    Square-abd2-ad-react-cn.reg
 )
 
 ifem_add_regression_test(

@@ -125,13 +125,14 @@ bool AdvectionDiffusionBDF::evalInt (LocalIntegral& elmInt,
   WeakOps::Mass(elMat.A[0], fe, s + r*timeCoef);
 
   if (timeMethod == TimeIntegration::THETA) {
+    const double Tn = fe.N.dot(elMat.vec[1]);
     RealArray g;
     fe.dNdX.multiply(elMat.vec[1], g, true);
     Vec3 grad(g);
     ResidualOps::Laplacian(elMat.b[0], fe, grad, mu);
     theta -= 0.5*props.getMassAdvectionConstant()*U[1]*grad;
     if (reaction)
-      theta -= 0.5*props.getReactionConstant(X)*(*reaction)(Xt);
+      theta -= 0.5*props.getReactionConstant(X)*(*reaction)(Xt)*Tn;
   }
 
   WeakOps::Source(elMat.b.front(), fe, theta);
