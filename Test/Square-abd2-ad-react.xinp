@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<simulation>
+
+  <geometry dim="2" sets="true">
+    <raiseorder patch="1" u="3" v="3"/>
+    <refine patch="1" u="3" v="3"/>
+  </geometry>
+
+  <advectiondiffusion>
+    <boundaryconditions>
+      <dirichlet set="Boundary" basis="1" comp="1"/>
+    </boundaryconditions>
+    <advectionfield> 4*pow(x-x*x,2)*8*(y-1)*y*(2*y-1)*pow(t,3) |
+                    -8*(x-1)*x*(2*x-1)*4*pow(y-y*y,2)*pow(t,3)
+    </advectionfield>
+    <source type="anasol"/>
+    <reactionfield>1</reactionfield>
+    <anasol type="expression" autodiff="true">
+      <variables>
+        f   = 4*pow(x-x*x,2);
+        g   = 4*pow(y-y*y,2);
+        h   = pow(t,3);
+      </variables>
+      <primary>f*g*h</primary>
+    </anasol>
+  </advectiondiffusion>
+
+  <discretization>
+    <nGauss>4</nGauss>
+  </discretization>
+
+  <timestepping start="0" end="1" dt="0.1"/>
+
+</simulation>
