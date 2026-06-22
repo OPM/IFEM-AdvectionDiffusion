@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<simulation>
+
+  <geometry dim="2" sets="true">
+    <raiseorder patch="1" u="2" v="2"/>
+    <refine patch="1" u="7" v="7" />
+  </geometry>
+
+  <advectiondiffusion>
+    <boundaryconditions>
+      <dirichlet set="Boundary" comp="1" type="anasol" autodiff="true"/>
+    </boundaryconditions>
+    <source type="anasol"/>>
+    <advectionfield>
+      1/3*pow(x,3)*pow(y,2)*sin(t) | -1/3*pow(x,2)*pow(y,3)*sin(t)
+    </advectionfield>
+
+    <fluidproperties kappa="1.0" C="1.0"/>
+    <reactionfield>1</reactionfield>
+
+    <anasol type="expression" autodiff="true">
+      <primary>1/3*pow(x,3)*pow(y,2)*sin(t)</primary>
+    </anasol>
+  </advectiondiffusion>
+
+  <discretization>
+    <nGauss>4</nGauss>
+  </discretization>
+
+  <timestepping start="0" end="0.05" dt="0.000390625"/>
+
+</simulation>
