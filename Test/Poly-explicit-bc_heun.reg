@@ -1,0 +1,401 @@
+Poly-explicit-bc.xinp -heun
+
+Input file: Poly-explicit-bc.xinp
+Number of elements    64
+Number of nodes       121
+Number of dofs        121
+Number of constraints 40
+Number of unknowns    81
+  step = 1  time = 0.000390625
+  L2-norm            : 3.17786e-05
+  Max temperature    : 0.000130208
+  step = 2  time = 0.00078125
+  L2-norm            : 6.35572e-05
+  Max temperature    : 0.000260417
+  step = 3  time = 0.00117188
+  L2-norm            : 9.53358e-05
+  Max temperature    : 0.000390625
+  step = 4  time = 0.0015625
+  L2-norm            : 0.000127114
+  Max temperature    : 0.000520833
+  step = 5  time = 0.00195312
+  L2-norm            : 0.000158893
+  Max temperature    : 0.000651041
+  step = 6  time = 0.00234375
+  L2-norm            : 0.000190671
+  Max temperature    : 0.000781249
+  step = 7  time = 0.00273437
+  L2-norm            : 0.00022245
+  Max temperature    : 0.000911457
+  step = 8  time = 0.003125
+  L2-norm            : 0.000254228
+  Max temperature    : 0.00104166
+  step = 9  time = 0.00351562
+  L2-norm            : 0.000286007
+  Max temperature    : 0.00117187
+  step = 10  time = 0.00390625
+  L2-norm            : 0.000317785
+  Max temperature    : 0.00130208
+  step = 11  time = 0.00429687
+  L2-norm            : 0.000349564
+  Max temperature    : 0.00143229
+  step = 12  time = 0.0046875
+  L2-norm            : 0.000381342
+  Max temperature    : 0.00156249
+  step = 13  time = 0.00507813
+  L2-norm            : 0.00041312
+  Max temperature    : 0.0016927
+  step = 14  time = 0.00546875
+  L2-norm            : 0.000444898
+  Max temperature    : 0.00182291
+  step = 15  time = 0.00585938
+  L2-norm            : 0.000476676
+  Max temperature    : 0.00195311
+  step = 16  time = 0.00625
+  L2-norm            : 0.000508454
+  Max temperature    : 0.00208332
+  step = 17  time = 0.00664063
+  L2-norm            : 0.000540232
+  Max temperature    : 0.00221353
+  step = 18  time = 0.00703125
+  L2-norm            : 0.00057201
+  Max temperature    : 0.00234373
+  step = 19  time = 0.00742188
+  L2-norm            : 0.000603788
+  Max temperature    : 0.00247394
+  step = 20  time = 0.0078125
+  L2-norm            : 0.000635566
+  Max temperature    : 0.00260414
+  step = 21  time = 0.00820313
+  L2-norm            : 0.000667343
+  Max temperature    : 0.00273434
+  step = 22  time = 0.00859375
+  L2-norm            : 0.000699121
+  Max temperature    : 0.00286455
+  step = 23  time = 0.00898438
+  L2-norm            : 0.000730898
+  Max temperature    : 0.00299475
+  step = 24  time = 0.009375
+  L2-norm            : 0.000762675
+  Max temperature    : 0.00312495
+  step = 25  time = 0.00976563
+  L2-norm            : 0.000794453
+  Max temperature    : 0.00325516
+  step = 26  time = 0.0101563
+  L2-norm            : 0.00082623
+  Max temperature    : 0.00338536
+  step = 27  time = 0.0105469
+  L2-norm            : 0.000858006
+  Max temperature    : 0.00351556
+  step = 28  time = 0.0109375
+  L2-norm            : 0.000889783
+  Max temperature    : 0.00364576
+  step = 29  time = 0.0113281
+  L2-norm            : 0.00092156
+  Max temperature    : 0.00377596
+  step = 30  time = 0.0117188
+  L2-norm            : 0.000953336
+  Max temperature    : 0.00390616
+  step = 31  time = 0.0121094
+  L2-norm            : 0.000985113
+  Max temperature    : 0.00403636
+  step = 32  time = 0.0125
+  L2-norm            : 0.00101689
+  Max temperature    : 0.00416656
+  step = 33  time = 0.0128906
+  L2-norm            : 0.00104866
+  Max temperature    : 0.00429676
+  step = 34  time = 0.0132813
+  L2-norm            : 0.00108044
+  Max temperature    : 0.00442695
+  step = 35  time = 0.0136719
+  L2-norm            : 0.00111222
+  Max temperature    : 0.00455715
+  step = 36  time = 0.0140625
+  L2-norm            : 0.00114399
+  Max temperature    : 0.00468735
+  step = 37  time = 0.0144531
+  L2-norm            : 0.00117577
+  Max temperature    : 0.00481754
+  step = 38  time = 0.0148438
+  L2-norm            : 0.00120754
+  Max temperature    : 0.00494773
+  step = 39  time = 0.0152344
+  L2-norm            : 0.00123932
+  Max temperature    : 0.00507793
+  step = 40  time = 0.015625
+  L2-norm            : 0.00127109
+  Max temperature    : 0.00520812
+  step = 41  time = 0.0160156
+  L2-norm            : 0.00130287
+  Max temperature    : 0.00533831
+  step = 42  time = 0.0164063
+  L2-norm            : 0.00133464
+  Max temperature    : 0.0054685
+  step = 43  time = 0.0167969
+  L2-norm            : 0.00136642
+  Max temperature    : 0.0055987
+  step = 44  time = 0.0171875
+  L2-norm            : 0.00139819
+  Max temperature    : 0.00572888
+  step = 45  time = 0.0175781
+  L2-norm            : 0.00142996
+  Max temperature    : 0.00585907
+  step = 46  time = 0.0179687
+  L2-norm            : 0.00146174
+  Max temperature    : 0.00598926
+  step = 47  time = 0.0183594
+  L2-norm            : 0.00149351
+  Max temperature    : 0.00611945
+  step = 48  time = 0.01875
+  L2-norm            : 0.00152528
+  Max temperature    : 0.00624963
+  step = 49  time = 0.0191406
+  L2-norm            : 0.00155706
+  Max temperature    : 0.00637982
+  step = 50  time = 0.0195312
+  L2-norm            : 0.00158883
+  Max temperature    : 0.00651
+  step = 51  time = 0.0199219
+  L2-norm            : 0.0016206
+  Max temperature    : 0.00664019
+  step = 52  time = 0.0203125
+  L2-norm            : 0.00165237
+  Max temperature    : 0.00677037
+  step = 53  time = 0.0207031
+  L2-norm            : 0.00168415
+  Max temperature    : 0.00690055
+  step = 54  time = 0.0210937
+  L2-norm            : 0.00171592
+  Max temperature    : 0.00703073
+  step = 55  time = 0.0214844
+  L2-norm            : 0.00174769
+  Max temperature    : 0.00716091
+  step = 56  time = 0.021875
+  L2-norm            : 0.00177946
+  Max temperature    : 0.00729109
+  step = 57  time = 0.0222656
+  L2-norm            : 0.00181123
+  Max temperature    : 0.00742126
+  step = 58  time = 0.0226562
+  L2-norm            : 0.001843
+  Max temperature    : 0.00755144
+  step = 59  time = 0.0230469
+  L2-norm            : 0.00187477
+  Max temperature    : 0.00768161
+  step = 60  time = 0.0234375
+  L2-norm            : 0.00190654
+  Max temperature    : 0.00781178
+  step = 61  time = 0.0238281
+  L2-norm            : 0.00193831
+  Max temperature    : 0.00794196
+  step = 62  time = 0.0242187
+  L2-norm            : 0.00197008
+  Max temperature    : 0.00807213
+  step = 63  time = 0.0246094
+  L2-norm            : 0.00200185
+  Max temperature    : 0.0082023
+  step = 64  time = 0.025
+  L2-norm            : 0.00203362
+  Max temperature    : 0.00833247
+  step = 65  time = 0.0253906
+  L2-norm            : 0.00206539
+  Max temperature    : 0.00846263
+  step = 66  time = 0.0257812
+  L2-norm            : 0.00209716
+  Max temperature    : 0.0085928
+  step = 67  time = 0.0261719
+  L2-norm            : 0.00212892
+  Max temperature    : 0.00872296
+  step = 68  time = 0.0265625
+  L2-norm            : 0.00216069
+  Max temperature    : 0.00885313
+  step = 69  time = 0.0269531
+  L2-norm            : 0.00219246
+  Max temperature    : 0.00898329
+  step = 70  time = 0.0273437
+  L2-norm            : 0.00222423
+  Max temperature    : 0.00911345
+  step = 71  time = 0.0277344
+  L2-norm            : 0.00225599
+  Max temperature    : 0.00924361
+  step = 72  time = 0.028125
+  L2-norm            : 0.00228776
+  Max temperature    : 0.00937376
+  step = 73  time = 0.0285156
+  L2-norm            : 0.00231952
+  Max temperature    : 0.00950392
+  step = 74  time = 0.0289062
+  L2-norm            : 0.00235129
+  Max temperature    : 0.00963407
+  step = 75  time = 0.0292969
+  L2-norm            : 0.00238305
+  Max temperature    : 0.00976423
+  step = 76  time = 0.0296875
+  L2-norm            : 0.00241482
+  Max temperature    : 0.00989438
+  step = 77  time = 0.0300781
+  L2-norm            : 0.00244658
+  Max temperature    : 0.0100245
+  step = 78  time = 0.0304687
+  L2-norm            : 0.00247835
+  Max temperature    : 0.0101547
+  step = 79  time = 0.0308594
+  L2-norm            : 0.00251011
+  Max temperature    : 0.0102848
+  step = 80  time = 0.03125
+  L2-norm            : 0.00254187
+  Max temperature    : 0.010415
+  step = 81  time = 0.0316406
+  L2-norm            : 0.00257364
+  Max temperature    : 0.0105451
+  step = 82  time = 0.0320312
+  L2-norm            : 0.0026054
+  Max temperature    : 0.0106753
+  step = 83  time = 0.0324219
+  L2-norm            : 0.00263716
+  Max temperature    : 0.0108054
+  step = 84  time = 0.0328125
+  L2-norm            : 0.00266892
+  Max temperature    : 0.0109355
+  step = 85  time = 0.0332031
+  L2-norm            : 0.00270069
+  Max temperature    : 0.0110657
+  step = 86  time = 0.0335937
+  L2-norm            : 0.00273245
+  Max temperature    : 0.0111958
+  step = 87  time = 0.0339844
+  L2-norm            : 0.00276421
+  Max temperature    : 0.0113259
+  step = 88  time = 0.034375
+  L2-norm            : 0.00279597
+  Max temperature    : 0.0114561
+  step = 89  time = 0.0347656
+  L2-norm            : 0.00282773
+  Max temperature    : 0.0115862
+  step = 90  time = 0.0351562
+  L2-norm            : 0.00285949
+  Max temperature    : 0.0117163
+  step = 91  time = 0.0355469
+  L2-norm            : 0.00289124
+  Max temperature    : 0.0118465
+  step = 92  time = 0.0359375
+  L2-norm            : 0.002923
+  Max temperature    : 0.0119766
+  step = 93  time = 0.0363281
+  L2-norm            : 0.00295476
+  Max temperature    : 0.0121067
+  step = 94  time = 0.0367187
+  L2-norm            : 0.00298652
+  Max temperature    : 0.0122368
+  step = 95  time = 0.0371094
+  L2-norm            : 0.00301827
+  Max temperature    : 0.012367
+  step = 96  time = 0.0375
+  L2-norm            : 0.00305003
+  Max temperature    : 0.0124971
+  step = 97  time = 0.0378906
+  L2-norm            : 0.00308179
+  Max temperature    : 0.0126272
+  step = 98  time = 0.0382812
+  L2-norm            : 0.00311354
+  Max temperature    : 0.0127573
+  step = 99  time = 0.0386719
+  L2-norm            : 0.0031453
+  Max temperature    : 0.0128874
+  step = 100  time = 0.0390625
+  L2-norm            : 0.00317705
+  Max temperature    : 0.0130175
+  step = 101  time = 0.0394531
+  L2-norm            : 0.00320881
+  Max temperature    : 0.0131476
+  step = 102  time = 0.0398437
+  L2-norm            : 0.00324056
+  Max temperature    : 0.0132777
+  step = 103  time = 0.0402344
+  L2-norm            : 0.00327231
+  Max temperature    : 0.0134078
+  step = 104  time = 0.040625
+  L2-norm            : 0.00330407
+  Max temperature    : 0.0135379
+  step = 105  time = 0.0410156
+  L2-norm            : 0.00333582
+  Max temperature    : 0.013668
+  step = 106  time = 0.0414062
+  L2-norm            : 0.00336757
+  Max temperature    : 0.0137981
+  step = 107  time = 0.0417969
+  L2-norm            : 0.00339932
+  Max temperature    : 0.0139282
+  step = 108  time = 0.0421875
+  L2-norm            : 0.00343107
+  Max temperature    : 0.0140583
+  step = 109  time = 0.0425781
+  L2-norm            : 0.00346282
+  Max temperature    : 0.0141884
+  step = 110  time = 0.0429687
+  L2-norm            : 0.00349457
+  Max temperature    : 0.0143185
+  step = 111  time = 0.0433594
+  L2-norm            : 0.00352632
+  Max temperature    : 0.0144486
+  step = 112  time = 0.04375
+  L2-norm            : 0.00355807
+  Max temperature    : 0.0145787
+  step = 113  time = 0.0441406
+  L2-norm            : 0.00358982
+  Max temperature    : 0.0147088
+  step = 114  time = 0.0445312
+  L2-norm            : 0.00362156
+  Max temperature    : 0.0148388
+  step = 115  time = 0.0449219
+  L2-norm            : 0.00365331
+  Max temperature    : 0.0149689
+  step = 116  time = 0.0453125
+  L2-norm            : 0.00368506
+  Max temperature    : 0.015099
+  step = 117  time = 0.0457031
+  L2-norm            : 0.0037168
+  Max temperature    : 0.0152291
+  step = 118  time = 0.0460937
+  L2-norm            : 0.00374855
+  Max temperature    : 0.0153591
+  step = 119  time = 0.0464844
+  L2-norm            : 0.00378029
+  Max temperature    : 0.0154892
+  step = 120  time = 0.046875
+  L2-norm            : 0.00381204
+  Max temperature    : 0.0156193
+  step = 121  time = 0.0472656
+  L2-norm            : 0.00384378
+  Max temperature    : 0.0157493
+  step = 122  time = 0.0476562
+  L2-norm            : 0.00387552
+  Max temperature    : 0.0158794
+  step = 123  time = 0.0480469
+  L2-norm            : 0.00390726
+  Max temperature    : 0.0160095
+  step = 124  time = 0.0484375
+  L2-norm            : 0.00393901
+  Max temperature    : 0.0161395
+  step = 125  time = 0.0488281
+  L2-norm            : 0.00397075
+  Max temperature    : 0.0162696
+  step = 126  time = 0.0492187
+  L2-norm            : 0.00400249
+  Max temperature    : 0.0163996
+  step = 127  time = 0.0496094
+  L2-norm            : 0.00403423
+  Max temperature    : 0.0165297
+  step = 128  time = 0.05
+  L2-norm            : 0.00406597
+  Max temperature    : 0.0166597
+  Time integration completed.
+>>> Norm summary for AdvectionDiffusion <<<
+  L2 norm |T^h| = (T^h,T^h)^0.5       : 0.00281601
+  H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.0123605
+  L2 norm |T|   = (T,T)^0.5           : 0.00281601
+  H1 norm |T|   = a(T,T)^0.5          : 0.0123605
+  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 7.1605e-11
+  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 1.13009e-09
+  Exact relative error (%)            : 9.14274e-06

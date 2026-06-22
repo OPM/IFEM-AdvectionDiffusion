@@ -158,8 +158,10 @@ ifem_add_regression_test(
     Square-robin.reg
     Square-abd2-ad-react-am2.reg
     Square-abd2-ad-react-cn.reg
-    Poly-explicit-lmm-bc_ab1.reg
-    Poly-explicit-lmm-bc_ab2.reg
+    Poly-explicit-bc_ab1.reg
+    Poly-explicit-bc_ab2.reg
+    Poly-explicit-bc_euler.reg
+    Poly-explicit-bc_heun.reg
 )
 
 ifem_add_regression_test(
