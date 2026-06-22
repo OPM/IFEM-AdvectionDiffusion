@@ -1,6 +1,6 @@
-Poly-explicit-lmm-bc.xinp -ab2
+Poly-explicit-bc.xinp -euler
 
-Input file: Poly-explicit-lmm-bc.xinp
+Input file: Poly-explicit-bc.xinp
 Number of elements    64
 Number of nodes       121
 Number of dofs        121
@@ -76,7 +76,7 @@ Number of unknowns    81
   L2-norm            : 0.000730898
   Max temperature    : 0.00299475
   step = 24  time = 0.009375
-  L2-norm            : 0.000762675
+  L2-norm            : 0.000762676
   Max temperature    : 0.00312495
   step = 25  time = 0.00976563
   L2-norm            : 0.000794453
@@ -85,7 +85,7 @@ Number of unknowns    81
   L2-norm            : 0.00082623
   Max temperature    : 0.00338536
   step = 27  time = 0.0105469
-  L2-norm            : 0.000858006
+  L2-norm            : 0.000858007
   Max temperature    : 0.00351556
   step = 28  time = 0.0109375
   L2-norm            : 0.000889783
@@ -94,7 +94,7 @@ Number of unknowns    81
   L2-norm            : 0.00092156
   Max temperature    : 0.00377596
   step = 30  time = 0.0117188
-  L2-norm            : 0.000953336
+  L2-norm            : 0.000953337
   Max temperature    : 0.00390616
   step = 31  time = 0.0121094
   L2-norm            : 0.000985113
@@ -103,7 +103,7 @@ Number of unknowns    81
   L2-norm            : 0.00101689
   Max temperature    : 0.00416656
   step = 33  time = 0.0128906
-  L2-norm            : 0.00104866
+  L2-norm            : 0.00104867
   Max temperature    : 0.00429676
   step = 34  time = 0.0132813
   L2-norm            : 0.00108044
@@ -229,7 +229,7 @@ Number of unknowns    81
   L2-norm            : 0.00235129
   Max temperature    : 0.00963407
   step = 75  time = 0.0292969
-  L2-norm            : 0.00238305
+  L2-norm            : 0.00238306
   Max temperature    : 0.00976423
   step = 76  time = 0.0296875
   L2-norm            : 0.00241482
@@ -244,7 +244,7 @@ Number of unknowns    81
   L2-norm            : 0.00251011
   Max temperature    : 0.0102848
   step = 80  time = 0.03125
-  L2-norm            : 0.00254187
+  L2-norm            : 0.00254188
   Max temperature    : 0.010415
   step = 81  time = 0.0316406
   L2-norm            : 0.00257364
@@ -277,7 +277,7 @@ Number of unknowns    81
   L2-norm            : 0.00285949
   Max temperature    : 0.0117163
   step = 91  time = 0.0355469
-  L2-norm            : 0.00289124
+  L2-norm            : 0.00289125
   Max temperature    : 0.0118465
   step = 92  time = 0.0359375
   L2-norm            : 0.002923
@@ -289,7 +289,7 @@ Number of unknowns    81
   L2-norm            : 0.00298652
   Max temperature    : 0.0122368
   step = 95  time = 0.0371094
-  L2-norm            : 0.00301827
+  L2-norm            : 0.00301828
   Max temperature    : 0.012367
   step = 96  time = 0.0375
   L2-norm            : 0.00305003
@@ -346,7 +346,7 @@ Number of unknowns    81
   L2-norm            : 0.00358982
   Max temperature    : 0.0147088
   step = 114  time = 0.0445312
-  L2-norm            : 0.00362156
+  L2-norm            : 0.00362157
   Max temperature    : 0.0148388
   step = 115  time = 0.0449219
   L2-norm            : 0.00365331
@@ -373,7 +373,7 @@ Number of unknowns    81
   L2-norm            : 0.00387552
   Max temperature    : 0.0158794
   step = 123  time = 0.0480469
-  L2-norm            : 0.00390726
+  L2-norm            : 0.00390727
   Max temperature    : 0.0160095
   step = 124  time = 0.0484375
   L2-norm            : 0.00393901
@@ -396,6 +396,6 @@ Number of unknowns    81
   H1 norm |T^h| = a(T^h,T^h)^0.5      : 0.0123605
   L2 norm |T|   = (T,T)^0.5           : 0.00281601
   H1 norm |T|   = a(T,T)^0.5          : 0.0123605
-  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 4.16226e-11
-  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 2.75367e-10
-  Exact relative error (%)            : 2.22779e-06
+  L2 norm |e|   = (e,e)^0,5, e=T-T^h  : 4.2297e-09
+  H1 norm |e|   = a(e,e)^0.5, e=T-T^h : 3.1008e-08
+  Exact relative error (%)            : 0.000250863
