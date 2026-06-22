@@ -53,6 +53,9 @@ public:
   //! \param[in] asol Pointer to analytical solution (optional)
   NormBase* getNormIntegrand(AnaSol* asol = 0) const override;
 
+  //! \brief Returns time integration method used.
+  TimeIntegration::Method getTimeMethod() const override { return timeMethod; }
+
 protected:
   TimeIntegration::Method timeMethod; //!< Time stepping method used
 };
