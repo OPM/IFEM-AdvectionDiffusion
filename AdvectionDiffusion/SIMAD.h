@@ -89,7 +89,7 @@ public:
   //! \brief Preprocessing performed before the FEM model generation.
   //! \details This method is reimplemented to couple the weak Dirichlet
   //! integrand to the Robin property codes.
-  void preprocessA() override;
+  bool preprocessA() override;
 
   //! \brief Defines the global number of elements.
   bool preprocessB() override;
