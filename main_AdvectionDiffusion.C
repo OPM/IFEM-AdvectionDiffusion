@@ -219,7 +219,6 @@ int main (int argc, char** argv)
     IFEM::getOptions().discretization = ASM::LRSpline;
 
   IFEM::cout <<"\nInput file: "<< infile;
-  IFEM::getOptions().print(IFEM::cout) << std::endl;
 
   utl::profiler->stop("Initialization");
 
