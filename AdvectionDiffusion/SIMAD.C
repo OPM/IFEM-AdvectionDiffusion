@@ -237,7 +237,8 @@ bool SIMAD<Dim,Integrand>::init (const TimeStep&)
 template<class Dim, class Integrand>
 bool SIMAD<Dim,Integrand>::preprocessA ()
 {
-  Dim::myInts.insert(std::make_pair(0,Dim::myProblem));
+  if (!this->Dim::preprocessA())
+    return false;
 
   for (Property& p : Dim::myProps)
     if (p.pcode == Property::ROBIN) {
