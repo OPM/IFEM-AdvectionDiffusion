@@ -119,7 +119,7 @@ int runSimulatorTransientImpl (char* infile, Solver& sim, AD& model)
 */
 
 template<class Dim>
-int runSimulator(char* infile, const AdvectionDiffusionArgs& args)
+int runSimulator (char* infile, const AdvectionDiffusionArgs& args)
 {
   if (args.timeMethod == TimeIntegration::NONE)  {
     AdvectionDiffusion integrand(Dim::dimension);
@@ -201,24 +201,10 @@ int main (int argc, char** argv)
   Profiler prof(argv[0]);
   utl::profiler->start("Initialization");
 
-  char* infile = nullptr;
-  AdvectionDiffusionArgs args;
-
   IFEM::Init(argc,argv,"Advection-Diffusion solver");
-  for (int i = 1; i < argc; i++)
-    if (argv[i] == infile || args.parseArg(argv[i]))
-      ; // ignore the input file on the second pass
-    else if (SIMoptions::ignoreOldOptions(argc,argv,i))
-      ; // ignore the obsolete option
-    else if (!infile) {
-      infile = argv[i];
-      if (!args.readXML(infile,false))
-        return 1;
-      i = 0;
-    }
-    else
-      std::cerr <<"  ** Unknown option ignored: "<< argv[i] << std::endl;
 
+  AdvectionDiffusionArgs args;
+  char* infile = args.preParse(argc,argv);
   if (!infile)
   {
     std::cout <<"usage: "<< argv[0]
@@ -234,10 +220,13 @@ int main (int argc, char** argv)
 
   IFEM::cout <<"\nInput file: "<< infile;
   IFEM::getOptions().print(IFEM::cout) << std::endl;
+
   utl::profiler->stop("Initialization");
 
   if (args.dim == 2)
     return runSimulator<SIM2D>(infile,args);
-  else
+  else if (args.dim == 3)
     return runSimulator<SIM3D>(infile,args);
+
+  return 1; // No 1D implementation
 }
