@@ -73,6 +73,25 @@ public:
   bool advanceStep(const TimeDomain& time) override
   { return bdf.advanceStep(time.dt,time.dtn); }
 
+  //! \brief Serializes the state of the time integration scheme.
+  //! \param data Container for serialized data
+  //! \param[in] name Name of the simulator
+  bool serialize(std::map<std::string,std::string>& data,
+                 const std::string& name) const override
+  {
+    return bdf.serialize(data,name);
+  }
+
+  //! \brief Sets the state of the time integration scheme from a serialized
+  //! state.
+  //! \param[in] data Container for serialized data
+  //! \param[in] name Name of the simulator
+  bool deSerialize(const std::map<std::string,std::string>& data,
+                   const std::string& name) override
+  {
+    return bdf.deSerialize(data,name);
+  }
+
   //! \brief Returns a pointer to an Integrand for solution norm evaluation.
   //! \note The Integrand object is allocated dynamically and has to be deleted
   //! manually when leaving the scope of the pointer variable receiving the
