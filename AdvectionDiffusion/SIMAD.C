@@ -375,7 +375,8 @@ bool SIMAD<Dim,Integrand>::saveStep (const TimeStep& tp, int& nBlock)
 template<class Dim, class Integrand>
 bool SIMAD<Dim,Integrand>::serialize (SerializeMap& data) const
 {
-  return this->saveSolution(data,this->getName());
+  return this->saveSolution(data,this->getName()) &&
+         AD.serialize(data,this->getName());
 }
 
 
@@ -385,8 +386,7 @@ bool SIMAD<Dim,Integrand>::deSerialize (const SerializeMap& data)
   if (!this->restoreSolution(data,this->getName()))
     return false;
 
-  AD.advanceStep();
-  return true;
+  return AD.deSerialize(data,this->getName());
 }
 
 

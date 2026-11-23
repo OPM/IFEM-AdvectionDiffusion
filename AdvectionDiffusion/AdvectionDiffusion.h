@@ -24,7 +24,9 @@
 
 #include <array>
 #include <cstddef>
+#include <map>
 #include <memory>
+#include <string>
 
 
 /*!
@@ -256,6 +258,16 @@ public:
   //! \brief Returns time integration method used.
   virtual TimeIntegration::Method getTimeMethod() const
   { return TimeIntegration::NONE; }
+
+  //! \brief Serializes the state of the time integration scheme.
+  //! \details No state without a time integration scheme.
+  virtual bool serialize(std::map<std::string,std::string>&,
+                         const std::string&) const { return true; }
+  //! \brief Sets the state of the time integration scheme from a serialized
+  //! state.
+  //! \details No state without a time integration scheme.
+  virtual bool deSerialize(const std::map<std::string,std::string>&,
+                           const std::string&) { return true; }
 
   //! \brief Registers where we can inject a mixed-basis vector field.
   void setNamedFields(const std::string&, Fields*) override;
