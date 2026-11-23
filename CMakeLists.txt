@@ -134,6 +134,7 @@ ifem_add_regression_test(
     Square-abd1-ad-heun.reg
     Square-abd1-ad-rk3.reg
     Square-abd1-ad-rk4.reg
+    Square-abd1-ad-varstep.reg
     Square-abd2-ad-ab1.reg
     Square-abd2-ad-ab2.reg
     Square-abd2-ad-ab3.reg

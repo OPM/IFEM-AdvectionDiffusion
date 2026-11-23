@@ -16,6 +16,7 @@
 
 #include "AdvectionDiffusion.h"
 #include "BDF.h"
+#include "TimeDomain.h"
 
 
 /*!
@@ -68,6 +69,9 @@ public:
 
   //! \brief Advances the time stepping scheme.
   bool advanceStep() override { return bdf.advanceStep(); }
+  //! \brief Advances the time stepping scheme for the current step sizes.
+  bool advanceStep(const TimeDomain& time) override
+  { return bdf.advanceStep(time.dt,time.dtn); }
 
   //! \brief Returns a pointer to an Integrand for solution norm evaluation.
   //! \note The Integrand object is allocated dynamically and has to be deleted

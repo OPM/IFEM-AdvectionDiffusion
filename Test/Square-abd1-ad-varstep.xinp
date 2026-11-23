@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<!-- A solution linear in time, in the discrete space, with a changing time
+     step. BDF2 with the coefficients of the step sizes reproduces it. !-->
+
+<simulation>
+
+  <geometry dim="2" sets="true">
+    <raiseorder patch="1" u="3" v="3"/>
+    <refine type="uniform" patch="1" u="3" v="3"/>
+  </geometry>
+
+  <advectiondiffusion>
+    <boundaryconditions>
+      <dirichlet set="Boundary" basis="1" comp="1"/>
+    </boundaryconditions>
+    <advectionfield> 4*pow(x-x*x,2)*8*(y-1)*y*(2*y-1)*t |
+                    -8*(x-1)*x*(2*x-1)*4*pow(y-y*y,2)*t
+    </advectionfield>
+    <source type="anasol"/>
+    <anasol type="expression" autodiff="true">
+      <variables>
+        f   = 4*pow(x-x*x,2);
+        g   = 4*pow(y-y*y,2);
+        h   = t;
+      </variables>
+      <primary>f*g*h</primary>
+    </anasol>
+  </advectiondiffusion>
+
+  <discretization>
+    <nGauss>4</nGauss>
+  </discretization>
+
+  <timestepping>
+    <step start="0" end="0.25">0.25</step>
+    <step start="0.25" end="1">0.75</step>
+  </timestepping>
+
+</simulation>
