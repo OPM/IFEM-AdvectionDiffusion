@@ -294,10 +294,10 @@ bool SIMAD<Dim,Integrand>::saveModel (char* fileName, int& geoBlk, int&)
 
 
 template<class Dim, class Integrand>
-bool SIMAD<Dim,Integrand>::advanceStep (TimeStep&)
+bool SIMAD<Dim,Integrand>::advanceStep (TimeStep& tp)
 {
   this->pushSolution(); // Update solution vectors between time steps
-  AD.advanceStep();
+  AD.advanceStep(tp.time);
   return true;
 }
 
